@@ -13,15 +13,44 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # set(CMAKE_GENERATOR "MinGW Makefiles")
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
+find_package(Qt5 COMPONENTS Core Widgets Gui REQUIRED)
 
-
-add_executable(MultiCam
+add_executable(MultiCam 
+    src/mainwindow.ui
+    src/formcamconfig.ui
     src/main.cpp
     src/mainwindow.cpp
-    src/mainwindow.h
-    src/mainwindow.ui
+    src/winusbdriver.cpp
+    src/usbthread.cpp
+    src/easytool.cpp
+    src/image.cpp
+    src/glview.cpp
+    src/gldrow.cpp
+    src/imu.cpp
+    src/setting.cpp
+    src/findstr.cpp
+    src/log.cpp
+    src/formcamconfig.cpp
+    src/imuso3.cpp
 )
 
-target_link_libraries(MultiCam PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+include_directories(
+                    src
+                    src/eigen-3.2.10
+                    src/glut
+)
+
+link_directories(
+                    src/lib
+                    src/glut
+                    )
+
+target_link_libraries(MultiCam 
+                        Qt5::Widgets
+                        Qt5::Core
+                        Qt5::Gui
+                        ${CMAKE_SOURCE_DIR}/src/lib/libusb-1.0.a
+                        -lopengl32
+				        -lglu32
+                        
+)
