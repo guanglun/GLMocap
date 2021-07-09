@@ -36,20 +36,20 @@ add_executable(MultiCam
 
 include_directories(
                     src
-                    src/eigen-3.2.10
-                    src/glut
+                    lib/eigen-3.2.10
+                    lib/glut
 )
 
 link_directories(
-                    src/lib
-                    src/glut
+                    lib/eigen-3.2.10
+                    lib/glut
                     )
 
 target_link_libraries(MultiCam 
                         Qt5::Widgets
                         Qt5::Core
                         Qt5::Gui
-                        ${CMAKE_SOURCE_DIR}/src/lib/libusb-1.0.a
+                        ${CMAKE_SOURCE_DIR}/lib/usb/libusb-1.0.a
                         -lopengl32
 				        -lglu32
                         
