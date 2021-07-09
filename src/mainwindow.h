@@ -4,6 +4,7 @@
 #include "workspace.h"
 #include <QMainWindow>
 #include <QTimer>
+#include <QDateTime>
 #include "winusbdriver.h"
 #include "ui_mainwindow.h"
 #include "imu.h"
@@ -50,6 +51,7 @@ private slots:
     
     void sendStatusSlot(int);
     void on_action_config_cam_triggered();
+    void on_pb_img_cap_clicked();
 };
 
 #endif // MAINWINDOW_H

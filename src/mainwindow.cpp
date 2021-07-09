@@ -6,6 +6,7 @@
 Setting *setting;
 QLabel *status_msg,*status_speed;
 Log *mlog;
+bool isCapImage = false;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -64,6 +65,9 @@ void MainWindow::camSlot(int index)
     static float d_time = 0;
 
     QImage myImage;
+    QPixmap pixImage;
+    QDateTime timeNow;
+
     t1 = (uint32_t)(qwinusb->img.time[index][0]<<24);
     t1 |= (uint32_t)(qwinusb->img.time[index][1]<<16);
     t1 |= (uint32_t)(qwinusb->img.time[index][2]<<8);
@@ -119,7 +123,17 @@ void MainWindow::camSlot(int index)
         if(qwinusb->pixformat == PIXFORMAT_GRAYSCALE)
         {
             myImage = QImage(qwinusb->img.img[index],qwinusb->img.width,qwinusb->img.high,QImage::Format_Grayscale8);
-            ui->lb_img->setPixmap(QPixmap::fromImage(myImage));
+            pixImage = QPixmap::fromImage(myImage);
+            ui->lb_img->setPixmap(pixImage);
+            if(isCapImage)
+            {
+                timeNow =  QDateTime::currentDateTime();
+                QString current_date = timeNow.toString("yyyy_MM_dd_hh_mm_ss_zzz");
+                QString file_name = "image/"+current_date+".png";
+                pixImage.save(file_name);
+
+                isCapImage = false;
+            }
         }
     }else{
         return;
@@ -316,4 +330,9 @@ void MainWindow::on_action_config_cam_triggered()
     FormCamConfig *formCamConfig = new FormCamConfig();
     formCamConfig->setQData(qwinusb);
     formCamConfig->show();
+}
+
+void MainWindow::on_pb_img_cap_clicked()
+{
+    isCapImage = true;
 }

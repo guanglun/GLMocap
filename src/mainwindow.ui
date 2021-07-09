@@ -227,7 +227,7 @@
       <rect>
        <x>90</x>
        <y>80</y>
-       <width>75</width>
+       <width>41</width>
        <height>23</height>
       </rect>
      </property>
@@ -238,7 +238,7 @@
     <widget class="QPushButton" name="pb_imu_calibration">
      <property name="geometry">
       <rect>
-       <x>170</x>
+       <x>130</x>
        <y>80</y>
        <width>51</width>
        <height>23</height>
@@ -246,6 +246,19 @@
      </property>
      <property name="text">
       <string>校准</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pb_img_cap">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>80</y>
+       <width>51</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>截图</string>
      </property>
     </widget>
    </widget>
