@@ -2,9 +2,10 @@ cmake_minimum_required(VERSION 3.5)
 
 project(MultiCam LANGUAGES CXX)
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
+find_package(Qt5 COMPONENTS Core Widgets Gui REQUIRED)
 
-set(CMAKE_AUTOUIC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOUIC OFF)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
@@ -13,29 +14,42 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # set(CMAKE_GENERATOR "MinGW Makefiles")
 
-find_package(Qt5 COMPONENTS Core Widgets Gui REQUIRED)
+QT5_WRAP_UI( UI_HEADERS 
+    src/formMainWindow/mainwindow.ui
+    src/formCameraConfig/formcamconfig.ui
+)
 
 add_executable(MultiCam 
-    src/mainwindow.ui
-    src/formcamconfig.ui
+    
+    src/formCameraConfig/formcamconfig.cpp
+    src/formMainWindow/mainwindow.cpp
+    
     src/main.cpp
-    src/mainwindow.cpp
-    src/winusbdriver.cpp
-    src/usbthread.cpp
-    src/easytool.cpp
-    src/image.cpp
-    src/glview.cpp
-    src/gldrow.cpp
-    src/imu.cpp
-    src/setting.cpp
-    src/findstr.cpp
-    src/log.cpp
-    src/formcamconfig.cpp
-    src/imuso3.cpp
+    src/winusb/winusbdriver.cpp
+    src/winusb/usbthread.cpp
+    src/easytool/easytool.cpp
+    src/easytool/findstr.cpp
+    src/image/image.cpp
+    src/drow/glview.cpp
+    src/drow/gldrow.cpp
+    src/setting/setting.cpp
+    src/log/log.cpp
+
+    src/imu/imuso3.cpp
+    src/imu/imu.cpp
 )
 
 include_directories(
                     src
+                    src/winusb
+                    src/imu
+                    src/log
+                    src/setting
+                    src/easytool
+                    src/drow
+                    src/image
+                    src/formCameraConfig
+                    src/formMainWindow
                     lib/eigen-3.2.10
                     lib/glut
 )

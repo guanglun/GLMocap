@@ -11,8 +11,8 @@
 #define FILTER_NUM 2
 
 //采样速度
-#define Kp 10.0f      // proportional gain governs rate of convergence to accelerometer/magnetometer
-#define Ki 0.008f     // integral gain governs rate of convergence of gyroscope biases
+#define Kpp 10.0f      // proportional gain governs rate of convergence to accelerometer/magnetometer
+#define Kii 0.008f     // integral gain governs rate of convergence of gyroscope biases
 #define halfT 0.0025f // half the sample period
 
 IMU::IMU()
@@ -207,14 +207,14 @@ void IMU::update(T_int16_xyz *gyr, T_int16_xyz *acc, T_int16_xyz *mag, T_float_a
     ey = (az * vx - ax * vz);
     ez = (ax * vy - ay * vx);
 
-    exInt = exInt + ex * Ki; //对误差进行积分
-    eyInt = eyInt + ey * Ki;
-    ezInt = ezInt + ez * Ki;
+    exInt = exInt + ex * Kii; //对误差进行积分
+    eyInt = eyInt + ey * Kii;
+    ezInt = ezInt + ez * Kii;
 
     // adjusted gyroscope measurements
-    gx = gx + Kp * ex + exInt; //将误差PI后补偿到陀螺仪，即补偿零点漂移
-    gy = gy + Kp * ey + eyInt;
-    gz = gz + Kp * ez + ezInt; //这里的gz由于没有观测者进行矫正会产生漂移，表现出来的就是积分自增或自减
+    gx = gx + Kpp * ex + exInt; //将误差PI后补偿到陀螺仪，即补偿零点漂移
+    gy = gy + Kpp * ey + eyInt;
+    gz = gz + Kpp * ez + ezInt; //这里的gz由于没有观测者进行矫正会产生漂移，表现出来的就是积分自增或自减
 
     // integrate quaternion rate and normalise						   //四元素的微分方程
     q0 = q0 + (-q1 * gx - q2 * gy - q3 * gz) * time / 2;
