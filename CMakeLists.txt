@@ -17,13 +17,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 QT5_WRAP_UI( UI_HEADERS 
     src/formMainWindow/mainwindow.ui
     src/formCameraConfig/formcamconfig.ui
+    src/formCameraWindow/formcamwindow.ui
 )
 
 add_executable(MultiCam 
     
     src/formCameraConfig/formcamconfig.cpp
     src/formMainWindow/mainwindow.cpp
-    
+    src/formCameraWindow/formcamwindow.cpp
+
     src/main.cpp
     src/winusb/winusbdriver.cpp
     src/winusb/usbthread.cpp
@@ -50,6 +52,7 @@ include_directories(
                     src/image
                     src/formCameraConfig
                     src/formMainWindow
+                    src/formCameraWindow
                     lib/eigen-3.2.10
                     lib/glut
 )
