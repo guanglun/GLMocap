@@ -14,9 +14,14 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
 
     QStandardItemModel *pModelOpenvio = new QStandardItemModel();
     MuItemCam *pItemCam = new MuItemCam(this);
+
     ui->lv_openvio->setItemDelegate(pItemCam);
     ui->lv_openvio->setModel(pModelOpenvio);
     ui->lv_openvio->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->lv_openvio->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->lv_openvio, SIGNAL(customContextMenuRequested(const QPoint &)),
+            this, SLOT(ProvideContextMenu(const QPoint &)));
+
     connect(ui->lv_openvio, SIGNAL(clicked(QModelIndex)), this, SLOT(vioItemSelected(QModelIndex)));
     connect(ui->lv_openvio, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(doubleClickedSlot(QModelIndex)));
 
@@ -30,6 +35,30 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
     timer->start(1000);
+}
+
+void FormCamWindow::ProvideContextMenu(const QPoint &pos)
+{
+    QPoint item = ui->lv_openvio->mapToGlobal(pos);
+    
+    QMenu submenu;
+    submenu.addAction("Rename");
+    //submenu.addAction("Delete");
+    QAction *rightClickItem = submenu.exec(item);
+    if (rightClickItem && rightClickItem->text().contains("Rename"))
+    {
+        
+        QString dlgTitle = QString(openvioList.at(ui->lv_openvio->indexAt(pos).row())->idStr);
+        QString txtLabel = QStringLiteral("input new name："); 
+        QString defaultInput = QStringLiteral("camera0");      
+        QLineEdit::EchoMode echoMode = QLineEdit::Normal;     
+        bool ok = false;
+        QString text = QInputDialog::getText(this, dlgTitle, txtLabel, echoMode, defaultInput, &ok);
+        if (ok && !text.isEmpty())
+        {
+            openvioList.at(ui->lv_openvio->indexAt(pos).row())->setName(text);
+        }
+    }
 }
 
 FormCamWindow::~FormCamWindow()

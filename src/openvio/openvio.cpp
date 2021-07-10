@@ -246,6 +246,14 @@ void OPENVIO::setStatus(QString status)
     pModelOpenvio->item(row,0)->setData(QVariant::fromValue(itemCamData));
 }
 
+void OPENVIO::setName(QString name)
+{
+    itemCamData.name = name;
+
+    pModelOpenvio->item(row,0)->setData(QVariant::fromValue(itemCamData));
+}
+
+
 int OPENVIO::close(void)
 {
     emit closeSignals();

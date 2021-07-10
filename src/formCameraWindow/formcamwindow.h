@@ -15,6 +15,7 @@
 #include "FormVioWindow.h"
 #include <QTimer>
 #include <QLabel>
+#include <QInputDialog>
 
 namespace Ui {
 class FormCamWindow;
@@ -31,7 +32,7 @@ public:
     Log *mlog;
     QLabel *status_msg,*status_speed;
     int recv_count_1s;
-    
+
     explicit FormCamWindow(QWidget *parent = nullptr);
     ~FormCamWindow();
 
@@ -40,6 +41,7 @@ private slots:
     void vioItemSelected(const QModelIndex &index);
     void doubleClickedSlot(const QModelIndex &index);
     void onTimeOut(); 
+    void ProvideContextMenu(const QPoint &pos);
 private:
     Ui::FormCamWindow *ui;
 };

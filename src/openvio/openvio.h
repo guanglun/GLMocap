@@ -46,6 +46,7 @@ public:
     void open(void);
     void setItem(QStandardItemModel *pModelOpenvio);
     void setStatus(QString status);
+    void setName(QString name);
     void CamRecv(void);
     void IMURecv(void);
     int sendCtrl(char request, uint16_t wValue,uint16_t wIndex,unsigned char *buffer);
@@ -56,7 +57,7 @@ public:
     int ctrlCamSetFrameSizeNum(uint16_t num);
     int ctrlCamSetExposure(int value);
     int close(void);
-    
+
 signals:
     void camSignals(int index);
     void imuSignals(int index);   

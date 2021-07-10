@@ -44,17 +44,19 @@ void MuItemCam::paint(QPainter *painter, const QStyleOptionViewItem &option, con
             painter->drawPath(path);
         }
 
-        QRectF iconRect = QRect(rect.left()+5, rect.top()+5, 40, 40);
-        QRectF singerRect = QRect(iconRect.right()+5, iconRect.top(), rect.width()-10-iconRect.width(), 20);
-        QRectF songNbRect = QRect(singerRect.left(), singerRect.bottom()+5, rect.width()-10-iconRect.width(), 20);
+        QRectF iconRect = QRect(rect.left()+5, rect.top()+5, 60, 60);
+        QRectF idRect = QRect(iconRect.right()+5, iconRect.top(), rect.width()-10-iconRect.width(), 20);
+        QRectF statusRect = QRect(idRect.left(), idRect.bottom(), rect.width()-10-iconRect.width(), 20);
+        QRectF nameRect = QRect(statusRect.left(), statusRect.bottom(), rect.width()-10-iconRect.width(), 20);
 
         painter->drawImage(iconRect, QImage(QString(":/image/camera.png")));
         painter->setPen(QPen(Qt::black));
         painter->setFont(QFont("Microsoft Yahei", 10));
-        painter->drawText(singerRect, itemData.id);
+        painter->drawText(idRect, itemData.id);
+        painter->drawText(nameRect, itemData.name);
 
         painter->setPen(QPen(Qt::gray));
-        painter->drawText(songNbRect, itemData.status);
+        painter->drawText(statusRect, itemData.status);
 
         painter->restore();
     }
@@ -63,5 +65,5 @@ void MuItemCam::paint(QPainter *painter, const QStyleOptionViewItem &option, con
 QSize MuItemCam::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     Q_UNUSED(index)
-    return QSize(option.rect.width(), 50);
+    return QSize(option.rect.width(), 70);
 }
