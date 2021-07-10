@@ -3,13 +3,26 @@
 
 #include "workspace.h"
 #include <QObject>
+#include <QThread>
+#include <QList>
+
+#include <QStandardItemModel>
+#include "MuItemCam.h"
 
 #include "libusb.h"
 
 #include "image.h"
 #include "findstr.h"
+
+class OPENVIO;
+#include "openvio.h"
+
 class USBThread;
 #include "usbthread.h"
+
+
+#define IDVENDOR    2012
+#define IDPRODUCT   2012
 
 #define CANDLE_MAX_DEVICES 32
 
@@ -22,27 +35,13 @@ class USBThread;
 #define LEPTON_ID           (0x54)
 #define HM01B0_ID           (0xB0)
 
-typedef enum {
-    PIXFORMAT_INVALID = 0,
-    PIXFORMAT_BINARY,    // 1BPP/BINARY
-    PIXFORMAT_GRAYSCALE, // 1BPP/GRAYSCALE
-    PIXFORMAT_RGB565,    // 2BPP/RGB565
-    PIXFORMAT_YUV422,    // 2BPP/YUV422
-    PIXFORMAT_BAYER,     // 1BPP/RAW
-    PIXFORMAT_JPEG,      // JPEG/COMPRESSED
-} pixformat_t;
+#define CTRL_EPADDR 0x01
+#define CAM_EPADDR 0x81
+#define IMU_EPADDR 0x82
 
-enum{
-USB_MSG_OPEN_SUCCESS,
-USB_MSG_CLOSE_SUCCESS,
-USB_MSG_OPEN_FAIL
-};
+#define USB_TIMEOUT 10000 //传输数据的时间延迟
 
-enum SENSOR_STATUS{
-    SENSOR_STATUS_STOP,
-    SENSOR_STATUS_WAIT_HEAD,
-    SENSOR_STATUS_RUNNING
-};
+
 
 class WinUSBDriver : public QObject
 {
@@ -71,11 +70,14 @@ private:
     enum SENSOR_STATUS camStatus,imuStatus;
     
 public:
+    QStandardItemModel *pModelOpenvio;
     Image img;
     unsigned char cam_id;
     pixformat_t pixformat;
     unsigned int recv_count_1s = 0,frame_fps = 0,imu_hz = 0;
-    
+    QList<OPENVIO*> *openvioList;
+    libusb_device **list;
+
     WinUSBDriver();
     ~WinUSBDriver();
     
@@ -92,6 +94,9 @@ public:
     int ctrlIMUStop();
     int ctrlCamSetFrameSizeNum(uint16_t num);
     int ctrlCamSetExposure(int value);
+    void scan(void);
+    void setModule(QStandardItemModel *pModelOpenvio);
+    void setOpenvioList(QList<OPENVIO*> *openvioList);
 
 signals:
     void camSignals(int index);
@@ -101,9 +106,12 @@ signals:
     void closeSignals(void);
     void openSignals(int vid,int pid);
     void sendStatusSignals(int msg);
+    void scanSignals(void);
+    
 private slots:
     void closeSlot(void);
     void openSlot(int vid,int pid);
+    void scanSlot(void);
 };
 
 #endif // WINUSBDRIVER_H

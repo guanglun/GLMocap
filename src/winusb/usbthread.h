@@ -5,6 +5,10 @@
 #include "libusb.h"
 #include "workspace.h"
 
+
+class OPENVIO;
+#include "openvio.h"
+
 class WinUSBDriver;
 #include "winusbdriver.h"
 
@@ -13,13 +17,13 @@ class USBThread : public QThread
     Q_OBJECT
 private:
     
-    WinUSBDriver *qwindriver;
+    OPENVIO *vio;
     bool is_loop;
     QString buikName;
     
 public:
     USBThread();
-    void init(WinUSBDriver *qwindriver,QString buikName);
+    void init(OPENVIO *vio,QString buikName);
     void run();
     void waitClose();
     

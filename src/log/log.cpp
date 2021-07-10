@@ -5,8 +5,9 @@ Log::Log()
 
 }
 
-void Log::show(QString str)
+void Log::show(QString str,enum LOG_TYPE type)
 {
-    status_msg->setText(str);
+    // if(type == LOG_ALL)
+    //     status_msg->setText(str);
     qDebug() << str;
 }

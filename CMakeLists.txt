@@ -15,18 +15,25 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # set(CMAKE_GENERATOR "MinGW Makefiles")
 
 QT5_WRAP_UI( UI_HEADERS 
-    src/formMainWindow/mainwindow.ui
-    src/formCameraConfig/formcamconfig.ui
-    src/formCameraWindow/formcamwindow.ui
+    ${CMAKE_SOURCE_DIR}/src/formMainWindow/mainwindow.ui
+    ${CMAKE_SOURCE_DIR}/src/formCameraConfig/formcamconfig.ui
+    ${CMAKE_SOURCE_DIR}/src/formCameraWindow/formcamwindow.ui
+    ${CMAKE_SOURCE_DIR}/src/formVioWindow/formviowindow.ui
 )
 
 add_executable(MultiCam 
+
+    ${UI_HEADERS}
+    src/resource.qrc
     
     src/formCameraConfig/formcamconfig.cpp
     src/formMainWindow/mainwindow.cpp
     src/formCameraWindow/formcamwindow.cpp
+    src/formVioWindow/formviowindow.cpp
 
+    src/formCameraWindow/MuItemCam.cpp
     src/main.cpp
+    src/openvio/openvio.cpp
     src/winusb/winusbdriver.cpp
     src/winusb/usbthread.cpp
     src/easytool/easytool.cpp
@@ -53,6 +60,8 @@ include_directories(
                     src/formCameraConfig
                     src/formMainWindow
                     src/formCameraWindow
+                    src/formVioWindow
+                    src/openvio
                     lib/eigen-3.2.10
                     lib/glut
 )

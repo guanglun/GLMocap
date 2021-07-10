@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "new": "cpp",
+        "qstringlistmodel": "cpp",
+        "array": "cpp",
+        "qstandarditemmodel": "cpp",
+        "qstandarditem": "cpp",
+        "qlist": "cpp",
+        "sstream": "cpp",
+        "qcloseevent": "cpp",
+        "qtimer": "cpp"
+    }
+}

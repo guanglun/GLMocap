@@ -1,148 +1,60 @@
-#include "winusbdriver.h"
-#include <QThread>
+#include "openvio.h"
 
-
-
-WinUSBDriver::WinUSBDriver()
+OPENVIO::OPENVIO(libusb_device *dev)
 {
-    // camThread = new USBThread();
-    // imuThread = new USBThread();
+    this->dev = dev;
+    pItem = new QStandardItem();
 
-    // camThread->init(this, "cam");
-    // imuThread->init(this, "imu");
+    camThread = new USBThread();
+    imuThread = new USBThread();
 
-    // ctrl_buffer = (unsigned char *)malloc(1024);
+    camThread->init(this, "cam");
+    imuThread->init(this, "imu");
 
-    // camStatus = SENSOR_STATUS_STOP;
-    // imuStatus = SENSOR_STATUS_STOP;
+    ctrl_buffer = (unsigned char *)malloc(1024);
+
+    camStatus = SENSOR_STATUS_STOP;
+    imuStatus = SENSOR_STATUS_STOP;
 
     connect(this, SIGNAL(closeSignals()), this, SLOT(closeSlot()));
-    connect(this, SIGNAL(openSignals(int, int)), this, SLOT(openSlot(int, int)));
-    connect(this, SIGNAL(scanSignals()), this, SLOT(scanSlot()));
 }
 
-WinUSBDriver::~WinUSBDriver()
-{
-    free(ctrl_buffer);
-}
-
-void WinUSBDriver::setModule(QStandardItemModel *pModelOpenvio)
-{
-    this->pModelOpenvio = pModelOpenvio;
-}
-
-void WinUSBDriver::setOpenvioList(QList<OPENVIO*> *openvioList)
-{
-    this->openvioList = openvioList;
-}
-
-void WinUSBDriver::open(int vid, int pid)
-{
-    emit openSignals(vid, pid);
-}
-
-void WinUSBDriver::scan(void)
-{
-    emit scanSignals();
-}
-
-void WinUSBDriver::scanSlot(void)
-{
-    struct libusb_device_descriptor desc;
-	struct libusb_config_descriptor* conf;
- 
-	libusb_device_handle *  handle = NULL;
-	int config= 0;
-	int ret;
- 
-	int status;
-
-    ssize_t num_devs, i, j, k;
-
-    libusb_init(&m_libusb_context);
-
-	num_devs = libusb_get_device_list(m_libusb_context, &list);
-    openvioList->clear();
-    pModelOpenvio->clear();
-
-	for (int i = 0; i < num_devs; ++i) {
-		struct libusb_device* device = list[i];
-		struct libusb_device_descriptor desc;
-		libusb_get_device_descriptor(device, &desc);	
-        
-		if (desc.idVendor == IDVENDOR && desc.idProduct == IDPRODUCT) {
-            OPENVIO *vio = new OPENVIO(device);
-            vio->dev = device;
-            libusb_open(device,&vio->dev_handle);
-
-            libusb_get_string_descriptor_ascii(vio->dev_handle,
-			desc.iProduct,
-			(unsigned char*)vio->idStr,
-			sizeof(vio->idStr));
-
-            DBG("found openvio %s",vio->idStr);
-
-			openvioList->append(vio);
-
-            vio->setItem(pModelOpenvio);
-            
-
-            libusb_close(vio->dev_handle);
-		}
-		
-	}
-
-    DBG("found openvio %d",(int)openvioList->length());
-
-    //libusb_free_device_list(list, 1);
-    //libusb_exit(m_libusb_context);
-
-    return;
-}
-
-void WinUSBDriver::openSlot(int vid, int pid)
+void OPENVIO::open(void)
 {
     int close_try_cnt = 0;
     dev_handle = NULL;
 
-    ret = libusb_init(&m_libusb_context);
-    if (ret < 0)
-    {
-        mlog->show("libusb init fail " + ret);
-        goto init_fail;
-    }
-    else
-    {
-        mlog->show("libusb init success");
-    }
+    // ret = libusb_init(&m_libusb_context);
+    // if (ret < 0)
+    // {
+    //     mlog->show("libusb init fail " + ret);
+    //     goto init_fail;
+    // }
+    // else
+    // {
+    //     mlog->show("libusb init success");
+    // }
 
-    dev_handle = libusb_open_device_with_vid_pid(m_libusb_context, vid, pid);
+    libusb_open(dev,&dev_handle);
     if (dev_handle == NULL)
     {
-        mlog->show("device open fail " + ret);
+        DBG("device open fail " + ret);
         goto open_fail;
     }
     else
     {
-        mlog->show("device open success");
+        DBG("device open success");
     }
-
-    //    if (libusb_kernel_driver_active(dev_handle, 0) == 1) {
-    //		DBG("Kernel Driver Active\n");
-    //		if (libusb_detach_kernel_driver(dev_handle, 0) == 0) {
-    //			DBG("Kernel Driver Detached!\n");
-    //		}
-    //	}
 
     ret = libusb_claim_interface(dev_handle, 0);
     if (ret < 0)
     {
-        mlog->show("claim interface fail " + ret);
+        DBG("claim interface fail " + ret);
         goto claim_fail;
     }
     else
     {
-        mlog->show("claim interface success");
+        DBG("claim interface success");
     }
 
     is_open = true;
@@ -159,11 +71,14 @@ void WinUSBDriver::openSlot(int vid, int pid)
         close_try_cnt++;
     }
 
+    DBG("open success");
+
     camThread->start();
     imuThread->start();
 
-    mlog->show("open success");
-    emit sendStatusSignals(USB_MSG_OPEN_SUCCESS);
+    
+    //emit sendStatusSignals(USB_MSG_OPEN_SUCCESS);
+    ctrlCamStart();
 
     return;
 
@@ -173,12 +88,13 @@ claim_fail:
     libusb_close(dev_handle);
 open_fail:
 init_fail:
-    mlog->show("open fail");
-    emit sendStatusSignals(USB_MSG_OPEN_FAIL);
+    DBG("open fail");
+    //emit sendStatusSignals(USB_MSG_OPEN_FAIL);
     return;
+
 }
 
-void WinUSBDriver::CamRecv(void)
+void OPENVIO::CamRecv(void)
 {
     DBG("cam recv start");
 
@@ -199,7 +115,7 @@ void WinUSBDriver::CamRecv(void)
             if (ret != -7 && ret != -9)
             {
                 DBG("cam recv error %d", ret);
-                emit disconnectSignals();
+                //emit disconnectSignals();
                 break;
             }
             else
@@ -252,6 +168,8 @@ void WinUSBDriver::CamRecv(void)
                     recv_index = 0;
                     recv_head_status = 0;
 
+                    //DBG("recv %d", img_index);
+
                     emit camSignals(img_index);
 
                     img_index++;
@@ -266,7 +184,7 @@ void WinUSBDriver::CamRecv(void)
     DBG("cam recv exit");
 }
 
-void WinUSBDriver::IMURecv(void)
+void OPENVIO::IMURecv(void)
 {
     DBG("imu recv start");
 
@@ -298,7 +216,7 @@ void WinUSBDriver::IMURecv(void)
 
             if (imuRecvLen == IMU_PACKAGE_SIZE)
             {
-                emit imuSignals(imu_index);
+                //emit imuSignals(imu_index);
                 imu_index++;
                 if (imu_index >= IMU_FRAME_SIZE_MAX)
                 {
@@ -310,20 +228,30 @@ void WinUSBDriver::IMURecv(void)
     DBG("imu recv exit");
 }
 
-void WinUSBDriver::send(QByteArray byte)
+
+void OPENVIO::setItem(QStandardItemModel *pModelOpenvio)
 {
-    if (is_open)
-    {
-        libusb_bulk_transfer(dev_handle, CTRL_EPADDR, (unsigned char *)byte.data(), byte.length(), NULL, 0xFFFF);
-    }
+    this->pModelOpenvio = pModelOpenvio;
+    itemCamData.id = idStr;
+    itemCamData.status = "wait";
+    pItem->setData(QVariant::fromValue(itemCamData), Qt::UserRole+1);
+    pModelOpenvio->appendRow(pItem); 
+    row = pModelOpenvio->rowCount()-1;
 }
 
-int WinUSBDriver::close(void)
+void OPENVIO::setStatus(QString status)
+{
+    itemCamData.status = status;
+
+    pModelOpenvio->item(row,0)->setData(QVariant::fromValue(itemCamData));
+}
+
+int OPENVIO::close(void)
 {
     emit closeSignals();
 }
 
-void WinUSBDriver::closeSlot(void)
+void OPENVIO::closeSlot(void)
 {
     int close_try_cnt = 0;
 
@@ -351,7 +279,7 @@ void WinUSBDriver::closeSlot(void)
         imuThread->waitClose();
         DBG("imuThread->waitClose()");
 
-        DBG("closeSlot");
+        //DBG("closeSlot");
 
         //libusb_release_interface(dev_handle, 0);
 
@@ -360,10 +288,10 @@ void WinUSBDriver::closeSlot(void)
         //        libusb_release_interface(dev_handle, 0);
 
         libusb_close(dev_handle);
-        libusb_exit(m_libusb_context);
+        //libusb_exit(m_libusb_context);
 
         mlog->show("close success");
-        emit sendStatusSignals(USB_MSG_CLOSE_SUCCESS);
+        //emit sendStatusSignals(USB_MSG_CLOSE_SUCCESS);
     }
 }
 
@@ -375,7 +303,7 @@ void WinUSBDriver::closeSlot(void)
 #define REQUEST_IMU_START 0xB0
 #define REQUEST_IMU_STOP 0xB1
 
-int WinUSBDriver::sendCtrl(char request, uint16_t wValue, uint16_t wIndex, unsigned char *buffer)
+int OPENVIO::sendCtrl(char request, uint16_t wValue, uint16_t wIndex, unsigned char *buffer)
 {
     if (is_open)
     {
@@ -398,7 +326,7 @@ int WinUSBDriver::sendCtrl(char request, uint16_t wValue, uint16_t wIndex, unsig
     return -1;
 }
 
-int WinUSBDriver::ctrlCamStart()
+int OPENVIO::ctrlCamStart()
 {
     uint8_t ret = 0;
     recv_index = 0;
@@ -420,7 +348,7 @@ int WinUSBDriver::ctrlCamStart()
     return -1;
 }
 
-int WinUSBDriver::ctrlCamStop()
+int OPENVIO::ctrlCamStop()
 {
     uint8_t ret = 0;
 
@@ -434,7 +362,7 @@ int WinUSBDriver::ctrlCamStop()
     return -1;
 }
 
-int WinUSBDriver::ctrlIMUStart()
+int OPENVIO::ctrlIMUStart()
 {
     uint8_t ret = 0;
 
@@ -447,7 +375,7 @@ int WinUSBDriver::ctrlIMUStart()
     return -1;
 }
 
-int WinUSBDriver::ctrlIMUStop()
+int OPENVIO::ctrlIMUStop()
 {
 
     uint8_t ret = 0;
@@ -461,7 +389,7 @@ int WinUSBDriver::ctrlIMUStop()
     return -1;
 }
 
-int WinUSBDriver::ctrlCamSetFrameSizeNum(uint16_t num)
+int OPENVIO::ctrlCamSetFrameSizeNum(uint16_t num)
 {
 
     uint8_t ret = 0;
@@ -480,7 +408,7 @@ int WinUSBDriver::ctrlCamSetFrameSizeNum(uint16_t num)
     return -1;
 }
 
-int WinUSBDriver::ctrlCamSetExposure(int value)
+int OPENVIO::ctrlCamSetExposure(int value)
 {
 
     uint8_t ret = 0;

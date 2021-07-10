@@ -8,6 +8,11 @@
 
 extern QLabel *status_msg;
 
+enum LOG_TYPE{
+    LOG_ALL,
+    LOG_DEBUG
+};
+
 class Log : public QObject
 {
     Q_OBJECT
@@ -15,7 +20,7 @@ public:
     
     
     Log();
-    void show(QString str);
+    void show(QString str,enum LOG_TYPE type = LOG_ALL);
 };
 
 #endif // LOG_H
