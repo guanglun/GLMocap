@@ -114,7 +114,7 @@ void OPENVIO::CamRecv(void)
         {
             if (ret != -7 && ret != -9)
             {
-                DBG("cam recv error %d", ret);
+                DBG("%s cam recv error %d",name.toStdString().c_str(),  ret);
                 //emit disconnectSignals();
                 break;
             }
@@ -155,7 +155,7 @@ void OPENVIO::CamRecv(void)
             }
             else if (recv_head_status == 0)
             {
-                DBG("cam recv error len %d", camRecvLen);
+                DBG("%s cam recv error len %d",name.toStdString().c_str(), camRecvLen);
                 //                emit disconnectSignals();
                 //                break;
             }

@@ -39,6 +39,7 @@ public:
 
 private slots:
     void on_pb_scan_camera_clicked();
+    void on_pb_capture_clicked();
     void vioItemSelected(const QModelIndex &index);
     void doubleClickedSlot(const QModelIndex &index);
     void onTimeOut(); 

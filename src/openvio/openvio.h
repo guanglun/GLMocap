@@ -21,6 +21,7 @@ private:
 
     
 public:
+    boolean isCapImage;
     USBThread *camThread,*imuThread;
     enum SENSOR_STATUS camStatus,imuStatus;
     int recv_len_count = 0;
@@ -32,7 +33,10 @@ public:
     Image img;
     unsigned char cam_id;
     pixformat_t pixformat;
+    QString saveImagePath;
 
+    int saveCount = 0;
+    
     MuItemCamData itemCamData;
     QStandardItem *pItem;
     char idStr[128];

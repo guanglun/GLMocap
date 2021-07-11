@@ -32,8 +32,9 @@ private:
     
     
     QSettings *set;
-    QString imagePath;
+    
 public:
+    QString imagePath;
     Setting();
     void getIMUOffset(T_int16_xyz *acc,T_int16_xyz *gyro);
     void setAccOffset(T_int16_xyz *acc);

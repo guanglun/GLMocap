@@ -33,7 +33,15 @@ void FormVioWindow::setQData(OPENVIO *vio)
     
 }
 
-
+static bool isDirExist(QString fullPath)
+{
+    QFileInfo fileInfo(fullPath);
+    if(fileInfo.isDir())
+    {
+      return true;
+    }
+    return false;
+}
 
 void FormVioWindow::camSlot(int index)
 {
@@ -104,15 +112,17 @@ void FormVioWindow::camSlot(int index)
             myImage = QImage(this->vio->img.img[index],this->vio->img.width,this->vio->img.high,QImage::Format_Grayscale8);
             pixImage = QPixmap::fromImage(myImage);
             ui->lb_img->setPixmap(pixImage);
-            // if(isCapImage)
-            // {
-            //     timeNow =  QDateTime::currentDateTime();
-            //     QString current_date = timeNow.toString("yyyy_MM_dd_hh_mm_ss_zzz");
-            //     QString file_name = "image/"+current_date+".png";
-            //     pixImage.save(file_name);
-
-            //     isCapImage = false;
-            // }
+            if(this->vio->isCapImage)
+            {
+                
+                // timeNow =  QDateTime::currentDateTime();
+                // QString current_date = timeNow.toString("yyyy_MM_dd_hh_mm_ss_zzz");
+                QString file_name = this->vio->saveImagePath + "/" + this->vio->name + "_" + QString::number(this->vio->saveCount) + ".png";
+                pixImage.save(file_name);
+                //mlog->show(file_name);
+                this->vio->saveCount++;
+                this->vio->isCapImage = false;
+            }
         }
     }else{
         return;

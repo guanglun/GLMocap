@@ -44,18 +44,18 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
 void FormCamWindow::ProvideContextMenu(const QPoint &pos)
 {
     QPoint item = ui->lv_openvio->mapToGlobal(pos);
-    
+
     QMenu submenu;
     submenu.addAction("Rename");
     //submenu.addAction("Delete");
     QAction *rightClickItem = submenu.exec(item);
     if (rightClickItem && rightClickItem->text().contains("Rename"))
     {
-        
+
         QString dlgTitle = QString(openvioList.at(ui->lv_openvio->indexAt(pos).row())->idStr);
-        QString txtLabel = QStringLiteral("input new name："); 
-        QString defaultInput = QStringLiteral("camera0");      
-        QLineEdit::EchoMode echoMode = QLineEdit::Normal;     
+        QString txtLabel = QStringLiteral("input new name：");
+        QString defaultInput = QStringLiteral("camera0");
+        QLineEdit::EchoMode echoMode = QLineEdit::Normal;
         bool ok = false;
         QString text = QInputDialog::getText(this, dlgTitle, txtLabel, echoMode, defaultInput, &ok);
         if (ok && !text.isEmpty())
@@ -74,6 +74,52 @@ void FormCamWindow::on_pb_scan_camera_clicked()
 {
     //mlog->show("Scan",LOG_DEBUG);
     qwinusb->scan();
+}
+
+static bool isDirExist(QString fullPath)
+{
+    QDir dir(fullPath);
+    if(dir.exists())
+    {
+      return true;
+    }
+    else
+    {
+       bool ok = dir.mkdir(fullPath);//只创建一级子目录，即必须保证上级目录存在
+       return ok;
+    }
+}
+
+void FormCamWindow::on_pb_capture_clicked()
+{
+    for (int i = 0; i < openvioList.length(); i++)
+    {
+        OPENVIO *vio = openvioList.at(i);
+        if (vio->is_open == true)
+        {
+            // if (vio->name.isEmpty() == true)
+            // {
+            //     vio->saveImagePath = setting->imagePath + "/" + QString(vio->idStr);
+            // }
+            // else
+            // {
+            //     vio->saveImagePath = setting->imagePath + "/" + vio->name;
+            // }
+            // isDirExist(vio->saveImagePath);
+            //mlog->show(vio->saveImagePath);
+
+            vio->saveImagePath = setting->imagePath;
+        }
+    }
+
+    for (int i = 0; i < openvioList.length(); i++)
+    {
+        OPENVIO *vio = openvioList.at(i);
+        if (vio->is_open == true)
+        {
+            vio->isCapImage = true;
+        }
+    }    
 }
 
 void FormCamWindow::vioItemSelected(const QModelIndex &index)
@@ -136,24 +182,22 @@ void FormCamWindow::onTimeOut()
 void FormCamWindow::on_actionImg_save_path_triggered()
 {
 
-        
-    //     QString dlgTitle = QStringLiteral("set images save path"); 
-    //     QString txtLabel = QStringLiteral("input new path："); 
-    //     QString defaultInput = QStringLiteral("");  
+    //     QString dlgTitle = QStringLiteral("set images save path");
+    //     QString txtLabel = QStringLiteral("input new path：");
+    //     QString defaultInput = QStringLiteral("");
 
-	// QInputDialog inputDialog=new QInputDialog(this);
+    // QInputDialog inputDialog=new QInputDialog(this);
     // inputDialog->setOkButtonText(QString::fromLocal8Bit("确定"));
     // inputDialog->setCancelButtonText(QString::fromLocal8Bit("取消"));
     // inputDialog->setInputMode(QInputDialog::TextInput);
     // inputDialog->setLabelText("Select a channel");
 
     // connect(getChNo,SIGNAL(intValueSelected(int)),this,SLOT(getChSelected(int)));
-	// inputDialog->show();    //在需要获取用户输入的地方调用show()
-
+    // inputDialog->show();    //在需要获取用户输入的地方调用show()
 
     QString srcDirPath = QFileDialog::getExistingDirectory(
-               this, "choose src Directory",
-                "/");
+        this, "choose src Directory",
+        "/");
 
     if (srcDirPath.isEmpty())
     {

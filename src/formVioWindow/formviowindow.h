@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QDateTime>
 #include <QCloseEvent> 
+#include <QFileInfo>
 
 #include "workspace.h"
 #include "openvio.h"
@@ -20,7 +21,10 @@ public:
     explicit FormVioWindow(QWidget *parent = 0);
     ~FormVioWindow();
     OPENVIO *vio;
+    
+    
     void setQData(OPENVIO *vio);
+
 private slots:
     void camSlot(int index);
     void imuSlot(int index);

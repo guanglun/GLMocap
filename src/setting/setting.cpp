@@ -10,6 +10,7 @@ Setting::Setting()
     qDebug() << "配置文件路径：" << setFile;
     set = new QSettings(setFile,QSettings::IniFormat);    
     
+    getImagePath();
 }
 
 void Setting::getIMUOffset(T_int16_xyz *acc,T_int16_xyz *gyro)
@@ -73,6 +74,8 @@ void Setting::getIMUOffset(T_int16_xyz *acc,T_int16_xyz *gyro)
     qDebug() << "gyr offset x:" << gyro->X;
     qDebug() << "gyr offset y:" << gyro->Y;
     qDebug() << "gyr offset z:" << gyro->Z;
+
+    
 }
 
 void Setting::setAccOffset(T_int16_xyz *acc)
