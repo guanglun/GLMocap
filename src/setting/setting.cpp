@@ -7,7 +7,7 @@ Setting::Setting()
     QApplication::setApplicationName("openvio");
 
     QString setFile= QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/.OPENVIOSettings.ini";
-    //qDebug() << "配置文件路径：" << setFile;
+    qDebug() << "配置文件路径：" << setFile;
     set = new QSettings(setFile,QSettings::IniFormat);    
     
 }
@@ -88,3 +88,32 @@ void Setting::setGyroOffset(T_int16_xyz *gyro)
     set->setValue(GYR_OFFSET_Y.SET_NAME,QString::number(gyro->Y));
     set->setValue(GYR_OFFSET_Z.SET_NAME,QString::number(gyro->Z));
 }
+
+void Setting::setNameById(QString id,QString name)
+{
+    set->beginGroup("openvio");
+    set->setValue(id,name);
+    set->endGroup(); 
+}
+
+QString Setting::getNameById(QString id)
+{
+    QString name;
+    set->beginGroup("openvio");
+    name = set->value(id).toString();
+    set->endGroup(); 
+    return name;
+}
+
+void Setting::setImagePath(QString path)
+{
+    imagePath = path;
+    set->setValue("IMAGE_PATH",path);
+}
+
+QString Setting::getImagePath()
+{
+    imagePath = set->value("IMAGE_PATH").toString();
+    return imagePath;
+}
+

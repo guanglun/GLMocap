@@ -16,6 +16,7 @@
 #include <QTimer>
 #include <QLabel>
 #include <QInputDialog>
+#include <QFileDialog>
 
 namespace Ui {
 class FormCamWindow;
@@ -42,6 +43,7 @@ private slots:
     void doubleClickedSlot(const QModelIndex &index);
     void onTimeOut(); 
     void ProvideContextMenu(const QPoint &pos);
+    void on_actionImg_save_path_triggered();
 private:
     Ui::FormCamWindow *ui;
 };

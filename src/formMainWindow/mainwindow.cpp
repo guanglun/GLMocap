@@ -3,7 +3,6 @@
 #include "log.h"
 #include "formcamconfig.h"
 
-Setting *setting;
 QLabel *status_msg,*status_speed;
 Log *mlog;
 bool isCapImage = false;

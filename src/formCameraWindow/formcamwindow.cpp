@@ -1,11 +1,15 @@
 #include "formcamwindow.h"
 #include "ui_formcamwindow.h"
 
+Setting *setting;
+
 FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
                                                 ui(new Ui::FormCamWindow)
 {
     ui->setupUi(this);
     this->setWindowTitle("OPENVIO");
+
+    setting = new Setting();
 
     qwinusb = new WinUSBDriver();
 
@@ -127,4 +131,37 @@ void FormCamWindow::onTimeOut()
     }
 
     status_speed->setText(getSpeed(recv_count_1s));
+}
+
+void FormCamWindow::on_actionImg_save_path_triggered()
+{
+
+        
+    //     QString dlgTitle = QStringLiteral("set images save path"); 
+    //     QString txtLabel = QStringLiteral("input new path："); 
+    //     QString defaultInput = QStringLiteral("");  
+
+	// QInputDialog inputDialog=new QInputDialog(this);
+    // inputDialog->setOkButtonText(QString::fromLocal8Bit("确定"));
+    // inputDialog->setCancelButtonText(QString::fromLocal8Bit("取消"));
+    // inputDialog->setInputMode(QInputDialog::TextInput);
+    // inputDialog->setLabelText("Select a channel");
+
+    // connect(getChNo,SIGNAL(intValueSelected(int)),this,SLOT(getChSelected(int)));
+	// inputDialog->show();    //在需要获取用户输入的地方调用show()
+
+
+    QString srcDirPath = QFileDialog::getExistingDirectory(
+               this, "choose src Directory",
+                "/");
+
+    if (srcDirPath.isEmpty())
+    {
+        return;
+    }
+    else
+    {
+        setting->setImagePath(srcDirPath);
+        //qDebug() << "srcDirPath=" << srcDirPath;
+    }
 }

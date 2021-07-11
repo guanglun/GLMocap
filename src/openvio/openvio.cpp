@@ -234,6 +234,9 @@ void OPENVIO::setItem(QStandardItemModel *pModelOpenvio)
     this->pModelOpenvio = pModelOpenvio;
     itemCamData.id = idStr;
     itemCamData.status = "wait";
+    itemCamData.name = setting->getNameById(idStr);
+    this->name = itemCamData.name;
+
     pItem->setData(QVariant::fromValue(itemCamData), Qt::UserRole+1);
     pModelOpenvio->appendRow(pItem); 
     row = pModelOpenvio->rowCount()-1;
@@ -249,8 +252,9 @@ void OPENVIO::setStatus(QString status)
 void OPENVIO::setName(QString name)
 {
     itemCamData.name = name;
-
+    this->name = itemCamData.name;
     pModelOpenvio->item(row,0)->setData(QVariant::fromValue(itemCamData));
+    setting->setNameById(idStr,name);
 }
 
 

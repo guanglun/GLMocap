@@ -36,6 +36,7 @@ public:
     MuItemCamData itemCamData;
     QStandardItem *pItem;
     char idStr[128];
+    QString name;
     libusb_device_handle *dev_handle = NULL;
     libusb_device *dev;
     QStandardItemModel *pModelOpenvio;

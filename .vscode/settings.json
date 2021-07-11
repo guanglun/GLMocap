@@ -8,6 +8,7 @@
         "qlist": "cpp",
         "sstream": "cpp",
         "qcloseevent": "cpp",
-        "qtimer": "cpp"
+        "qtimer": "cpp",
+        "typeinfo": "cpp"
     }
 }
