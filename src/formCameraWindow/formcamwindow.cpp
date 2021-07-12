@@ -97,18 +97,18 @@ void FormCamWindow::on_pb_capture_clicked()
         OPENVIO *vio = openvioList.at(i);
         if (vio->is_open == true)
         {
-            // if (vio->name.isEmpty() == true)
-            // {
-            //     vio->saveImagePath = setting->imagePath + "/" + QString(vio->idStr);
-            // }
-            // else
-            // {
-            //     vio->saveImagePath = setting->imagePath + "/" + vio->name;
-            // }
-            // isDirExist(vio->saveImagePath);
+            if (vio->name.isEmpty() == true)
+            {
+                vio->saveImagePath = setting->imagePath + "/" + QString(vio->idStr);
+            }
+            else
+            {
+                vio->saveImagePath = setting->imagePath + "/" + vio->name;
+            }
+            isDirExist(vio->saveImagePath);
             //mlog->show(vio->saveImagePath);
 
-            vio->saveImagePath = setting->imagePath;
+            //vio->saveImagePath = setting->imagePath;
         }
     }
 
