@@ -9,6 +9,8 @@
         "sstream": "cpp",
         "qcloseevent": "cpp",
         "qtimer": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "functional": "cpp",
+        "vector": "cpp"
     }
 }

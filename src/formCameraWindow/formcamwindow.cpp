@@ -1,12 +1,15 @@
 #include "formcamwindow.h"
 #include "ui_formcamwindow.h"
 
+
+
 Setting *setting;
 
 FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
                                                 ui(new Ui::FormCamWindow)
 {
     ui->setupUi(this);
+        
     this->setWindowTitle("OPENVIO");
 
     setting = new Setting();

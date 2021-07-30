@@ -29,6 +29,9 @@ private slots:
     void camSlot(int index);
     void imuSlot(int index);
 
+signals:
+    void imageSignals(QImage qImage);
+
 private:
     Ui::FormVioWindow *ui;
     

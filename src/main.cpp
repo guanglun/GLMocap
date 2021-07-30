@@ -2,6 +2,7 @@
 #include <QApplication>
 
 #include "formcamwindow.h"
+#include "formcvwindow.h"
 
 int main(int argc, char *argv[])
 {
@@ -11,6 +12,8 @@ int main(int argc, char *argv[])
     
     FormCamWindow fCamWindow;
     fCamWindow.show();
+
+
 
     return a.exec();
 }

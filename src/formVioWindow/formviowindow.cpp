@@ -1,6 +1,7 @@
 #include "formviowindow.h"
 #include "ui_formviowindow.h"
 
+#include "formcvwindow.h"
 
 FormVioWindow::FormVioWindow(QWidget *parent) :
     QWidget(parent),
@@ -8,6 +9,13 @@ FormVioWindow::FormVioWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+
+    FormCvWindow *formCvWindow = new FormCvWindow();
+    connect(this, SIGNAL(imageSignals(QImage)), formCvWindow, SLOT(imageSlot(QImage)));
+
+    formCvWindow->show();
+
+    
 }
 
 FormVioWindow::~FormVioWindow()
@@ -30,7 +38,7 @@ void FormVioWindow::setQData(OPENVIO *vio)
 
     this->setWindowTitle(this->vio->name +" : "+ this->vio->idStr);
     this->vio->open();
-    
+    ui->lb_img->setScaledContents(true);
 }
 
 static bool isDirExist(QString fullPath)
@@ -111,6 +119,7 @@ void FormVioWindow::camSlot(int index)
         {
             myImage = QImage(this->vio->img.img[index],this->vio->img.width,this->vio->img.high,QImage::Format_Grayscale8);
             pixImage = QPixmap::fromImage(myImage);
+            emit imageSignals(myImage);
             ui->lb_img->setPixmap(pixImage);
             if(this->vio->isCapImage)
             {

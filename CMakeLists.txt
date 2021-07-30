@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.5)
 project(MultiCam LANGUAGES CXX)
 
 find_package(Qt5 COMPONENTS Core Widgets Gui REQUIRED)
+find_package(OpenCV 4.5.3 REQUIRED)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC OFF)
@@ -19,6 +20,7 @@ QT5_WRAP_UI( UI_HEADERS
     ${CMAKE_SOURCE_DIR}/src/formCameraConfig/formcamconfig.ui
     ${CMAKE_SOURCE_DIR}/src/formCameraWindow/formcamwindow.ui
     ${CMAKE_SOURCE_DIR}/src/formVioWindow/formviowindow.ui
+    ${CMAKE_SOURCE_DIR}/src/formCvWindow/formcvwindow.ui
 )
 
 add_executable(MultiCam 
@@ -30,6 +32,7 @@ add_executable(MultiCam
     src/formMainWindow/mainwindow.cpp
     src/formCameraWindow/formcamwindow.cpp
     src/formVioWindow/formviowindow.cpp
+    src/formCvWindow/formcvwindow.cpp
 
     src/formCameraWindow/MuItemCam.cpp
     src/main.cpp
@@ -61,9 +64,11 @@ include_directories(
                     src/formMainWindow
                     src/formCameraWindow
                     src/formVioWindow
+                    src/formCvWindow
                     src/openvio
                     lib/eigen-3.2.10
                     lib/glut
+                    ${OpenCV_INCLUDE_DIRS}
 )
 
 link_directories(
@@ -78,5 +83,6 @@ target_link_libraries(MultiCam
                         ${CMAKE_SOURCE_DIR}/lib/usb/libusb-1.0.a
                         -lopengl32
 				        -lglu32
+                        ${OpenCV_LIBS}
                         
 )
