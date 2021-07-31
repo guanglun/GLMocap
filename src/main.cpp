@@ -4,7 +4,7 @@
 #include "formcamwindow.h"
 #include "formcvwindow.h"
 
-#include "MultipleViewTriangulation.h"
+
 
 int main(int argc, char *argv[])
 {
@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     FormCamWindow fCamWindow;
     fCamWindow.show();
 
-    MultipleViewTriangulation multipleViewTriangulation;
+
 
     return a.exec();
 }

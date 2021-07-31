@@ -21,6 +21,7 @@ QT5_WRAP_UI( UI_HEADERS
     ${CMAKE_SOURCE_DIR}/src/formCameraWindow/formcamwindow.ui
     ${CMAKE_SOURCE_DIR}/src/formVioWindow/formviowindow.ui
     ${CMAKE_SOURCE_DIR}/src/formCvWindow/formcvwindow.ui
+    ${CMAKE_SOURCE_DIR}/src/formVisionWindow/formvisionwindow.ui
 )
 
 add_executable(MultiCam 
@@ -32,8 +33,9 @@ add_executable(MultiCam
     src/formMainWindow/mainwindow.cpp
     src/formCameraWindow/formcamwindow.cpp
     src/formVioWindow/formviowindow.cpp
+    src/formVisionWindow/formvisionwindow.cpp
     src/formCvWindow/formcvwindow.cpp
-    src/vesion/MultipleViewTriangulation.cpp
+    src/vision/multipleViewTriangulation.cpp
 
     src/formCameraWindow/MuItemCam.cpp
     src/main.cpp
@@ -65,8 +67,9 @@ include_directories(
                     src/formMainWindow
                     src/formCameraWindow
                     src/formVioWindow
+                    src/formVisionWindow
                     src/formCvWindow
-                    src/vesion
+                    src/vision
                     src/openvio
                     lib/eigen-3.2.10
                     lib/glut

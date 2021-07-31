@@ -42,6 +42,10 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
     timer->start(1000);
+
+    
+    connect(&multipleViewTriangulation, SIGNAL(onXYZSignals(double,double,double)), &fVisionWindow, SLOT(onXYZSlot(double,double,double)));
+    fVisionWindow.show();
 }
 
 void FormCamWindow::ProvideContextMenu(const QPoint &pos)
@@ -134,6 +138,9 @@ void FormCamWindow::doubleClickedSlot(const QModelIndex &index)
     {
         FormVioWindow *formVioWindow = new FormVioWindow();
         formVioWindow->setQData(openvioList.at(index.row()));
+
+        connect(formVioWindow->formCvWindow, SIGNAL(positionSignals(int, double,double)), &multipleViewTriangulation, SLOT(positionSlot(int, double,double)));
+
         formVioWindow->show();
     }
 }

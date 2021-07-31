@@ -10,6 +10,8 @@
 
 #include "openvio.h"
 
+#include "multipleViewTriangulation.h"
+
 #include "MuItemCam.h"
 #include "winusbdriver.h"
 #include "FormVioWindow.h"
@@ -17,6 +19,8 @@
 #include <QLabel>
 #include <QInputDialog>
 #include <QFileDialog>
+
+#include "formvisionwindow.h"
 
 namespace Ui {
 class FormCamWindow;
@@ -34,6 +38,9 @@ public:
     QLabel *status_msg,*status_speed;
     int recv_count_1s;
 
+    MultipleViewTriangulation multipleViewTriangulation;
+    FormVisionWindow fVisionWindow;
+    
     explicit FormCamWindow(QWidget *parent = nullptr);
     ~FormCamWindow();
 

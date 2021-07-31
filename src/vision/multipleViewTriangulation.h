@@ -1,9 +1,11 @@
-#ifndef __MULTIPLEVIEWTRANGULATION_H__
-#define __MULTIPLEVUEWTRANGULATION_H__
+#ifndef MULTIPLEVIEWTRANGULATION_H
+#define MULTIPLEVIEWTRANGULATION_H
 
+#include "workspace.h"
 #include <QObject>
 
 #include <Eigen/Dense>
+
 
 using namespace Eigen;
 
@@ -17,12 +19,19 @@ typedef Matrix<double,9,9> Matrix9d;
 typedef DiagonalMatrix<double,9> DiagMatrix9d;
 
 #define Default_f0  1.0
+#define PT_NUM       1
+#define CAM_NUM_ALL   2
 
 class MultipleViewTriangulation : public QObject
 {
     Q_OBJECT
 private:
+    char positionFlag[4] = {0,0,0,0};
+
+    Matrix34d Prj[CAM_NUM_ALL];
+    MatrixXd xy[PT_NUM];
     
+    Vector3d Xr[PT_NUM];
 public:
     MultipleViewTriangulation();
 
@@ -34,6 +43,11 @@ public:
                           int PtNum,
                           const MatrixXi& idx,
                           double f0 = Default_f0);
+
+private slots:
+    void positionSlot(int camIndex, double x,double y);
+signals:
+    onXYZSignals(double x,double y,double z);
 };
 
 #endif

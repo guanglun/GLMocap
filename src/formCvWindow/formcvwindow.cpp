@@ -39,7 +39,7 @@ void FormCvWindow::imageSlot(QImage qImage)
 	Mat imageContours=Mat::zeros(image.size(),CV_8UC1);
 	Mat Contours=Mat::zeros(image.size(),CV_8UC1);  //绘制
 
-    DBG("found number %d",contours.size());
+    //DBG("found number %d",contours.size());
 
     vector<Point2f>centers(contours.size());//圆心
     vector<float>radius(contours.size());//半径
@@ -69,4 +69,14 @@ void FormCvWindow::imageSlot(QImage qImage)
     QImage qImg = QImage((const unsigned char *)(image.data), image.cols, image.rows, image.step, QImage::Format_RGB888);
     ui->lb_img->setPixmap(QPixmap::fromImage(qImg));
     ui->lb_img->setScaledContents(true);
+
+    if(contours.size() > 0)
+    {
+        if(this->index != -1)
+        {
+            emit positionSignals(this->index, centers[0].x,centers[0].y);    
+        }
+        
+    }
+    
 }

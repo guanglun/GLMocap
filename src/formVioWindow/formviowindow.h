@@ -9,6 +9,8 @@
 #include "workspace.h"
 #include "openvio.h"
 
+#include "formcvwindow.h"
+
 namespace Ui {
 class FormVioWindow;
 }
@@ -21,7 +23,7 @@ public:
     explicit FormVioWindow(QWidget *parent = 0);
     ~FormVioWindow();
     OPENVIO *vio;
-    
+    FormCvWindow *formCvWindow;
     
     void setQData(OPENVIO *vio);
 

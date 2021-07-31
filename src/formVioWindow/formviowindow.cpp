@@ -1,7 +1,7 @@
 #include "formviowindow.h"
 #include "ui_formviowindow.h"
 
-#include "formcvwindow.h"
+
 
 FormVioWindow::FormVioWindow(QWidget *parent) :
     QWidget(parent),
@@ -10,9 +10,10 @@ FormVioWindow::FormVioWindow(QWidget *parent) :
     ui->setupUi(this);
 
 
-    FormCvWindow *formCvWindow = new FormCvWindow();
-    connect(this, SIGNAL(imageSignals(QImage)), formCvWindow, SLOT(imageSlot(QImage)));
+    formCvWindow = new FormCvWindow();
 
+    connect(this, SIGNAL(imageSignals(QImage)), formCvWindow, SLOT(imageSlot(QImage)));
+    //
     formCvWindow->show();
 
     
@@ -33,6 +34,14 @@ void FormVioWindow::closeEvent(QCloseEvent *event)
 void FormVioWindow::setQData(OPENVIO *vio)
 {
     this->vio = vio;
+    if(QString::compare(this->vio->name,"camera0") == 0)
+    {
+        formCvWindow->index = 0;
+    }else if(QString::compare(this->vio->name,"camera1") == 0)
+    {
+        formCvWindow->index = 1;
+    }
+        
     connect(this->vio,SIGNAL(camSignals(int)),this,SLOT(camSlot(int)));
     connect(this->vio,SIGNAL(imuSignals(int)),this,SLOT(imuSlot(int)));
 
