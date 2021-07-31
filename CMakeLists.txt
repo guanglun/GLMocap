@@ -33,6 +33,7 @@ add_executable(MultiCam
     src/formCameraWindow/formcamwindow.cpp
     src/formVioWindow/formviowindow.cpp
     src/formCvWindow/formcvwindow.cpp
+    src/vesion/MultipleViewTriangulation.cpp
 
     src/formCameraWindow/MuItemCam.cpp
     src/main.cpp
@@ -65,6 +66,7 @@ include_directories(
                     src/formCameraWindow
                     src/formVioWindow
                     src/formCvWindow
+                    src/vesion
                     src/openvio
                     lib/eigen-3.2.10
                     lib/glut
