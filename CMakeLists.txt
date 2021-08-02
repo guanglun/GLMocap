@@ -22,6 +22,7 @@ QT5_WRAP_UI( UI_HEADERS
     ${CMAKE_SOURCE_DIR}/src/formVioWindow/formviowindow.ui
     ${CMAKE_SOURCE_DIR}/src/formCvWindow/formcvwindow.ui
     ${CMAKE_SOURCE_DIR}/src/formVisionWindow/formvisionwindow.ui
+    ${CMAKE_SOURCE_DIR}/src/form3DViewWindow/form3dviewwindow.ui
 )
 
 add_executable(MultiCam 
@@ -34,6 +35,7 @@ add_executable(MultiCam
     src/formCameraWindow/formcamwindow.cpp
     src/formVioWindow/formviowindow.cpp
     src/formVisionWindow/formvisionwindow.cpp
+    src/form3DViewWindow/form3dviewwindow.cpp
     src/formCvWindow/formcvwindow.cpp
     src/vision/multipleViewTriangulation.cpp
 
@@ -45,6 +47,7 @@ add_executable(MultiCam
     src/easytool/easytool.cpp
     src/easytool/findstr.cpp
     src/image/image.cpp
+    src/drow/camview.cpp
     src/drow/glview.cpp
     src/drow/gldrow.cpp
     src/setting/setting.cpp
@@ -68,6 +71,7 @@ include_directories(
                     src/formCameraWindow
                     src/formVioWindow
                     src/formVisionWindow
+                    src/form3DViewWindow
                     src/formCvWindow
                     src/vision
                     src/openvio
@@ -88,6 +92,7 @@ target_link_libraries(MultiCam
                         ${CMAKE_SOURCE_DIR}/lib/usb/libusb-1.0.a
                         -lopengl32
 				        -lglu32
+                        -lglut32
                         ${OpenCV_LIBS}
                         
 )

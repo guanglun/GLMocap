@@ -27,11 +27,11 @@ FormCvWindow::~FormCvWindow()
     delete ui;
 }
 
-void FormCvWindow::imageSlot(QImage qImage)
+void FormCvWindow::imageSlot(QImage qImage,int flag)
 {
-    Mat image = cv::Mat(qImage.height(),qImage.width(),CV_8UC1,qImage.bits());
-    threshold(image, image, 230, 255.0, THRESH_BINARY);
-
+    Mat image;
+    Mat sourceImg = cv::Mat(qImage.height(),qImage.width(),CV_8UC1,qImage.bits());
+    threshold(sourceImg, image, 230, 255.0, THRESH_BINARY);
 
 	vector<vector<Point>> contours;
 	vector<Vec4i> hierarchy;
@@ -61,10 +61,12 @@ void FormCvWindow::imageSlot(QImage qImage)
         minEnclosingCircle(contours[i], centers[i], radius[i]);
         circle(imageContours, centers[i], radius[i], Scalar(255), 1);
 
+        if(flag == Qt::CheckState::PartiallyChecked)
+        {
+            drawMarker(sourceImg, centers[i], Scalar(255, 0, 0), MarkerTypes::MARKER_CROSS, 20, 1, 8);
+        }
 	}
 
-
-    
     cv::cvtColor(imageContours, image, cv::COLOR_BGR2RGB);
     QImage qImg = QImage((const unsigned char *)(image.data), image.cols, image.rows, image.step, QImage::Format_RGB888);
     ui->lb_img->setPixmap(QPixmap::fromImage(qImg));
@@ -76,7 +78,15 @@ void FormCvWindow::imageSlot(QImage qImage)
         {
             emit positionSignals(this->index, centers[0].x,centers[0].y);    
         }
-        
     }
-    
+
+    if(flag == Qt::CheckState::PartiallyChecked)
+    {
+        cv::cvtColor(sourceImg, sourceImg, cv::COLOR_BGR2RGB);
+        QImage qSourceImg = QImage((const unsigned char *)(sourceImg.data), sourceImg.cols, sourceImg.rows, sourceImg.step, QImage::Format_RGB888);
+        emit visionImageSignals(qSourceImg);
+    }
+        
+    else if(flag == Qt::CheckState::Checked)
+        emit visionImageSignals(qImg);
 }

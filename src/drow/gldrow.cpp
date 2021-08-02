@@ -98,3 +98,9 @@ void GLDrow::DrowCube(void)
     //6----------------------------*/  
     glEnd();
 }
+
+// void GLDrow::DrowCube(void)
+// {
+//     //画立方体的6个面  
+//     glBegin(GL_QUADS);  
+// }

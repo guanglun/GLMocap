@@ -21,6 +21,7 @@
 #include <QFileDialog>
 
 #include "formvisionwindow.h"
+#include "form3dviewwindow.h"
 
 namespace Ui {
 class FormCamWindow;
@@ -40,7 +41,8 @@ public:
 
     MultipleViewTriangulation multipleViewTriangulation;
     FormVisionWindow fVisionWindow;
-    
+    Form3DViewWindow f3DViewWindow;
+
     explicit FormCamWindow(QWidget *parent = nullptr);
     ~FormCamWindow();
 
@@ -52,6 +54,9 @@ private slots:
     void onTimeOut(); 
     void ProvideContextMenu(const QPoint &pos);
     void on_actionImg_save_path_triggered();
+    void on_action_position_triggered();
+    void on_action3d_view_triggered();
+    
 private:
     Ui::FormCamWindow *ui;
 };

@@ -26,6 +26,7 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
     ui->lv_openvio->setModel(pModelOpenvio);
     ui->lv_openvio->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->lv_openvio->setContextMenuPolicy(Qt::CustomContextMenu);
+
     connect(ui->lv_openvio, SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(ProvideContextMenu(const QPoint &)));
 
@@ -42,10 +43,6 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
     timer->start(1000);
-
-    
-    connect(&multipleViewTriangulation, SIGNAL(onXYZSignals(double,double,double)), &fVisionWindow, SLOT(onXYZSlot(double,double,double)));
-    fVisionWindow.show();
 }
 
 void FormCamWindow::ProvideContextMenu(const QPoint &pos)
@@ -187,6 +184,24 @@ void FormCamWindow::onTimeOut()
     }
 
     status_speed->setText(getSpeed(recv_count_1s));
+}
+
+void FormCamWindow::on_action_position_triggered()
+{
+    if(!fVisionWindow.isActiveWindow())
+    {
+        connect(&multipleViewTriangulation, SIGNAL(onXYZSignals(double,double,double)), &fVisionWindow, SLOT(onXYZSlot(double,double,double)));
+        fVisionWindow.show();
+    }
+}
+
+void FormCamWindow::on_action3d_view_triggered()
+{
+    if(!f3DViewWindow.isActiveWindow())
+    {
+        connect(&multipleViewTriangulation, SIGNAL(onXYZSignals(double,double,double)), &f3DViewWindow, SLOT(onXYZSlot(double,double,double)));
+        f3DViewWindow.show();
+    }
 }
 
 void FormCamWindow::on_actionImg_save_path_triggered()

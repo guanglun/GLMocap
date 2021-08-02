@@ -30,10 +30,11 @@ public:
 private slots:
     void camSlot(int index);
     void imuSlot(int index);
-
+    void on_pb_vision_clicked();
+    void visionImageSlot(QImage qImage);  
 signals:
-    void imageSignals(QImage qImage);
-
+    void imageSignals(QImage qImage,int flag);
+    
 private:
     Ui::FormVioWindow *ui;
     

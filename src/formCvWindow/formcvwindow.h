@@ -23,9 +23,12 @@ public:
     int index = -1;
 
 private slots:
-    void imageSlot(QImage qImage);
+    void imageSlot(QImage qImage,int flag);
+    
 signals:
-    void positionSignals(int camIndex, double x,double y);    
+    void positionSignals(int camIndex, double x,double y);  
+    void visionImageSignals(QImage qImage);  
+
 private:
     Ui::FormCvWindow *ui;
     

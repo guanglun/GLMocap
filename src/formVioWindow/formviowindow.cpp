@@ -9,19 +9,15 @@ FormVioWindow::FormVioWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-
     formCvWindow = new FormCvWindow();
+    connect(this, SIGNAL(imageSignals(QImage,int)), formCvWindow, SLOT(imageSlot(QImage,int)));  
+    connect(formCvWindow, SIGNAL(visionImageSignals(QImage)), this, SLOT(visionImageSlot(QImage))); 
 
-    connect(this, SIGNAL(imageSignals(QImage)), formCvWindow, SLOT(imageSlot(QImage)));
-    //
-    formCvWindow->show();
-
-    
+    this->ui->cb_vision->setCheckState(Qt::CheckState::PartiallyChecked);
 }
 
 FormVioWindow::~FormVioWindow()
 {
-    
     delete ui;
 }
 
@@ -101,7 +97,6 @@ void FormVioWindow::camSlot(int index)
     d_time = timer*0.00001;
     //DBG("cam %d\t%d\t%d\t%f",t1,t2,timer,d_time);
 
-
     if(this->vio->cam_id == OV7725_ID)
     {
         if(this->vio->pixformat == PIXFORMAT_GRAYSCALE)
@@ -127,9 +122,13 @@ void FormVioWindow::camSlot(int index)
         if(this->vio->pixformat == PIXFORMAT_GRAYSCALE)
         {
             myImage = QImage(this->vio->img.img[index],this->vio->img.width,this->vio->img.high,QImage::Format_Grayscale8);
-            pixImage = QPixmap::fromImage(myImage);
-            emit imageSignals(myImage);
-            ui->lb_img->setPixmap(pixImage);
+            
+            emit imageSignals(myImage,this->ui->cb_vision->checkState());
+            if(this->ui->cb_vision->checkState() == Qt::CheckState::Unchecked)
+            {
+                ui->lb_img->setPixmap(QPixmap::fromImage(myImage));
+            }
+
             if(this->vio->isCapImage)
             {
                 
@@ -224,4 +223,21 @@ void FormVioWindow::imuSlot(int index)
     
     // ui->lb_temp->setText(QString::number(temp));
     
+}
+
+void FormVioWindow::on_pb_vision_clicked()
+{
+    if(!formCvWindow->isActiveWindow())
+    {
+
+        formCvWindow->show();
+    }
+}
+
+void FormVioWindow::visionImageSlot(QImage qImage)
+{
+    if(this->ui->cb_vision->checkState() != Qt::CheckState::Unchecked)
+    {
+        ui->lb_img->setPixmap(QPixmap::fromImage(qImage));
+    }
 }

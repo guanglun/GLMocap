@@ -78,7 +78,15 @@
     </property>
     <addaction name="actionImg_save_path"/>
    </widget>
+   <widget class="QMenu" name="menuWindow">
+    <property name="title">
+     <string>window</string>
+    </property>
+    <addaction name="action_position"/>
+    <addaction name="action3d_view"/>
+   </widget>
    <addaction name="menu"/>
+   <addaction name="menuWindow"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -92,6 +100,16 @@
   <action name="actionImg_save_path">
    <property name="text">
     <string>img save path</string>
+   </property>
+  </action>
+  <action name="action_position">
+   <property name="text">
+    <string>position</string>
+   </property>
+  </action>
+  <action name="action3d_view">
+   <property name="text">
+    <string>3d view</string>
    </property>
   </action>
  </widget>

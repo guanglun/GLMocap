@@ -18,6 +18,7 @@ FormVisionWindow::~FormVisionWindow()
     
     delete ui;
 }
+
 void FormVisionWindow::onXYZSlot(double x,double y,double z)
 {
     this->ui->lb_x->setText(QString::number(x,10,4));

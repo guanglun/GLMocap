@@ -143,7 +143,7 @@ void MultipleViewTriangulation::positionSlot(int camIndex, double x,double y)
         positionFlag[0] = 0;
         positionFlag[1] = 0;
         triangulation_all(Prj,CAM_NUM_ALL,xy,Xr,PT_NUM,idx);
-        std::cout << Xr[0](0,0)<< "\t" << Xr[0](1,0)<< "\t\t"<< Xr[0](2,0)<< std::endl;
+        //std::cout << Xr[0](0,0)<< "\t" << Xr[0](1,0)<< "\t\t"<< Xr[0](2,0)<< std::endl;
         emit onXYZSignals(Xr[0](0,0),Xr[0](1,0),Xr[0](2,0));
     }
     
