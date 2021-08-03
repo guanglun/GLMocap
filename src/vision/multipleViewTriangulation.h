@@ -9,6 +9,7 @@
 
 using namespace Eigen;
 
+typedef Matrix<double,3,3> Matrix33d;
 typedef Matrix<double,3,4> Matrix34d;
 typedef Matrix<double,3,9> Matrix39d;
 typedef Matrix<double,6,1> Vector6d;
@@ -24,9 +25,15 @@ typedef DiagonalMatrix<double,9> DiagMatrix9d;
 
 #define PT_NUM_MAX      36
 #define CAM_NUM_MAX     36
+
+#define ARC_TO_DEG 57.29577951308238
+#define DEG_TO_ARC 0.0174532925199433
+
 struct VISION_PARAM{
     int CamNum;
-    Matrix34d   P[CAM_NUM_ALL];
+    Matrix34d   P[CAM_NUM_MAX];
+    Matrix33d   R[CAM_NUM_MAX];
+    RowVector3d T[CAM_NUM_MAX];
     MatrixXd    xy[PT_NUM_MAX];
     Vector3d    Xr[PT_NUM_MAX];
 };
@@ -44,6 +51,7 @@ private:
     
     Vector3d Xr[PT_NUM];
 public:
+
     MultipleViewTriangulation();
 
     // triangulation from all cameras and points
@@ -55,6 +63,9 @@ public:
                           const MatrixXi& idx,
                           double f0 = Default_f0);
 
+    static Matrix3d eulerAnglesToRotationMatrix(Vector3d &theta);
+    static bool isRotationMatirx(Matrix3d R);
+    static Vector3d rotationMatrixToEulerAngles(Matrix3d &R);
 private slots:
     void positionSlot(int camIndex, double x,double y);
 signals:

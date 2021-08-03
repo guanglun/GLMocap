@@ -7,17 +7,17 @@ struct VISION_PARAM vision_param={
 
 MultipleViewTriangulation::MultipleViewTriangulation()
 {
-    MatrixXi idx(PT_NUM,CAM_NUM_ALL);
+    // MatrixXi idx(PT_NUM,CAM_NUM_ALL);
 
-    Prj[0] << 
-    548.049981125843,	0,	379.671945319308,	0,
-    0,	546.580521576416,	219.142050804001,	0,
-    0,	0,	1,	0;
+    // Prj[0] << 
+    // 548.049981125843,	0,	379.671945319308,	0,
+    // 0,	546.580521576416,	219.142050804001,	0,
+    // 0,	0,	1,	0;
 
-    Prj[1] << 
-    581.602049369935,	-6.69977397891934,	392.276652597385,	129586.910805590,
-    4.23333484278993,	544.536754956410,	238.300220263312,	-2295.93069926829,
-    0.0643427051349901,	-0.0415907957059505,	0.997060791531017,	-15.6183130081946;
+    // Prj[1] << 
+    // 581.602049369935,	-6.69977397891934,	392.276652597385,	129586.910805590,
+    // 4.23333484278993,	544.536754956410,	238.300220263312,	-2295.93069926829,
+    // 0.0643427051349901,	-0.0415907957059505,	0.997060791531017,	-15.6183130081946;
 
     
     // Prj[2] <<
@@ -35,7 +35,7 @@ MultipleViewTriangulation::MultipleViewTriangulation()
     // std::cout << "Prj[2]:\n" << Prj[2] << std::endl;
     // std::cout << "Prj[3]:\n" << Prj[3] << std::endl;
 
-    xy[0].resize(2,CAM_NUM_ALL);
+    // xy[0].resize(2,CAM_NUM_ALL);
 
     // xy[0] << 
     // 265.2741,  328.4092,  364.6402,  605.1474,
@@ -55,9 +55,9 @@ MultipleViewTriangulation::MultipleViewTriangulation()
     // 1,1,1,1,
     // 1,1,1,1;
 
-    idx << 
-    1,
-    1;
+    // idx << 
+    // 1,
+    // 1;
 
     // std::cout << "idx:\n" << idx << std::endl;
 
@@ -150,4 +150,57 @@ void MultipleViewTriangulation::positionSlot(int camIndex, double x,double y)
         emit onXYZSignals(Xr[0](0,0),Xr[0](1,0),Xr[0](2,0));
     }
     
+}
+
+Matrix3d MultipleViewTriangulation::eulerAnglesToRotationMatrix(Vector3d &theta)
+{
+    Matrix3d R_x;    // 计算旋转矩阵的X分量
+    R_x <<
+            1,              0,               0,
+            0,  cos(theta[0]),  -sin(theta[0]),
+            0,  sin(theta[0]),   cos(theta[0]);
+
+    Matrix3d R_y;    // 计算旋转矩阵的Y分量
+    R_y <<
+            cos(theta[1]),   0, sin(theta[1]),
+            0,   1,             0,
+            -sin(theta[1]),  0, cos(theta[1]);
+
+    Matrix3d R_z;    // 计算旋转矩阵的Z分量
+    R_z <<
+            cos(theta[2]), -sin(theta[2]), 0,
+            sin(theta[2]),  cos(theta[2]), 0,
+            0,              0,             1;
+    Matrix3d R = R_z * R_y * R_x;
+    return R;
+}
+
+bool MultipleViewTriangulation::isRotationMatirx(Matrix3d R)
+{
+    double err=1e-6;
+    Matrix3d shouldIdenity;
+    shouldIdenity=R*R.transpose();
+    Matrix3d I=Matrix3d::Identity();
+    return (shouldIdenity - I).norm() < err;
+}
+
+Vector3d MultipleViewTriangulation::rotationMatrixToEulerAngles(Matrix3d &R)
+{
+    assert(isRotationMatirx(R));
+    double sy = sqrt(R(0,0) * R(0,0) + R(1,0) * R(1,0));
+    bool singular = sy < 1e-6;
+    double x, y, z;
+    if (!singular)
+    {
+        x = atan2( R(2,1), R(2,2));
+        y = atan2(-R(2,0), sy);
+        z = atan2( R(1,0), R(0,0));
+    }
+    else
+    {
+        x = atan2(-R(1,2), R(1,1));
+        y = atan2(-R(2,0), sy);
+        z = 0;
+    }
+    return {x, y, z};
 }

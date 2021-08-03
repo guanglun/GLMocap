@@ -43,6 +43,13 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
     timer->start(1000);
+
+    QString path = setting->getVisionParamPath();
+    if(path.length() != 0 )
+    {
+        setting->loadVisionParam(path);
+    }
+    
 }
 
 void FormCamWindow::ProvideContextMenu(const QPoint &pos)

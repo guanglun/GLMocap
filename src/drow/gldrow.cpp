@@ -23,23 +23,24 @@ void GLDrow::DrowGrid(void)
         glVertex3f(cnt, 4.0,  -0.5);
         glEnd();
     }
+
     glLineWidth(3);//设置线段宽度
-    glColor3f(1.0, 0.0, 0.0);
+    glColor3f(0.0, 0.0, 1.0);
     glBegin(GL_LINES);
-    glVertex3f(4.0, -4.0, -0.5);
-    glVertex3f(4.0, -4.0, 0.5);
+    glVertex3f(-4.0, -4.0, -0.5);
+    glVertex3f(-4.0, -4.0, 0.5);
     glEnd();
 
     glColor3f(0.0, 1.0, 0.0);
     glBegin(GL_LINES);
-    glVertex3f(4.0, -4.0, -0.5);
-    glVertex3f(4.0, -3.0, -0.5);
+    glVertex3f(-4.0, -4.0, -0.5);
+    glVertex3f(-4.0, -3.0, -0.5);
     glEnd();
 
-    glColor3f(0.0, 0.0, 1.0);
+    glColor3f(1.0, 0.0, 0.0);
     glBegin(GL_LINES);
-    glVertex3f(4.0, -4.0, -0.5);
-    glVertex3f(3.0, -4.0, -0.5);
+    glVertex3f(-4.0, -4.0, -0.5);
+    glVertex3f(-3.0, -4.0, -0.5);
     glEnd();    
 }
 
@@ -99,8 +100,61 @@ void GLDrow::DrowCube(void)
     glEnd();
 }
 
-// void GLDrow::DrowCube(void)
-// {
-//     //画立方体的6个面  
-//     glBegin(GL_QUADS);  
-// }
+void GLDrow::DrowCam(float size)
+{
+    // glRotatef(90, 1, 0, 0);
+    // glRotatef(180, 0, 0, 1);
+    // glRotatef(-90, 0, 1, 0);
+
+    glColor3f(1.0, 0.0, 0.0);
+    glutWireCube(size);
+
+    glBegin(GL_LINES);
+    glVertex3f(size/2, size/2, size/2);
+    glVertex3f(size/2*2, size/2*2, size/2*3);
+
+    glVertex3f(-size/2, size/2, size/2);
+    glVertex3f(-size/2*2, size/2*2, size/2*3);
+
+    glVertex3f(size/2, -size/2, size/2);
+    glVertex3f(size/2*2, -size/2*2, size/2*3);
+
+    glVertex3f(-size/2, -size/2, size/2);
+    glVertex3f(-size/2*2, -size/2*2, size/2*3);
+
+    glVertex3f(size/2*2, size/2*2, size/2*3);
+    glVertex3f(-size/2*2, size/2*2, size/2*3);
+
+    glVertex3f(size/2*2, size/2*2, size/2*3);
+    glVertex3f(size/2*2, -size/2*2, size/2*3);
+
+    glVertex3f(-size/2*2, size/2*2, size/2*3);
+    glVertex3f(-size/2*2, -size/2*2, size/2*3);
+
+    glVertex3f(size/2*2, -size/2*2, size/2*3);
+    glVertex3f(-size/2*2, -size/2*2, size/2*3);
+
+    glEnd();
+
+    //glRotatef(-90, 0, 1, 0);
+
+    //方向
+    glLineWidth(3);//设置线段宽度
+    glColor3f(1.0, 0.0, 0.0);
+    glBegin(GL_LINES);
+    glVertex3f(0, 0, 0);
+    glVertex3f(size, 0, 0);
+    glEnd();
+
+    glColor3f(0.0, 1.0, 0.0);
+    glBegin(GL_LINES);
+    glVertex3f(0, 0, 0);
+    glVertex3f(0, size, 0);
+    glEnd();
+
+    glColor3f(0.0, 0.0, 1.0);
+    glBegin(GL_LINES);
+    glVertex3f(0, 0, 0);
+    glVertex3f(0, 0, size);
+    glEnd();    
+}

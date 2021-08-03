@@ -6,7 +6,8 @@
 #include <Eigen/Geometry>
 #include <Eigen/Core>
 #include <Eigen/Dense> 
-
+#include "multipleViewTriangulation.h"
+#include <iostream>
 
 using namespace Eigen;
 
@@ -48,12 +49,13 @@ void CamView::paintGL()
     
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+
     gluLookAt (eye[0],      eye[1],     eye[2],
                center[0],   center[1],  center[2], 
                up[0],       up[1],      up[2]);  
-    
 
-    glPushMatrix();
+    /*Cube*/
+    //glPushMatrix();
 
     
     //欧拉角角度不一致，需要转换一下
@@ -64,22 +66,46 @@ void CamView::paintGL()
     
     //GLDrow::DrowCube();
     
-    glTranslatef(px,py,pz);
-    glColor3f(1.0, 0.0, 0.0);
-    glutSolidSphere( 0.04, 15, 15 );
+    // glTranslatef(px,py,pz);
+    // glColor3f(1.0, 0.0, 0.0);
+    // glutSolidSphere( 0.04, 60, 60 );
 
-    glPopMatrix();
+    // glPopMatrix();
     
-    
+    /*网格*/
     glPushMatrix();
     glTranslatef(0.0,0.0,-0.8);//下移
     GLDrow::DrowGrid();
     glPopMatrix();
     
-    
+    glPushMatrix();
+    //GLDrow::DrowCam();
+    glPopMatrix();
+
+    for(int i=0;i<vision_param.CamNum;i++)
+    {
+        /*相机*/
+        glPushMatrix();
+
+        //DBG("Drow %d",i);
+
+        //std::cout << vision_param.R[i] << std::endl;
+
+        Vector3d v = MultipleViewTriangulation::rotationMatrixToEulerAngles(vision_param.R[i]);
+        
+        glRotatef(v(0,0) * ARC_TO_DEG , 1, 0, 0);
+        glRotatef(v(1,0) * ARC_TO_DEG , 0, 1, 0);
+        glRotatef(v(2,0) * ARC_TO_DEG , 0, 0, 1);
+
+        glTranslatef(vision_param.T[i](0,0)/1000,vision_param.T[i](0,1)/1000,vision_param.T[i](0,2)/1000);
+
+        GLDrow::DrowCam();
+        glPopMatrix();
+    }
+
+
     QMetaObject::invokeMethod(this,"update",Qt::QueuedConnection); 
 
-    
 }
 
 void CamView::resizeGL(int w, int h)

@@ -65,7 +65,6 @@ private:
     void cameraTurn(double yaw, double pitch, double R_long);
     void cameraInit(double yaw, double pitch, double R_long);
     
-    
 private slots:
     void updateGL();
 };

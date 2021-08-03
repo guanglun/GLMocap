@@ -55,6 +55,7 @@
         "utility": "cpp",
         "typeindex": "cpp",
         "qobject": "cpp",
-        "qdebug": "cpp"
+        "qdebug": "cpp",
+        "dense": "cpp"
     }
 }
