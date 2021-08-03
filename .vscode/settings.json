@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.json": "jsonc",
         "new": "cpp",
         "qstringlistmodel": "cpp",
         "array": "cpp",
@@ -53,6 +54,7 @@
         "type_traits": "cpp",
         "utility": "cpp",
         "typeindex": "cpp",
-        "qobject": "cpp"
+        "qobject": "cpp",
+        "qdebug": "cpp"
     }
 }

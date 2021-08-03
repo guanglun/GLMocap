@@ -1,4 +1,6 @@
 #include "setting.h"
+#include "multipleViewTriangulation.h"
+#include <iostream>
 
 Setting::Setting()
 {
@@ -7,14 +9,16 @@ Setting::Setting()
     QApplication::setApplicationName("openvio");
 
     QString setFile= QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/.OPENVIOSettings.ini";
-    qDebug() << "配置文件路径：" << setFile;
+    qDebug() << "configure file path：" << setFile;
     set = new QSettings(setFile,QSettings::IniFormat);    
-    
+
     getImagePath();
 }
 
 void Setting::getIMUOffset(T_int16_xyz *acc,T_int16_xyz *gyro)
 {
+    set->beginGroup("openvio");
+
     QString acc_offset_x  = set->value(ACC_OFFSET_X.SET_NAME).toString();
     QString acc_offset_y  = set->value(ACC_OFFSET_Y.SET_NAME).toString();
     QString acc_offset_z  = set->value(ACC_OFFSET_Z.SET_NAME).toString();
@@ -75,21 +79,25 @@ void Setting::getIMUOffset(T_int16_xyz *acc,T_int16_xyz *gyro)
     qDebug() << "gyr offset y:" << gyro->Y;
     qDebug() << "gyr offset z:" << gyro->Z;
 
-    
+    set->endGroup(); 
 }
 
 void Setting::setAccOffset(T_int16_xyz *acc)
 {
+    set->beginGroup("openvio");
     set->setValue(ACC_OFFSET_X.SET_NAME,QString::number(acc->X));
     set->setValue(ACC_OFFSET_Y.SET_NAME,QString::number(acc->Y));
     set->setValue(ACC_OFFSET_Z.SET_NAME,QString::number(acc->Z));
+    set->endGroup(); 
 }
 
 void Setting::setGyroOffset(T_int16_xyz *gyro)
 {
+    set->beginGroup("openvio");
     set->setValue(GYR_OFFSET_X.SET_NAME,QString::number(gyro->X));
     set->setValue(GYR_OFFSET_Y.SET_NAME,QString::number(gyro->Y));
     set->setValue(GYR_OFFSET_Z.SET_NAME,QString::number(gyro->Z));
+    set->endGroup(); 
 }
 
 void Setting::setNameById(QString id,QString name)
@@ -110,13 +118,58 @@ QString Setting::getNameById(QString id)
 
 void Setting::setImagePath(QString path)
 {
+    set->beginGroup("openvio");
     imagePath = path;
     set->setValue("IMAGE_PATH",path);
+    set->endGroup(); 
 }
 
 QString Setting::getImagePath()
 {
+    set->beginGroup("openvio");
     imagePath = set->value("IMAGE_PATH").toString();
+    set->endGroup(); 
     return imagePath;
 }
 
+void Setting::setVisionParamPath(QString path)
+{
+    set->beginGroup("openvio");
+    imagePath = path;
+    set->setValue("VISION_PARAM_PATH",path);
+    set->endGroup();     
+}
+
+QString Setting::getVisionParamPath()
+{
+    set->beginGroup("openvio");
+    QString path = set->value("VISION_PARAM_PATH").toString();
+    set->endGroup(); 
+    return path;
+}
+
+bool Setting::loadVisionParam(QString path)
+{
+    double p11, p12, p13, p14, p21, p22, p23, p24, p31, p32, p33, p34;
+    QSettings *set_vision = new QSettings(path,QSettings::IniFormat); 
+    vision_param.CamNum = set_vision->value("CamNum").toInt();
+    std::cout << "CamNum: " << vision_param.CamNum << std::endl;
+
+    for(int i=0;i<vision_param.CamNum;i++)
+    {
+        QString P = set_vision->value(QString("P"+QString::number(i))).toString();
+        //qDebug() << QString("P"+QString::number(i)) << " = " << P;
+
+        sscanf(P.toStdString().data(), "%lf,%lf,%lf,%lf;%lf,%lf,%lf,%lf;%lf,%lf,%lf,%lf", 
+        &p11, &p12, &p13, &p14,
+        &p21, &p22, &p23, &p24,
+        &p31, &p32, &p33, &p34);
+
+        vision_param.P[i] << p11, p12, p13, p14, p21, p22, p23, p24, p31, p32, p33, p34;
+        std::cout << "P" <<i<<":\n"<< vision_param.P[i] << std::endl;
+    }
+
+    vision_param.xy[0].resize(2,vision_param.CamNum);
+
+    return true;
+}

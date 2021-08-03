@@ -204,25 +204,40 @@ void FormCamWindow::on_action3d_view_triggered()
     }
 }
 
+void FormCamWindow::on_actionLoad_vision_param_triggered()
+{
+    QString path = setting->getVisionParamPath();
+    if(path.length() == 0 )
+    {
+        path = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+    }
+
+	QString filePath = QFileDialog::getOpenFileName(
+		this, 
+		tr("open a file."),
+		path, 
+		tr("param(*.ini);;"));
+	if (filePath.isEmpty()) {
+		QMessageBox::warning(this, "Warning!", "Failed to open the video!");
+	}
+    else
+    {
+        setting->setVisionParamPath(filePath);
+        setting->loadVisionParam(filePath);
+    }
+}
+
 void FormCamWindow::on_actionImg_save_path_triggered()
 {
-
-    //     QString dlgTitle = QStringLiteral("set images save path");
-    //     QString txtLabel = QStringLiteral("input new path：");
-    //     QString defaultInput = QStringLiteral("");
-
-    // QInputDialog inputDialog=new QInputDialog(this);
-    // inputDialog->setOkButtonText(QString::fromLocal8Bit("确定"));
-    // inputDialog->setCancelButtonText(QString::fromLocal8Bit("取消"));
-    // inputDialog->setInputMode(QInputDialog::TextInput);
-    // inputDialog->setLabelText("Select a channel");
-
-    // connect(getChNo,SIGNAL(intValueSelected(int)),this,SLOT(getChSelected(int)));
-    // inputDialog->show();    //在需要获取用户输入的地方调用show()
+    QString path = setting->getImagePath();
+    if(path.length() == 0 )
+    {
+        path = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+    }
 
     QString srcDirPath = QFileDialog::getExistingDirectory(
         this, "choose src Directory",
-        "/");
+        path);
 
     if (srcDirPath.isEmpty())
     {

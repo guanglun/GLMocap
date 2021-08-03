@@ -1,6 +1,10 @@
 #include "multipleViewTriangulation.h"
 #include <iostream>
 
+struct VISION_PARAM vision_param={
+    .CamNum = 0,
+};
+
 MultipleViewTriangulation::MultipleViewTriangulation()
 {
     MatrixXi idx(PT_NUM,CAM_NUM_ALL);
@@ -15,6 +19,7 @@ MultipleViewTriangulation::MultipleViewTriangulation()
     4.23333484278993,	544.536754956410,	238.300220263312,	-2295.93069926829,
     0.0643427051349901,	-0.0415907957059505,	0.997060791531017,	-15.6183130081946;
 
+    
     // Prj[2] <<
     // 527.114979412141,	0.169291136410878,	231.181347920051,	194710.194193955,
     // 65.0399923964585,	438.312938642950,	196.735669670058,	24743.6483437954,
@@ -29,8 +34,6 @@ MultipleViewTriangulation::MultipleViewTriangulation()
     // std::cout << "Prj[1]:\n" << Prj[1] << std::endl;
     // std::cout << "Prj[2]:\n" << Prj[2] << std::endl;
     // std::cout << "Prj[3]:\n" << Prj[3] << std::endl;
-
-    
 
     xy[0].resize(2,CAM_NUM_ALL);
 

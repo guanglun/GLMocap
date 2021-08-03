@@ -22,6 +22,17 @@ typedef DiagonalMatrix<double,9> DiagMatrix9d;
 #define PT_NUM       1
 #define CAM_NUM_ALL   2
 
+#define PT_NUM_MAX      36
+#define CAM_NUM_MAX     36
+struct VISION_PARAM{
+    int CamNum;
+    Matrix34d   P[CAM_NUM_ALL];
+    MatrixXd    xy[PT_NUM_MAX];
+    Vector3d    Xr[PT_NUM_MAX];
+};
+
+extern struct VISION_PARAM vision_param;
+
 class MultipleViewTriangulation : public QObject
 {
     Q_OBJECT
@@ -47,7 +58,7 @@ public:
 private slots:
     void positionSlot(int camIndex, double x,double y);
 signals:
-    onXYZSignals(double x,double y,double z);
+    void onXYZSignals(double x,double y,double z);
 };
 
 #endif

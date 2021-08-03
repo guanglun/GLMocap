@@ -43,6 +43,9 @@ public:
     QString getNameById(QString id);
     void setImagePath(QString path);
     QString getImagePath();
+    void setVisionParamPath(QString path);
+    QString getVisionParamPath();
+    bool loadVisionParam(QString path);
 };
 
 #endif // SETTING_H

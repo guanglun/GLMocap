@@ -7,6 +7,7 @@
 #include <QStandardItemModel>
 #include <QStandardItem>
 #include <QList>
+#include <QMessageBox>
 
 #include "openvio.h"
 
@@ -56,6 +57,7 @@ private slots:
     void on_actionImg_save_path_triggered();
     void on_action_position_triggered();
     void on_action3d_view_triggered();
+    void on_actionLoad_vision_param_triggered();
     
 private:
     Ui::FormCamWindow *ui;
