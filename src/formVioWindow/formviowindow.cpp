@@ -14,6 +14,11 @@ FormVioWindow::FormVioWindow(QWidget *parent) :
     connect(formCvWindow, SIGNAL(visionImageSignals(QImage)), this, SLOT(visionImageSlot(QImage))); 
 
     this->ui->cb_vision->setCheckState(Qt::CheckState::PartiallyChecked);
+
+    timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
+    timer->start(1000);
+
 }
 
 FormVioWindow::~FormVioWindow()
@@ -126,6 +131,7 @@ void FormVioWindow::camSlot(int index)
             emit imageSignals(myImage,this->ui->cb_vision->checkState());
             if(this->ui->cb_vision->checkState() == Qt::CheckState::Unchecked)
             {
+                fps_1s++;
                 ui->lb_img->setPixmap(QPixmap::fromImage(myImage));
             }
 
@@ -229,7 +235,6 @@ void FormVioWindow::on_pb_vision_clicked()
 {
     if(!formCvWindow->isActiveWindow())
     {
-
         formCvWindow->show();
     }
 }
@@ -238,6 +243,15 @@ void FormVioWindow::visionImageSlot(QImage qImage)
 {
     if(this->ui->cb_vision->checkState() != Qt::CheckState::Unchecked)
     {
+        fps_1s++;
         ui->lb_img->setPixmap(QPixmap::fromImage(qImage));
     }
+}
+
+void FormVioWindow::onTimeOut()
+{
+    QString speedStr = QString::number(fps_1s);
+    fps_1s = 0;
+    speedStr += "fps";
+    ui->lb_fps->setText(speedStr);
 }

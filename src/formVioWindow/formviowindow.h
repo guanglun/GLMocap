@@ -5,6 +5,9 @@
 #include <QDateTime>
 #include <QCloseEvent> 
 #include <QFileInfo>
+#include <QStatusBar>
+#include <QLabel>
+#include <QTimer>
 
 #include "workspace.h"
 #include "openvio.h"
@@ -26,8 +29,11 @@ public:
     FormCvWindow *formCvWindow;
     
     void setQData(OPENVIO *vio);
-
+private:
+    QTimer *timer;
+    int fps_1s = 0;
 private slots:
+    void onTimeOut(); 
     void camSlot(int index);
     void imuSlot(int index);
     void on_pb_vision_clicked();

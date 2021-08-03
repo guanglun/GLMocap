@@ -31,6 +31,10 @@ class CamView : public QOpenGLWidget ,
     Q_OBJECT
 
 public:
+
+    int view_fps_1s = 0;
+    int point_fps_1s = 0;
+    
     CamView(QWidget *parent = 0);
     ~CamView();
     void setAngle(float rol, float pit, float yaw);
@@ -61,6 +65,7 @@ private:
     int clickX,clickY;
     float rol = 0,pit = 0,yaw = 0;
     float px = 0,py = 0,pz = 0;
+
 
     void cameraTurn(double yaw, double pitch, double R_long);
     void cameraInit(double yaw, double pitch, double R_long);

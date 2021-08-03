@@ -134,8 +134,8 @@ void MultipleViewTriangulation::positionSlot(int camIndex, double x,double y)
     MatrixXi idx(PT_NUM,CAM_NUM_ALL);
 
     positionFlag[camIndex] = 1;
-    xy[0].col(camIndex)(0) = x;
-    xy[0].col(camIndex)(1) = y;
+    vision_param.xy[0].col(camIndex)(0) = x;
+    vision_param.xy[0].col(camIndex)(1) = y;
 
     if(positionFlag[0] && positionFlag[1])
     {
@@ -145,8 +145,10 @@ void MultipleViewTriangulation::positionSlot(int camIndex, double x,double y)
 
         positionFlag[0] = 0;
         positionFlag[1] = 0;
-        triangulation_all(Prj,CAM_NUM_ALL,xy,Xr,PT_NUM,idx);
+        triangulation_all(vision_param.P,vision_param.CamNum,vision_param.xy,Xr,PT_NUM,idx);
+        
         //std::cout << Xr[0](0,0)<< "\t" << Xr[0](1,0)<< "\t\t"<< Xr[0](2,0)<< std::endl;
+
         emit onXYZSignals(Xr[0](0,0),Xr[0](1,0),Xr[0](2,0));
     }
     

@@ -55,7 +55,7 @@ void CamView::paintGL()
                up[0],       up[1],      up[2]);  
 
     /*Cube*/
-    //glPushMatrix();
+    glPushMatrix();
 
     
     //欧拉角角度不一致，需要转换一下
@@ -66,17 +66,17 @@ void CamView::paintGL()
     
     //GLDrow::DrowCube();
     
-    // glTranslatef(px,py,pz);
-    // glColor3f(1.0, 0.0, 0.0);
-    // glutSolidSphere( 0.04, 60, 60 );
+    glTranslatef(px,py,pz);
+    glColor3f(1.0, 0.0, 0.0);
+    glutSolidSphere( 0.04, 60, 60 );
 
-    // glPopMatrix();
+    glPopMatrix();
     
     /*网格*/
-    glPushMatrix();
-    glTranslatef(0.0,0.0,-0.8);//下移
-    GLDrow::DrowGrid();
-    glPopMatrix();
+    // glPushMatrix();
+    // glTranslatef(0.0,0.0,-0.8);//下移
+    // GLDrow::DrowGrid();
+    // glPopMatrix();
     
     glPushMatrix();
     //GLDrow::DrowCam();
@@ -105,7 +105,7 @@ void CamView::paintGL()
 
 
     QMetaObject::invokeMethod(this,"update",Qt::QueuedConnection); 
-
+    view_fps_1s++;
 }
 
 void CamView::resizeGL(int w, int h)
@@ -135,6 +135,8 @@ void CamView::setPosition(float x, float y, float z)
     this->px = x;
     this->py = y;
     this->pz = z;
+
+    point_fps_1s++;
 }
 
 void CamView::cameraInit(double yaw, double pitch, double R_long)
@@ -260,7 +262,6 @@ void CamView::wheelEvent(QWheelEvent*event){
     }
 
     cameraTurn(yawCam,pitchCam,farCam);
-    
-    
 }
+    
 

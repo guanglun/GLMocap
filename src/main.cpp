@@ -15,8 +15,8 @@ int main(int argc, char *argv[])
     FormCamWindow fCamWindow;
     fCamWindow.show();
 
-    Form3DViewWindow f3DViewWindow;
-    f3DViewWindow.show();
+    // Form3DViewWindow f3DViewWindow;
+    // f3DViewWindow.show();
 
     return a.exec();
 }

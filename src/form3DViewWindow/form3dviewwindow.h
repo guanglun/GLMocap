@@ -5,6 +5,7 @@
 #include <QDateTime>
 #include <QCloseEvent> 
 #include <QFileInfo>
+#include <QTimer>
 
 #include "workspace.h"
 
@@ -23,9 +24,12 @@ public:
     
     explicit Form3DViewWindow(QWidget *parent = 0);
     ~Form3DViewWindow();
+private:
+    QTimer *timer;
 
 private slots:
     void onXYZSlot(double x,double y,double z); 
+    void onTimeOut();
 signals:
 
 private:

@@ -35,7 +35,7 @@ struct VISION_PARAM{
     Matrix33d   R[CAM_NUM_MAX];
     RowVector3d T[CAM_NUM_MAX];
     MatrixXd    xy[PT_NUM_MAX];
-    Vector3d    Xr[PT_NUM_MAX];
+    // Vector3d    Xr[PT_NUM_MAX];
 };
 
 extern struct VISION_PARAM vision_param;
@@ -46,10 +46,8 @@ class MultipleViewTriangulation : public QObject
 private:
     char positionFlag[4] = {0,0,0,0};
 
-    Matrix34d Prj[CAM_NUM_ALL];
-    MatrixXd xy[PT_NUM];
-    
-    Vector3d Xr[PT_NUM];
+    //MatrixXd xy[PT_NUM_MAX];
+    Vector3d Xr[PT_NUM_MAX];
 public:
 
     MultipleViewTriangulation();
