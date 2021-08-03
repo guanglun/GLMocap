@@ -155,7 +155,7 @@ bool Setting::loadVisionParam(QString path)
 
     vision_param.CamNum = set_vision->value("CamNum").toInt();
 
-    std::cout << "CamNum: " << vision_param.CamNum << std::endl;
+    std::cout << "Load CamNum : " << vision_param.CamNum << std::endl;
 
     for(int i=0;i<vision_param.CamNum;i++)
     {
@@ -168,7 +168,7 @@ bool Setting::loadVisionParam(QString path)
         &p31, &p32, &p33, &p34);
 
         vision_param.P[i] << p11, p12, p13, p14, p21, p22, p23, p24, p31, p32, p33, p34;
-        std::cout << "P" <<i<<":\n"<< vision_param.P[i] << std::endl;
+        //std::cout << "P" <<i<<":\n"<< vision_param.P[i] << std::endl;
 
         QString R = set_vision->value(QString("R"+QString::number(i))).toString();
         sscanf(R.toStdString().data(), "%lf,%lf,%lf;%lf,%lf,%lf;%lf,%lf,%lf", 
@@ -177,14 +177,14 @@ bool Setting::loadVisionParam(QString path)
         &p31, &p32, &p33);
 
         vision_param.R[i] << p11, p12, p13, p21, p22, p23, p31, p32, p33;
-        std::cout << "R" <<i<<":\n"<< vision_param.R[i] << std::endl;
+        //std::cout << "R" <<i<<":\n"<< vision_param.R[i] << std::endl;
 
         QString T = set_vision->value(QString("T"+QString::number(i))).toString();
         sscanf(T.toStdString().data(), "%lf,%lf,%lf", 
         &p11, &p12, &p13);
 
         vision_param.T[i] << p11, p12, p13;
-        std::cout << "T" <<i<<":\n"<< vision_param.T[i] << std::endl;
+        //std::cout << "T" <<i<<":\n"<< vision_param.T[i] << std::endl;
     }
 
     vision_param.xy[0].resize(2,vision_param.CamNum);
