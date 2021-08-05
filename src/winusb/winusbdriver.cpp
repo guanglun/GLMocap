@@ -76,7 +76,7 @@ void WinUSBDriver::scanSlot(void)
             libusb_open(device,&vio->dev_handle);
 
             libusb_get_string_descriptor_ascii(vio->dev_handle,
-			desc.iProduct,
+			desc.iSerialNumber,
 			(unsigned char*)vio->idStr,
 			sizeof(vio->idStr));
 
