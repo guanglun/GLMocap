@@ -41,4 +41,11 @@ enum SENSOR_STATUS{
     SENSOR_STATUS_RUNNING
 };
 
+enum OPENVIO_TYPE {
+    TYPE_NULL,
+    TYPE_BOOTLOADER,
+    TYPE_OPENVIO
+    
+};
+
 #endif // WORKSPACE_H

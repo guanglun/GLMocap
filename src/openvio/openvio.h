@@ -14,6 +14,8 @@
 class USBThread;
 #include "usbthread.h"
 
+
+
 class OPENVIO : public QObject
 {
     Q_OBJECT
@@ -40,6 +42,8 @@ public:
     MuItemCamData itemCamData;
     QStandardItem *pItem;
     char idStr[128];
+    char productStr[128];
+    enum OPENVIO_TYPE type = TYPE_NULL;
     QString name;
     libusb_device_handle *dev_handle = NULL;
     libusb_device *dev;

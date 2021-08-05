@@ -235,6 +235,7 @@ void OPENVIO::setItem(QStandardItemModel *pModelOpenvio)
     itemCamData.id = idStr;
     itemCamData.status = "wait";
     itemCamData.name = setting->getNameById(idStr);
+    itemCamData.type = type;
     this->name = itemCamData.name;
 
     pItem->setData(QVariant::fromValue(itemCamData), Qt::UserRole+1);

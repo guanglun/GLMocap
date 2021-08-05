@@ -49,7 +49,14 @@ void MuItemCam::paint(QPainter *painter, const QStyleOptionViewItem &option, con
         QRectF statusRect = QRect(idRect.left(), idRect.bottom(), rect.width()-10-iconRect.width(), 20);
         QRectF nameRect = QRect(statusRect.left(), statusRect.bottom(), rect.width()-10-iconRect.width(), 20);
 
-        painter->drawImage(iconRect, QImage(QString(":/image/camera.png")));
+        if(itemData.type == TYPE_OPENVIO)
+        {
+            painter->drawImage(iconRect, QImage(QString(":/image/camera.png")));
+        }else if(itemData.type == TYPE_BOOTLOADER)
+        {
+            painter->drawImage(iconRect, QImage(QString(":/image/bl.png")));
+        }
+        
         painter->setPen(QPen(Qt::black));
         painter->setFont(QFont("Microsoft Yahei", 10));
         painter->drawText(idRect, itemData.id);

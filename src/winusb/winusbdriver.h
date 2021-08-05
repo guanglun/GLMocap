@@ -21,8 +21,11 @@ class USBThread;
 #include "usbthread.h"
 
 
-#define IDVENDOR    2012
-#define IDPRODUCT   2012
+#define OPENVIO_IDVENDOR                2012
+#define OPENVIO_IDPRODUCT               2012
+
+#define OPENVIO_BOOTLOADER_IDVENDOR     2012
+#define OPENVIO_BOOTLOADER_IDPRODUCT    2013
 
 #define CANDLE_MAX_DEVICES 32
 
