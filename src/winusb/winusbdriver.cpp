@@ -104,6 +104,9 @@ void WinUSBDriver::scanSlot(void)
             vio->setItem(pModelOpenvio);
             
             libusb_close(vio->dev_handle);
+
+            vio->open();
+            vio->upgrade->upgradeStart();
 		}
 	}
 

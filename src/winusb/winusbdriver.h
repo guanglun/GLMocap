@@ -39,8 +39,8 @@ class USBThread;
 #define HM01B0_ID           (0xB0)
 
 #define CTRL_EPADDR 0x01
-#define CAM_EPADDR 0x81
-#define IMU_EPADDR 0x82
+#define CAM_EPADDR  0x81
+#define IMU_EPADDR  0x82
 
 #define USB_TIMEOUT 10000 //传输数据的时间延迟
 

@@ -33,7 +33,7 @@ public:
     USBThread *camThread,*imuThread;
     enum SENSOR_STATUS camStatus,imuStatus;
     int recv_len_count = 0;
-    int ret;
+    
     int isCamRecv=false,isIMURecv=false;
     unsigned char *ctrl_buffer;
     int camRecvLen,imuRecvLen,recv_index;
@@ -67,7 +67,7 @@ public:
     void CamRecv(void);
     void IMURecv(void);
     int sendCtrl(char request, uint16_t wValue,uint16_t wIndex,unsigned char *buffer);
-    void sendBulk(unsigned char * buffer,int len);
+    bool sendBulk(unsigned char * buffer,int len);
     int ctrlCamStart();
     int ctrlCamStop();
     int ctrlIMUStart();
