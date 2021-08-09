@@ -225,7 +225,7 @@ bool OPENVIO::sendBulk(unsigned char *buffer, int len)
     int recvLen = 0;
     int ret = 0;
 
-    ret = libusb_bulk_transfer(dev_handle, CTRL_EPADDR, buffer, len, &recvLen, 1000);
+    ret = libusb_bulk_transfer(dev_handle, 0x01, buffer, len, &recvLen, 10);
 
     if (ret < 0)
     {

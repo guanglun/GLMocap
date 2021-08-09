@@ -7,6 +7,8 @@ FirmwareUpgrade::FirmwareUpgrade(OPENVIO *vio)
 
 void FirmwareUpgrade::upgradeStart()
 {
-    vio->sendBulk((unsigned char *)"hello openvio",strlen("hello openvio"));
+    unsigned char bugger[1024]="hello";
+    //for(int i=0;i<1000;i++)
+        vio->sendBulk((unsigned char *)bugger,12);
 }
 
