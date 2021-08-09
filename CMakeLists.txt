@@ -38,7 +38,7 @@ add_executable(MultiCam
     src/form3DViewWindow/form3dviewwindow.cpp
     src/formCvWindow/formcvwindow.cpp
     src/vision/multipleViewTriangulation.cpp
-
+    src/firmwareUpgrade/firmwareUpgrade.cpp
     src/formCameraWindow/MuItemCam.cpp
     src/main.cpp
     src/openvio/openvio.cpp
@@ -73,6 +73,7 @@ include_directories(
                     src/formVisionWindow
                     src/form3DViewWindow
                     src/formCvWindow
+                    src/firmwareUpgrade
                     src/vision
                     src/openvio
                     lib/eigen-3.2.10

@@ -46,6 +46,9 @@ public:
     void setVisionParamPath(QString path);
     QString getVisionParamPath();
     bool loadVisionParam(QString path);
+
+    QString getFirmwarePath();
+    void setFirmwarePath(QString path);
 };
 
 #endif // SETTING_H

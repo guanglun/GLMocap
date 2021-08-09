@@ -8,6 +8,8 @@ OPENVIO::OPENVIO(libusb_device *dev)
     camThread = new USBThread();
     imuThread = new USBThread();
 
+    upgrade = new FirmwareUpgrade(this);
+
     camThread->init(this, "cam");
     imuThread->init(this, "imu");
 
@@ -19,9 +21,15 @@ OPENVIO::OPENVIO(libusb_device *dev)
     connect(this, SIGNAL(closeSignals()), this, SLOT(closeSlot()));
 }
 
-void OPENVIO::open(void)
+bool OPENVIO::open(void)
 {
-    int close_try_cnt = 0;
+    if(is_open)
+    {
+        DBG("already open");
+        return true;
+    }
+       
+
     dev_handle = NULL;
 
     // ret = libusb_init(&m_libusb_context);
@@ -59,28 +67,12 @@ void OPENVIO::open(void)
 
     is_open = true;
 
-    close_try_cnt = 0;
-    while (ctrlCamStop() != 0 && close_try_cnt < 4)
-    {
-        close_try_cnt++;
-    }
-
-    close_try_cnt = 0;
-    while (ctrlIMUStop() != 0 && close_try_cnt < 4)
-    {
-        close_try_cnt++;
-    }
-
     DBG("open success");
 
-    camThread->start();
-    imuThread->start();
-
-    
     //emit sendStatusSignals(USB_MSG_OPEN_SUCCESS);
-    ctrlCamStart();
+    //ctrlCamStart();
 
-    return;
+    return true;
 
 close_fail:
     is_open = false;
@@ -90,8 +82,7 @@ open_fail:
 init_fail:
     DBG("open fail");
     //emit sendStatusSignals(USB_MSG_OPEN_FAIL);
-    return;
-
+    return false;
 }
 
 void OPENVIO::CamRecv(void)
@@ -104,7 +95,7 @@ void OPENVIO::CamRecv(void)
     FindStr findStr;
     uint8_t head_tmp[1024];
     findStr.config((unsigned char *)"CAMERA", 6);
-    while (is_open)
+    while (isCamRecv)
     {
         //        if (recv_head_status == 0)
         //            ret = libusb_bulk_transfer(dev_handle, CAM_EPADDR, (unsigned char *)(head_tmp), 1024, &camRecvLen, 1000);
@@ -193,7 +184,7 @@ void OPENVIO::IMURecv(void)
 
     int imu_index = 0;
 
-    while (is_open)
+    while (isIMURecv)
     {
         ret = libusb_bulk_transfer(dev_handle, IMU_EPADDR, (unsigned char *)(img.imu[imu_index]), IMU_PACKAGE_SIZE, &imuRecvLen, 10);
         if (ret < 0)
@@ -228,6 +219,11 @@ void OPENVIO::IMURecv(void)
     DBG("imu recv exit");
 }
 
+void OPENVIO::sendBulk(unsigned char * buffer,int len)
+{
+    int recvLen = 0;
+    ret = libusb_bulk_transfer(dev_handle, CTRL_EPADDR, buffer, len, &recvLen, 1000);
+}
 
 void OPENVIO::setItem(QStandardItemModel *pModelOpenvio)
 {
@@ -286,11 +282,7 @@ void OPENVIO::closeSlot(void)
 
         is_open = false;
 
-        camThread->waitClose();
-        DBG("camThread->waitClose()");
 
-        imuThread->waitClose();
-        DBG("imuThread->waitClose()");
 
         //DBG("closeSlot");
 
@@ -339,6 +331,33 @@ int OPENVIO::sendCtrl(char request, uint16_t wValue, uint16_t wIndex, unsigned c
     return -1;
 }
 
+int OPENVIO::camStart()
+{
+    DBG("cam start");
+    isCamRecv = true;
+    camThread->start();
+    ctrlCamStart();
+    return true;
+}
+
+int OPENVIO::camStop()
+{
+    int close_try_cnt = 0;
+
+    
+    while (ctrlCamStop() != 0 && close_try_cnt < 4)
+    {
+        close_try_cnt++;
+    }
+
+    isCamRecv = false;
+    camThread->waitClose();
+    
+    DBG("cam stop");
+
+    return true;
+}
+
 int OPENVIO::ctrlCamStart()
 {
     uint8_t ret = 0;
@@ -375,9 +394,39 @@ int OPENVIO::ctrlCamStop()
     return -1;
 }
 
+int OPENVIO::IMUStart()
+{
+    DBG("imu start");
+    isIMURecv = true;
+    imuThread->start();
+    ctrlIMUStart();
+    return true;
+}
+
+int OPENVIO::IMUStop()
+{
+    int close_try_cnt = 0;
+
+    
+
+    while (ctrlIMUStop() != 0 && close_try_cnt < 4)
+    {
+        close_try_cnt++;
+    }
+    
+    isIMURecv = false;
+    imuThread->waitClose();
+
+    DBG("imu stop");
+
+    return true;
+}
+
 int OPENVIO::ctrlIMUStart()
 {
     uint8_t ret = 0;
+
+    
 
     ret = sendCtrl(REQUEST_IMU_START, 0, 0, ctrl_buffer);
     if ((ret > 0) && (ctrl_buffer[0] == 'S'))

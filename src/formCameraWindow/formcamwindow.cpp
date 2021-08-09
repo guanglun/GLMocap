@@ -1,15 +1,13 @@
 #include "formcamwindow.h"
 #include "ui_formcamwindow.h"
 
-
-
 Setting *setting;
 
 FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
                                                 ui(new Ui::FormCamWindow)
 {
     ui->setupUi(this);
-        
+
     this->setWindowTitle("OPENVIO");
 
     setting = new Setting();
@@ -45,11 +43,12 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
     timer->start(1000);
 
     QString path = setting->getVisionParamPath();
-    if(path.length() != 0 )
+    if (path.length() != 0)
     {
         setting->loadVisionParam(path);
     }
-    
+
+    qwinusb->scan();
 }
 
 void FormCamWindow::ProvideContextMenu(const QPoint &pos)
@@ -58,7 +57,7 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
 
     QMenu submenu;
     submenu.addAction("Rename");
-    //submenu.addAction("Delete");
+    submenu.addAction("Upgrade Firmware");
     QAction *rightClickItem = submenu.exec(item);
     if (rightClickItem && rightClickItem->text().contains("Rename"))
     {
@@ -72,6 +71,27 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
         if (ok && !text.isEmpty())
         {
             openvioList.at(ui->lv_openvio->indexAt(pos).row())->setName(text);
+        }
+    }
+    if (rightClickItem && rightClickItem->text().contains("Upgrade Firmware"))
+    {
+        QString path = setting->getFirmwarePath();
+        if (path.length() == 0)
+        {
+            path = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+        }
+        QString filePath = QFileDialog::getOpenFileName(
+            this,
+            tr("choose a firmware file"),
+            path,
+            tr("param(*.bin);;"));
+        if (filePath.isEmpty())
+        {
+            QMessageBox::warning(this, "Warning!", "Failed to open the firmware!");
+        }
+        else
+        {
+            setting->setFirmwarePath(filePath);
         }
     }
 }
@@ -90,14 +110,14 @@ void FormCamWindow::on_pb_scan_camera_clicked()
 static bool isDirExist(QString fullPath)
 {
     QDir dir(fullPath);
-    if(dir.exists())
+    if (dir.exists())
     {
-      return true;
+        return true;
     }
     else
     {
-       bool ok = dir.mkdir(fullPath);//只创建一级子目录，即必须保证上级目录存在
-       return ok;
+        bool ok = dir.mkdir(fullPath); //只创建一级子目录，即必须保证上级目录存在
+        return ok;
     }
 }
 
@@ -130,7 +150,7 @@ void FormCamWindow::on_pb_capture_clicked()
         {
             vio->isCapImage = true;
         }
-    }    
+    }
 }
 
 void FormCamWindow::vioItemSelected(const QModelIndex &index)
@@ -138,14 +158,27 @@ void FormCamWindow::vioItemSelected(const QModelIndex &index)
 }
 void FormCamWindow::doubleClickedSlot(const QModelIndex &index)
 {
-    if (openvioList.at(index.row())->is_open == false)
+    OPENVIO *vio = openvioList.at(index.row());
+
+    if (vio->isCamRecv == false)
     {
-        FormVioWindow *formVioWindow = new FormVioWindow();
-        formVioWindow->setQData(openvioList.at(index.row()));
+        if(vio->formVioWindow == NULL)
+        {
+            vio->formVioWindow = new FormVioWindow();
+            vio->formVioWindow->setQData(openvioList.at(index.row()));
 
-        connect(formVioWindow->formCvWindow, SIGNAL(positionSignals(int, double,double)), &multipleViewTriangulation, SLOT(positionSlot(int, double,double)));
+            connect(vio->formVioWindow->formCvWindow, SIGNAL(positionSignals(int, double, double)), &multipleViewTriangulation, SLOT(positionSlot(int, double, double)));
+        }
 
-        formVioWindow->show();
+        if(vio->formVioWindow->isVisible() == false)
+        {
+            vio->formVioWindow->show();
+            if(vio->open())
+            {
+                vio->camStart();
+            }
+        }
+
     }
 }
 
@@ -195,18 +228,18 @@ void FormCamWindow::onTimeOut()
 
 void FormCamWindow::on_action_position_triggered()
 {
-    if(!fVisionWindow.isActiveWindow())
+    if (!fVisionWindow.isActiveWindow())
     {
-        connect(&multipleViewTriangulation, SIGNAL(onXYZSignals(double,double,double)), &fVisionWindow, SLOT(onXYZSlot(double,double,double)));
+        connect(&multipleViewTriangulation, SIGNAL(onXYZSignals(double, double, double)), &fVisionWindow, SLOT(onXYZSlot(double, double, double)));
         fVisionWindow.show();
     }
 }
 
 void FormCamWindow::on_action3d_view_triggered()
 {
-    if(!f3DViewWindow.isActiveWindow())
+    if (!f3DViewWindow.isActiveWindow())
     {
-        connect(&multipleViewTriangulation, SIGNAL(onXYZSignals(double,double,double)), &f3DViewWindow, SLOT(onXYZSlot(double,double,double)));
+        connect(&multipleViewTriangulation, SIGNAL(onXYZSignals(double, double, double)), &f3DViewWindow, SLOT(onXYZSlot(double, double, double)));
         f3DViewWindow.show();
     }
 }
@@ -214,19 +247,20 @@ void FormCamWindow::on_action3d_view_triggered()
 void FormCamWindow::on_actionLoad_vision_param_triggered()
 {
     QString path = setting->getVisionParamPath();
-    if(path.length() == 0 )
+    if (path.length() == 0)
     {
         path = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
     }
 
-	QString filePath = QFileDialog::getOpenFileName(
-		this, 
-		tr("open a file."),
-		path, 
-		tr("param(*.ini);;"));
-	if (filePath.isEmpty()) {
-		QMessageBox::warning(this, "Warning!", "Failed to open the video!");
-	}
+    QString filePath = QFileDialog::getOpenFileName(
+        this,
+        tr("choose a param file."),
+        path,
+        tr("param(*.ini);;"));
+    if (filePath.isEmpty())
+    {
+        QMessageBox::warning(this, "Warning!", "Failed to open the file!");
+    }
     else
     {
         setting->setVisionParamPath(filePath);
@@ -237,13 +271,13 @@ void FormCamWindow::on_actionLoad_vision_param_triggered()
 void FormCamWindow::on_actionImg_save_path_triggered()
 {
     QString path = setting->getImagePath();
-    if(path.length() == 0 )
+    if (path.length() == 0)
     {
         path = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
     }
 
     QString srcDirPath = QFileDialog::getExistingDirectory(
-        this, "choose src Directory",
+        this, "choose image save directory",
         path);
 
     if (srcDirPath.isEmpty())

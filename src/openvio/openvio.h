@@ -11,6 +11,12 @@
 #include "image.h"
 #include "findstr.h"
 
+class FormVioWindow;
+#include "FormVioWindow.h"
+
+class FirmwareUpgrade;
+#include "firmwareUpgrade.h"
+
 class USBThread;
 #include "usbthread.h"
 
@@ -28,6 +34,7 @@ public:
     enum SENSOR_STATUS camStatus,imuStatus;
     int recv_len_count = 0;
     int ret;
+    int isCamRecv=false,isIMURecv=false;
     unsigned char *ctrl_buffer;
     int camRecvLen,imuRecvLen,recv_index;
     bool is_open;
@@ -36,6 +43,7 @@ public:
     unsigned char cam_id;
     pixformat_t pixformat;
     QString saveImagePath;
+    FormVioWindow *formVioWindow = NULL;
 
     int saveCount = 0;
     
@@ -48,17 +56,18 @@ public:
     libusb_device_handle *dev_handle = NULL;
     libusb_device *dev;
     QStandardItemModel *pModelOpenvio;
-
+    FirmwareUpgrade *upgrade;
     int row;
 
     OPENVIO(libusb_device *dev);
-    void open(void);
+    bool open(void);
     void setItem(QStandardItemModel *pModelOpenvio);
     void setStatus(QString status);
     void setName(QString name);
     void CamRecv(void);
     void IMURecv(void);
     int sendCtrl(char request, uint16_t wValue,uint16_t wIndex,unsigned char *buffer);
+    void sendBulk(unsigned char * buffer,int len);
     int ctrlCamStart();
     int ctrlCamStop();
     int ctrlIMUStart();
@@ -66,7 +75,10 @@ public:
     int ctrlCamSetFrameSizeNum(uint16_t num);
     int ctrlCamSetExposure(int value);
     int close(void);
-
+    int camStart();
+    int IMUStart();
+    int camStop();
+    int IMUStop();
 signals:
     void camSignals(int index);
     void imuSignals(int index);   

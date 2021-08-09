@@ -44,8 +44,6 @@ class USBThread;
 
 #define USB_TIMEOUT 10000 //传输数据的时间延迟
 
-
-
 class WinUSBDriver : public QObject
 {
     Q_OBJECT

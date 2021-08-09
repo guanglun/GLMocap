@@ -109,12 +109,6 @@ void WinUSBDriver::scanSlot(void)
 
     DBG("all found openvio : %d",(int)openvioList->length());
 
-
-
-
-
-
-
     //libusb_free_device_list(list, 1);
     //libusb_exit(m_libusb_context);
 

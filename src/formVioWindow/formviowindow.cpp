@@ -13,7 +13,7 @@ FormVioWindow::FormVioWindow(QWidget *parent) :
     connect(this, SIGNAL(imageSignals(QImage,int)), formCvWindow, SLOT(imageSlot(QImage,int)));  
     connect(formCvWindow, SIGNAL(visionImageSignals(QImage)), this, SLOT(visionImageSlot(QImage))); 
 
-    this->ui->cb_vision->setCheckState(Qt::CheckState::PartiallyChecked);
+    this->ui->cb_vision->setCheckState(Qt::CheckState::Unchecked);
 
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
@@ -28,7 +28,7 @@ FormVioWindow::~FormVioWindow()
 
 void FormVioWindow::closeEvent(QCloseEvent *event) 
 { 
-    this->vio->close();
+    this->vio->camStop();
     DBG("exit");
 } 
 
@@ -47,7 +47,7 @@ void FormVioWindow::setQData(OPENVIO *vio)
     connect(this->vio,SIGNAL(imuSignals(int)),this,SLOT(imuSlot(int)));
 
     this->setWindowTitle(this->vio->name +" : "+ this->vio->idStr);
-    this->vio->open();
+    
     ui->lb_img->setScaledContents(true);
 }
 
@@ -128,10 +128,11 @@ void FormVioWindow::camSlot(int index)
         {
             myImage = QImage(this->vio->img.img[index],this->vio->img.width,this->vio->img.high,QImage::Format_Grayscale8);
             
-            emit imageSignals(myImage,this->ui->cb_vision->checkState());
+            
             if(this->ui->cb_vision->checkState() == Qt::CheckState::Unchecked)
             {
                 fps_1s++;
+                emit imageSignals(myImage,this->ui->cb_vision->checkState());
                 ui->lb_img->setPixmap(QPixmap::fromImage(myImage));
             }
 

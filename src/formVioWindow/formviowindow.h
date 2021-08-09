@@ -10,8 +10,11 @@
 #include <QTimer>
 
 #include "workspace.h"
+
+class OPENVIO;
 #include "openvio.h"
 
+class FormCvWindow;
 #include "formcvwindow.h"
 
 namespace Ui {

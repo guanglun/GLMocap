@@ -148,6 +148,22 @@ QString Setting::getVisionParamPath()
     return path;
 }
 
+void Setting::setFirmwarePath(QString path)
+{
+    set->beginGroup("openvio");
+    imagePath = path;
+    set->setValue("FIRMWARE_PATH",path);
+    set->endGroup();     
+}
+
+QString Setting::getFirmwarePath()
+{
+    set->beginGroup("openvio");
+    QString path = set->value("FIRMWARE_PATH").toString();
+    set->endGroup(); 
+    return path;
+}
+
 bool Setting::loadVisionParam(QString path)
 {
     double p11, p12, p13, p14, p21, p22, p23, p24, p31, p32, p33, p34;
