@@ -18,11 +18,12 @@ class UpgradeRecvThread : public QThread
 private:
     
     OPENVIO *vio;
-    bool is_loop;
+    
     QString buikName;
     unsigned char recvBuffer[512];
     int recvLen;
 public:
+    bool is_loop;
     UpgradeRecvThread(OPENVIO *vio);
     void run();
     void waitClose();

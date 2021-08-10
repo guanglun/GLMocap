@@ -56,6 +56,9 @@ FirmwareUpgrade::FirmwareUpgrade(OPENVIO *vio)
     this->vio = vio;
 
     upgradeThread = new UpgradeThread(this);
+    connect(upgradeThread, SIGNAL(endSignals()), this, SLOT(endSlot()));
+
+
     upgradeRecvThread = new UpgradeRecvThread(vio);
     connect(upgradeRecvThread, SIGNAL(recvSignals(unsigned char *, int)), this, SLOT(recvSlot(unsigned char *, int)));
     
@@ -64,6 +67,11 @@ FirmwareUpgrade::FirmwareUpgrade(OPENVIO *vio)
 void FirmwareUpgrade::setBinPath(QString binPath)
 {
     upgradeThread->setBinPath(binPath);
+}
+
+void FirmwareUpgrade::endSlot(void)
+{
+    upgradeRecvThread->is_loop = false;
 }
 
 int send_hello(void)

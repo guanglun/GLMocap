@@ -245,9 +245,9 @@ int OPENVIO::recvBulk(unsigned char *buffer, int len)
     int recvLen = 0;
     int ret = 0;
 
-    ret = libusb_bulk_transfer(dev_handle, CAM_EPADDR, buffer, len, &recvLen, 0);
+    ret = libusb_bulk_transfer(dev_handle, CAM_EPADDR, buffer, len, &recvLen, 10);
 
-    if (ret < 0)
+    if (ret < 0 && ret != -7)
     {
         DBG("recvBulk fail :%d", ret);
         return -1;
@@ -272,6 +272,11 @@ void OPENVIO::setItem(QStandardItemModel *pModelOpenvio)
     pItem->setData(QVariant::fromValue(itemCamData), Qt::UserRole + 1);
     pModelOpenvio->appendRow(pItem);
     row = pModelOpenvio->rowCount() - 1;
+}
+
+void OPENVIO::removeItem(void)
+{
+    pModelOpenvio->removeRow(row);
 }
 
 void OPENVIO::setStatus(QString status)

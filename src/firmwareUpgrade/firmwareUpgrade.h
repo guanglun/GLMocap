@@ -67,6 +67,7 @@ signals:
 
 private slots:
     void recvSlot(unsigned char *buffer, int len);
+    void endSlot(void);
 };
 
 #endif

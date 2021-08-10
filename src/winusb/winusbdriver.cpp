@@ -1,8 +1,6 @@
 #include "winusbdriver.h"
 #include <QThread>
 
-
-
 WinUSBDriver::WinUSBDriver()
 {
     // camThread = new USBThread();
@@ -16,9 +14,16 @@ WinUSBDriver::WinUSBDriver()
     // camStatus = SENSOR_STATUS_STOP;
     // imuStatus = SENSOR_STATUS_STOP;
 
+    libusb_init(&m_libusb_context);
+
     connect(this, SIGNAL(closeSignals()), this, SLOT(closeSlot()));
     connect(this, SIGNAL(openSignals(int, int)), this, SLOT(openSlot(int, int)));
     connect(this, SIGNAL(scanSignals()), this, SLOT(scanSlot()));
+
+    timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
+    timer->start(1000);
+    
 }
 
 WinUSBDriver::~WinUSBDriver()
@@ -31,7 +36,7 @@ void WinUSBDriver::setModule(QStandardItemModel *pModelOpenvio)
     this->pModelOpenvio = pModelOpenvio;
 }
 
-void WinUSBDriver::setOpenvioList(QList<OPENVIO*> *openvioList)
+void WinUSBDriver::setOpenvioList(QList<OPENVIO *> *openvioList)
 {
     this->openvioList = openvioList;
 }
@@ -46,74 +51,130 @@ void WinUSBDriver::scan(void)
     emit scanSignals();
 }
 
+
 void WinUSBDriver::scanSlot(void)
 {
+    //autoScan();
+}
+
+void WinUSBDriver::onTimeOut()
+{
+    autoScan();
+}
+
+void WinUSBDriver::autoScan(void)
+{
+    DBG("start scan");
+
     struct libusb_device_descriptor desc;
-	struct libusb_config_descriptor* conf;
- 
-	libusb_device_handle *  handle = NULL;
-	int config= 0;
-	int ret;
- 
-	int status;
+    struct libusb_config_descriptor *conf;
+    struct libusb_device *device;
+    libusb_device_handle *handle = NULL;
+    int config = 0;
+    int ret;
+    int ii, i;
 
-    ssize_t num_devs, i, j, k;
+    int status;
 
-    libusb_init(&m_libusb_context);
+    ssize_t num_devs, j, k;
+    int size = openvioList->size();
+    
 
-	num_devs = libusb_get_device_list(m_libusb_context, &list);
-    openvioList->clear();
-    pModelOpenvio->clear();
+    num_devs = libusb_get_device_list(m_libusb_context, &list);
 
-	for (int i = 0; i < num_devs; ++i) {
-		struct libusb_device* device = list[i];
-		struct libusb_device_descriptor desc;
-		libusb_get_device_descriptor(device, &desc);	
+    for (i = 0; i < size; i++)
+    {
+
+        for (ii = 0; ii < num_devs; ii++)
+        {
+            device = list[ii];
+
+            if (openvioList->at(i)->devAddr == libusb_get_device_address(device))
+            {
+                //openvioList->at(i)->dev = device;
+                break;
+            }
+        }
+
+        if (ii >= num_devs)
+        {
+            DBG("remove %d",openvioList->at(i)->devAddr);
+            openvioList->at(i)->removeItem();
+            openvioList->removeAt(i);
+            i--;
+            size--;
+        }
+    }
+
+    //openvioList->clear();
+    //pModelOpenvio->clear();
+
+    for (i = 0; i < num_devs; ++i)
+    {
+
+        device = list[i];
+        struct libusb_device_descriptor desc;
+        libusb_get_device_descriptor(device, &desc);
         enum OPENVIO_TYPE type = TYPE_NULL;
 
-		if (desc.idVendor == OPENVIO_IDVENDOR && desc.idProduct == OPENVIO_IDPRODUCT)
+        if (desc.idVendor == OPENVIO_IDVENDOR && desc.idProduct == OPENVIO_IDPRODUCT)
         {
             type = TYPE_OPENVIO;
-        }else if(desc.idVendor == OPENVIO_BOOTLOADER_IDVENDOR && desc.idProduct == OPENVIO_BOOTLOADER_IDPRODUCT) 
+        }
+        else if (desc.idVendor == OPENVIO_BOOTLOADER_IDVENDOR && desc.idProduct == OPENVIO_BOOTLOADER_IDPRODUCT)
         {
             type = TYPE_BOOTLOADER;
         }
 
-        if(type != TYPE_NULL)
+        if (type != TYPE_NULL)
         {
-            OPENVIO *vio = new OPENVIO(device);
-            vio->dev = device;
-            vio->type = type;
-            
-            libusb_open(device,&vio->dev_handle);
+            size = openvioList->size();
+            for (ii = 0; ii < size; ii++)
+            {
+                if (openvioList->at(ii)->devAddr == libusb_get_device_address(device))
+                {
+                    break;
+                }
+            }
 
-            libusb_get_string_descriptor_ascii(vio->dev_handle,
-			desc.iSerialNumber,
-			(unsigned char*)vio->idStr,
-			sizeof(vio->idStr));
+            if (ii >= size)
+            {
 
-            libusb_get_string_descriptor_ascii(vio->dev_handle,
-			desc.iProduct,
-			(unsigned char*)vio->productStr,
-			sizeof(vio->productStr));
+                OPENVIO *vio = new OPENVIO(device);
+                vio->dev = device;
+                vio->type = type;
+                vio->devAddr = libusb_get_device_address(device);
 
-            DBG("found %s %s",vio->productStr,vio->idStr);
+                DBG("new addr : %d ",vio->devAddr);
+                ret = libusb_open(device, &vio->dev_handle);
 
-			openvioList->append(vio);
+                libusb_get_string_descriptor_ascii(vio->dev_handle,
+                                                   desc.iSerialNumber,
+                                                   (unsigned char *)vio->idStr,
+                                                   sizeof(vio->idStr));
 
-            vio->setItem(pModelOpenvio);
-            
-            libusb_close(vio->dev_handle);
+                libusb_get_string_descriptor_ascii(vio->dev_handle,
+                                                   desc.iProduct,
+                                                   (unsigned char *)vio->productStr,
+                                                   sizeof(vio->productStr));
 
-		}
-	}
+                DBG("found %s %s", vio->productStr, vio->idStr);
 
-    DBG("all found openvio : %d",(int)openvioList->length());
+                openvioList->append(vio);
+
+                vio->setItem(pModelOpenvio);
+
+                libusb_close(vio->dev_handle);
+            }
+        }
+    }
+
+    DBG("all found openvio : %d", (int)openvioList->length());
 
     //libusb_free_device_list(list, 1);
     //libusb_exit(m_libusb_context);
 
-    return;
+    //return;
 }
 
 void WinUSBDriver::openSlot(int vid, int pid)

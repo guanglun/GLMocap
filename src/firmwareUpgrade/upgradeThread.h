@@ -35,7 +35,7 @@ public:
     void waitClose();
     void setBinPath(QString binPath);
 signals:
-    void recvSignals(unsigned char *buffer,int len);
+    void endSignals(void);
     // void imuSignals(int index);   
     // void closeSignals(void);   
 private slots:

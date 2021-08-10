@@ -117,6 +117,7 @@ void UpgradeThread::run()
 
     exit:
     mlog->show("IAP Thread Exit");
+    emit endSignals();
 
 }
 

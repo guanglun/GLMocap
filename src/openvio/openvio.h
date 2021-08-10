@@ -55,6 +55,7 @@ public:
     QString name;
     libusb_device_handle *dev_handle = NULL;
     libusb_device *dev;
+    uint8_t devAddr;
     QStandardItemModel *pModelOpenvio;
     FirmwareUpgrade *upgrade;
     int row;
@@ -80,6 +81,7 @@ public:
     int camStop();
     int IMUStop();
     int recvBulk(unsigned char *buffer, int len);
+    void removeItem(void);
 signals:
     void camSignals(int index);
     void imuSignals(int index);   

@@ -17,13 +17,11 @@ void UpgradeRecvThread::run()
         if(recvLen > 0)
         {
             emit recvSignals(recvBuffer,recvLen);
-        }else
+        }else if(recvLen < 0)
         {
             is_loop = false;
         }
-
     }
-
     qDebug() <<  " UpgradeRecvThread exit";
     is_loop = false;
 }

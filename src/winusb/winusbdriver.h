@@ -70,7 +70,7 @@ private:
     libusb_context* m_libusb_context;
 
     enum SENSOR_STATUS camStatus,imuStatus;
-    
+    QTimer *timer;
 public:
     QStandardItemModel *pModelOpenvio;
     Image img;
@@ -97,9 +97,9 @@ public:
     int ctrlCamSetFrameSizeNum(uint16_t num);
     int ctrlCamSetExposure(int value);
     void scan(void);
+    void autoScan();
     void setModule(QStandardItemModel *pModelOpenvio);
     void setOpenvioList(QList<OPENVIO*> *openvioList);
-
 signals:
     void camSignals(int index);
     void imuSignals(int index);
@@ -114,6 +114,7 @@ private slots:
     void closeSlot(void);
     void openSlot(int vid,int pid);
     void scanSlot(void);
+    void onTimeOut(); 
 };
 
 #endif // WINUSBDRIVER_H
