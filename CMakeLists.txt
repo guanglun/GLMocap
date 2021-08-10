@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(MultiCam LANGUAGES CXX)
+project(MultiCam LANGUAGES C CXX)
 
 find_package(Qt5 COMPONENTS Core Widgets Gui REQUIRED)
 find_package(OpenCV 4.5.3 REQUIRED)
@@ -39,6 +39,8 @@ add_executable(MultiCam
     src/formCvWindow/formcvwindow.cpp
     src/vision/multipleViewTriangulation.cpp
     src/firmwareUpgrade/firmwareUpgrade.cpp
+    src/firmwareUpgrade/upgradeRecvThread.cpp
+    src/firmwareUpgrade/upgradeThread.cpp
     src/formCameraWindow/MuItemCam.cpp
     src/main.cpp
     src/openvio/openvio.cpp
@@ -52,9 +54,15 @@ add_executable(MultiCam
     src/drow/gldrow.cpp
     src/setting/setting.cpp
     src/log/log.cpp
-
+    
     src/imu/imuso3.cpp
     src/imu/imu.cpp
+
+    src/gl_protocol/frame_send.c
+    src/gl_protocol/frame_parse.c
+
+    src/gl_protocol/frame_send.c
+    src/gl_protocol/frame_parse.c
 )
 
 include_directories(
@@ -74,6 +82,7 @@ include_directories(
                     src/form3DViewWindow
                     src/formCvWindow
                     src/firmwareUpgrade
+                    src/gl_protocol
                     src/vision
                     src/openvio
                     lib/eigen-3.2.10

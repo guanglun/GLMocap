@@ -38,6 +38,7 @@ class USBThread;
 #define LEPTON_ID           (0x54)
 #define HM01B0_ID           (0xB0)
 
+
 #define CTRL_EPADDR 0x01
 #define CAM_EPADDR  0x81
 #define IMU_EPADDR  0x82

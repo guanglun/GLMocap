@@ -105,8 +105,6 @@ void WinUSBDriver::scanSlot(void)
             
             libusb_close(vio->dev_handle);
 
-            vio->open();
-            vio->upgrade->upgradeStart();
 		}
 	}
 
@@ -402,12 +400,12 @@ int WinUSBDriver::sendCtrl(char request, uint16_t wValue, uint16_t wIndex, unsig
 
         if (ret < 0)
         {
-            DBG("libusb_control_transfer fail");
+            DBG("sendCtrl fail");
             return -1;
         }
         else
         {
-            DBG("libusb_control_transfer success %d %c", ret, buffer[0]);
+            DBG("sendCtrl success %d %c", ret, buffer[0]);
 
             return ret;
         }

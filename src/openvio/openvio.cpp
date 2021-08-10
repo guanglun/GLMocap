@@ -225,18 +225,38 @@ bool OPENVIO::sendBulk(unsigned char *buffer, int len)
     int recvLen = 0;
     int ret = 0;
 
-    ret = libusb_bulk_transfer(dev_handle, 0x01, buffer, len, &recvLen, 10);
+    ret = libusb_bulk_transfer(dev_handle, 0x01, buffer, len, &recvLen, 0);
 
     if (ret < 0)
     {
-        DBG("libusb_control_transfer fail");
+        DBG("sendBulk fail");
         return false;
     }
     else
     {
-        DBG("libusb_control_transfer success. ret:%d buffer:%c", ret, buffer[0]);
+        //DBG("sendBulk success. ret:%d", ret);
 
         return true;
+    }
+}
+
+int OPENVIO::recvBulk(unsigned char *buffer, int len)
+{
+    int recvLen = 0;
+    int ret = 0;
+
+    ret = libusb_bulk_transfer(dev_handle, CAM_EPADDR, buffer, len, &recvLen, 0);
+
+    if (ret < 0)
+    {
+        DBG("recvBulk fail :%d", ret);
+        return -1;
+    }
+    else
+    {
+        //DBG("recvBulk success. ret:%d len:%d", ret,recvLen);
+
+        return recvLen;
     }
 }
 
@@ -330,12 +350,12 @@ int OPENVIO::sendCtrl(char request, uint16_t wValue, uint16_t wIndex, unsigned c
 
         if (ret < 0)
         {
-            DBG("libusb_control_transfer fail");
+            DBG("sendCtrl fail");
             return -1;
         }
         else
         {
-            DBG("libusb_control_transfer success. ret:%d buffer:%c", ret, buffer[0]);
+            DBG("sendCtrl success. ret:%d buffer:%c", ret, buffer[0]);
 
             return ret;
         }

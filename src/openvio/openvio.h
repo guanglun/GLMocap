@@ -79,6 +79,7 @@ public:
     int IMUStart();
     int camStop();
     int IMUStop();
+    int recvBulk(unsigned char *buffer, int len);
 signals:
     void camSignals(int index);
     void imuSignals(int index);   

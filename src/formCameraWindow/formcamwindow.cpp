@@ -53,6 +53,7 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
 
 void FormCamWindow::ProvideContextMenu(const QPoint &pos)
 {
+    OPENVIO *vio = openvioList.at(ui->lv_openvio->indexAt(pos).row());
     QPoint item = ui->lv_openvio->mapToGlobal(pos);
 
     QMenu submenu;
@@ -62,7 +63,7 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
     if (rightClickItem && rightClickItem->text().contains("Rename"))
     {
 
-        QString dlgTitle = QString(openvioList.at(ui->lv_openvio->indexAt(pos).row())->idStr);
+        QString dlgTitle = QString(vio->idStr);
         QString txtLabel = QStringLiteral("input new name：");
         QString defaultInput = QStringLiteral("camera0");
         QLineEdit::EchoMode echoMode = QLineEdit::Normal;
@@ -92,6 +93,9 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
         else
         {
             setting->setFirmwarePath(filePath);
+            vio->open();
+            vio->upgrade->setBinPath(filePath);
+            vio->upgrade->upgradeStart();
         }
     }
 }

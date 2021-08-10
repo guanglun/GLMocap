@@ -58,6 +58,7 @@
         "qdebug": "cpp",
         "dense": "cpp",
         "qfileinfo": "cpp",
-        "qlabel": "cpp"
+        "qlabel": "cpp",
+        "string": "cpp"
     }
 }
