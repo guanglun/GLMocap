@@ -33,7 +33,7 @@ public:
     USBThread *camThread,*imuThread;
     enum SENSOR_STATUS camStatus,imuStatus;
     int recv_len_count = 0;
-    
+    bool isShowSpeed = false;
     int isCamRecv=false,isIMURecv=false;
     unsigned char *ctrl_buffer;
     int camRecvLen,imuRecvLen,recv_index;
@@ -41,6 +41,7 @@ public:
     unsigned int recv_count_1s = 0,frame_fps = 0,imu_hz = 0;
     Image img;
     unsigned char cam_id;
+
     pixformat_t pixformat;
     QString saveImagePath;
     FormVioWindow *formVioWindow = NULL;
@@ -50,6 +51,7 @@ public:
     MuItemCamData itemCamData;
     QStandardItem *pItem;
     char idStr[128];
+    char *idShort = &idStr[16];
     char productStr[128];
     enum OPENVIO_TYPE type = TYPE_NULL;
     QString name;
@@ -57,8 +59,8 @@ public:
     libusb_device *dev;
     uint8_t devAddr;
     QStandardItemModel *pModelOpenvio;
-    FirmwareUpgrade *upgrade;
-    int row;
+    
+    //int row;
 
     OPENVIO(libusb_device *dev);
     bool open(void);
@@ -86,8 +88,10 @@ signals:
     void camSignals(int index);
     void imuSignals(int index);   
     void closeSignals(void);   
+    void setStatusSignal(QString str); 
 private slots:
     void closeSlot(void);    
+    void setStatusSlot(QString str); 
 };
 
 #endif // SETTING_H

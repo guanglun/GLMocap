@@ -54,6 +54,9 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
 void FormCamWindow::ProvideContextMenu(const QPoint &pos)
 {
     OPENVIO *vio = openvioList.at(ui->lv_openvio->indexAt(pos).row());
+
+    mlog->show("[[[SELECT]]] " + QString(vio->idShort));
+
     QPoint item = ui->lv_openvio->mapToGlobal(pos);
 
     QMenu submenu;
@@ -63,7 +66,7 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
     if (rightClickItem && rightClickItem->text().contains("Rename"))
     {
 
-        QString dlgTitle = QString(vio->idStr);
+        QString dlgTitle = QString(vio->idShort);
         QString txtLabel = QStringLiteral("input new name：");
         QString defaultInput = QStringLiteral("camera0");
         QLineEdit::EchoMode echoMode = QLineEdit::Normal;
@@ -93,9 +96,10 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
         else
         {
             setting->setFirmwarePath(filePath);
-            vio->open();
-            vio->upgrade->setBinPath(filePath);
-            vio->upgrade->upgradeStart();
+            upgrade = new FirmwareUpgrade(vio);
+            connect(qwinusb, SIGNAL(newSignal(OPENVIO *)),upgrade->upgradeThread, SLOT(newSlot(OPENVIO *)));
+            upgrade->setBinPath(filePath);
+            upgrade->upgradeStart();
         }
     }
 }
@@ -134,7 +138,7 @@ void FormCamWindow::on_pb_capture_clicked()
         {
             if (vio->name.isEmpty() == true)
             {
-                vio->saveImagePath = setting->imagePath + "/" + QString(vio->idStr);
+                vio->saveImagePath = setting->imagePath + "/" + QString(vio->idShort);
             }
             else
             {
@@ -224,7 +228,9 @@ void FormCamWindow::onTimeOut()
         vio->frame_fps = 0;
 
         vio->recv_count_1s = 0;
-        vio->setStatus(speedStr);
+
+        if(vio->isShowSpeed)
+            vio->setStatus(speedStr);
     }
 
     status_speed->setText(getSpeed(recv_count_1s));

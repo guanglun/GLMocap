@@ -46,7 +46,7 @@ void FormVioWindow::setQData(OPENVIO *vio)
     connect(this->vio,SIGNAL(camSignals(int)),this,SLOT(camSlot(int)));
     connect(this->vio,SIGNAL(imuSignals(int)),this,SLOT(imuSlot(int)));
 
-    this->setWindowTitle(this->vio->name +" : "+ this->vio->idStr);
+    this->setWindowTitle(this->vio->name +" : "+ this->vio->idShort);
     
     ui->lb_img->setScaledContents(true);
 }

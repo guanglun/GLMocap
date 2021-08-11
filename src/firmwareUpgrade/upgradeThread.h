@@ -30,15 +30,18 @@ private:
     bool is_loop;
     QString binPath;
 public:
+    QString wait_id;
     UpgradeThread(FirmwareUpgrade *firmwareUpgrade);
     void run();
     void waitClose();
+    void showStatus(QString str);
     void setBinPath(QString binPath);
 signals:
     void endSignals(void);
     // void imuSignals(int index);   
     // void closeSignals(void);   
 private slots:
+    void newSlot(OPENVIO *vio);
     //void closeSlot(void);    
 };
 

@@ -52,16 +52,18 @@ FirmwareUpgrade::FirmwareUpgrade(OPENVIO *vio)
     parse_set_send_fun(&parse_usb, send_usb_data);
 
     firmwareUpgrade = this;
-    globalVio = vio;
-    this->vio = vio;
+    setOPENVIO(vio);
 
     upgradeThread = new UpgradeThread(this);
     connect(upgradeThread, SIGNAL(endSignals()), this, SLOT(endSlot()));
 
+}
 
-    upgradeRecvThread = new UpgradeRecvThread(vio);
-    connect(upgradeRecvThread, SIGNAL(recvSignals(unsigned char *, int)), this, SLOT(recvSlot(unsigned char *, int)));
-    
+void FirmwareUpgrade::setOPENVIO(OPENVIO *vio)
+{
+    globalVio = vio;
+    this->vio = vio;
+    vio->open();
 }
 
 void FirmwareUpgrade::setBinPath(QString binPath)
@@ -94,7 +96,7 @@ int send_hello(void)
 
 void FirmwareUpgrade::upgradeStart()
 {
-    upgradeRecvThread->start();
+    
     upgradeThread->start();
 }
 
@@ -168,6 +170,20 @@ void FirmwareUpgrade::send_iap_reboot()
     frame_s_tmp.SourceID = LOCAL_ID;
     frame_s_tmp.TargetID = TARGET_ID;
     frame_s_tmp.Cmd = CMD_IAP_RESET;
+    frame_s_tmp.DataIndex = 0x00;
+    frame_s_tmp.frame_data = NULL;
+    frame_s_tmp.send_frame_fun = send_usb_data;
+
+    creat_send_cmd(&parse_usb, &frame_s_tmp);
+}
+
+void FirmwareUpgrade::send_iap_reboot_to_bootloader()
+{
+    frame_s_tmp.Version = PROTOCOL_VERSION;
+    frame_s_tmp.FrameDataLen = 0;
+    frame_s_tmp.SourceID = LOCAL_ID;
+    frame_s_tmp.TargetID = TARGET_ID;
+    frame_s_tmp.Cmd = CMD_IAP_REBOOT_TO_BOOTLOADER;
     frame_s_tmp.DataIndex = 0x00;
     frame_s_tmp.frame_data = NULL;
     frame_s_tmp.send_frame_fun = send_usb_data;

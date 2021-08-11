@@ -23,7 +23,6 @@ WinUSBDriver::WinUSBDriver()
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
     timer->start(1000);
-    
 }
 
 WinUSBDriver::~WinUSBDriver()
@@ -51,7 +50,6 @@ void WinUSBDriver::scan(void)
     emit scanSignals();
 }
 
-
 void WinUSBDriver::scanSlot(void)
 {
     //autoScan();
@@ -64,7 +62,7 @@ void WinUSBDriver::onTimeOut()
 
 void WinUSBDriver::autoScan(void)
 {
-    DBG("start scan");
+    //DBG("start scan");
 
     struct libusb_device_descriptor desc;
     struct libusb_config_descriptor *conf;
@@ -78,7 +76,6 @@ void WinUSBDriver::autoScan(void)
 
     ssize_t num_devs, j, k;
     int size = openvioList->size();
-    
 
     num_devs = libusb_get_device_list(m_libusb_context, &list);
 
@@ -98,11 +95,13 @@ void WinUSBDriver::autoScan(void)
 
         if (ii >= num_devs)
         {
-            DBG("remove %d",openvioList->at(i)->devAddr);
+            DBG("remove %s %s %d", openvioList->at(i)->productStr, openvioList->at(i)->idShort, openvioList->at(i)->devAddr);
+
             openvioList->at(i)->removeItem();
             openvioList->removeAt(i);
             i--;
             size--;
+            DBG("remove success");
         }
     }
 
@@ -139,37 +138,56 @@ void WinUSBDriver::autoScan(void)
 
             if (ii >= size)
             {
-
                 OPENVIO *vio = new OPENVIO(device);
                 vio->dev = device;
                 vio->type = type;
                 vio->devAddr = libusb_get_device_address(device);
 
-                DBG("new addr : %d ",vio->devAddr);
+                //DBG("new addr : %d ",vio->devAddr);
                 ret = libusb_open(device, &vio->dev_handle);
+                if (ret < 0)
+                {
+                    DBG("open fail %d", ret);
+                }
 
-                libusb_get_string_descriptor_ascii(vio->dev_handle,
-                                                   desc.iSerialNumber,
-                                                   (unsigned char *)vio->idStr,
-                                                   sizeof(vio->idStr));
+                ret = libusb_get_string_descriptor_ascii(vio->dev_handle,
+                                                         desc.iSerialNumber,
+                                                         (unsigned char *)vio->idStr,
+                                                         sizeof(vio->idStr));
+                if (ret < 0)
+                {
+                    DBG("get descriptor fail %d", ret);
+                }
 
-                libusb_get_string_descriptor_ascii(vio->dev_handle,
-                                                   desc.iProduct,
-                                                   (unsigned char *)vio->productStr,
-                                                   sizeof(vio->productStr));
+                ret = libusb_get_string_descriptor_ascii(vio->dev_handle,
+                                                         desc.iProduct,
+                                                         (unsigned char *)vio->productStr,
+                                                         sizeof(vio->productStr));
+                if (ret < 0)
+                {
+                    DBG("get descriptor fail %d", ret);
+                }
 
-                DBG("found %s %s", vio->productStr, vio->idStr);
+                if (QString(vio->productStr).length() >= 7 &&
+                    QString(vio->idStr).length() == 24)
+                {
+                    DBG("found %s %s %d", vio->productStr, vio->idShort, vio->devAddr);
+                    openvioList->append(vio);
 
-                openvioList->append(vio);
-
-                vio->setItem(pModelOpenvio);
-
-                libusb_close(vio->dev_handle);
+                    vio->setItem(pModelOpenvio);
+                    libusb_close(vio->dev_handle);
+                    emit newSignal(vio);
+                }
+                else
+                {
+                    libusb_close(vio->dev_handle);
+                    delete vio;
+                }
             }
         }
     }
 
-    DBG("all found openvio : %d", (int)openvioList->length());
+    //DBG("all found openvio : %d", (int)openvioList->length());
 
     //libusb_free_device_list(list, 1);
     //libusb_exit(m_libusb_context);

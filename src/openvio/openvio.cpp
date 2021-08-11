@@ -8,7 +8,7 @@ OPENVIO::OPENVIO(libusb_device *dev)
     camThread = new USBThread();
     imuThread = new USBThread();
 
-    upgrade = new FirmwareUpgrade(this);
+    
 
     camThread->init(this, "cam");
     imuThread->init(this, "imu");
@@ -19,6 +19,7 @@ OPENVIO::OPENVIO(libusb_device *dev)
     imuStatus = SENSOR_STATUS_STOP;
 
     connect(this, SIGNAL(closeSignals()), this, SLOT(closeSlot()));
+    connect(this, SIGNAL(setStatusSignal(QString)), this, SLOT(setStatusSlot(QString)));
 }
 
 bool OPENVIO::open(void)
@@ -263,7 +264,7 @@ int OPENVIO::recvBulk(unsigned char *buffer, int len)
 void OPENVIO::setItem(QStandardItemModel *pModelOpenvio)
 {
     this->pModelOpenvio = pModelOpenvio;
-    itemCamData.id = idStr;
+    itemCamData.id = &idStr[16];
     itemCamData.status = "wait";
     itemCamData.name = setting->getNameById(idStr);
     itemCamData.type = type;
@@ -271,26 +272,32 @@ void OPENVIO::setItem(QStandardItemModel *pModelOpenvio)
 
     pItem->setData(QVariant::fromValue(itemCamData), Qt::UserRole + 1);
     pModelOpenvio->appendRow(pItem);
-    row = pModelOpenvio->rowCount() - 1;
+    //row = pModelOpenvio->rowCount() - 1;
 }
 
 void OPENVIO::removeItem(void)
 {
-    pModelOpenvio->removeRow(row);
+    QModelIndex index = pModelOpenvio->indexFromItem(pItem);
+    pModelOpenvio->removeRow(index.row());
+}
+
+void OPENVIO::setStatusSlot(QString str)
+{
+    itemCamData.status = str;
+
+    pItem->setData(QVariant::fromValue(itemCamData));
 }
 
 void OPENVIO::setStatus(QString status)
 {
-    itemCamData.status = status;
-
-    pModelOpenvio->item(row, 0)->setData(QVariant::fromValue(itemCamData));
+    emit setStatusSignal(status);
 }
 
 void OPENVIO::setName(QString name)
 {
     itemCamData.name = name;
     this->name = itemCamData.name;
-    pModelOpenvio->item(row, 0)->setData(QVariant::fromValue(itemCamData));
+    pItem->setData(QVariant::fromValue(itemCamData));
     setting->setNameById(idStr, name);
 }
 

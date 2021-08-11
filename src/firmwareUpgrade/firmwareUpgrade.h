@@ -23,6 +23,7 @@ class UpgradeThread;
 #define CMD_IAP_RESET 0xA4  //系统复位指令
 #define CMD_IAP_ACK 0xA5    //固件下载应答帧
 #define CMD_IAP_READY 0xA6  //固件下载准备
+#define CMD_IAP_REBOOT_TO_BOOTLOADER    0xA7
 
 typedef enum
 {
@@ -44,22 +45,26 @@ class FirmwareUpgrade : public QObject
 {
     Q_OBJECT
 private:
-    OPENVIO *vio;
-    UpgradeRecvThread *upgradeRecvThread;
-    UpgradeThread *upgradeThread;
+    
+
     FRAME_STRUCT frame_s_tmp;
 
 public:
+    OPENVIO *vio;
     enum REPLY reply_status;
     int errorCode;
+    UpgradeRecvThread *upgradeRecvThread;
+    UpgradeThread *upgradeThread;
 
     FirmwareUpgrade(OPENVIO *vio);
+    void setOPENVIO(OPENVIO *vio);
     void setBinPath(QString binPath);
     void upgradeStart();
     void send_iap_begin(unsigned int size);
     void send_iap_trans(unsigned short index,unsigned char *buffer,unsigned int len);
     void send_iap_crc(unsigned int crc);
     void send_iap_reboot();
+    void send_iap_reboot_to_bootloader();
 signals:
     //void camSignals(int index);
     //void imuSignals(int index);

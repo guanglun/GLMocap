@@ -39,7 +39,8 @@ public:
     Log *mlog;
     QLabel *status_msg,*status_speed;
     int recv_count_1s;
-
+    FirmwareUpgrade *upgrade;
+    
     MultipleViewTriangulation multipleViewTriangulation;
     FormVisionWindow fVisionWindow;
     Form3DViewWindow f3DViewWindow;

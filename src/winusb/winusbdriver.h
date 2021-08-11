@@ -78,6 +78,7 @@ public:
     pixformat_t pixformat;
     unsigned int recv_count_1s = 0,frame_fps = 0,imu_hz = 0;
     QList<OPENVIO*> *openvioList;
+
     libusb_device **list;
 
     WinUSBDriver();
@@ -110,6 +111,8 @@ signals:
     void sendStatusSignals(int msg);
     void scanSignals(void);
     
+    void newSignal(OPENVIO *vio);
+    void removeSignal(OPENVIO *vio);
 private slots:
     void closeSlot(void);
     void openSlot(int vid,int pid);
