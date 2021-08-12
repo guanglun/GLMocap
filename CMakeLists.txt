@@ -22,6 +22,7 @@ QT5_WRAP_UI( UI_HEADERS
     ${CMAKE_SOURCE_DIR}/src/formCvWindow/formcvwindow.ui
     ${CMAKE_SOURCE_DIR}/src/formVisionWindow/formvisionwindow.ui
     ${CMAKE_SOURCE_DIR}/src/form3DViewWindow/form3dviewwindow.ui
+    ${CMAKE_SOURCE_DIR}/src/formLogWindow/formlogwindow.ui
 )
 
 add_executable(MultiCam 
@@ -34,6 +35,7 @@ add_executable(MultiCam
     src/formVioWindow/formviowindow.cpp
     src/formVisionWindow/formvisionwindow.cpp
     src/form3DViewWindow/form3dviewwindow.cpp
+    src/formlogWindow/formlogwindow.cpp
     src/formCvWindow/formcvwindow.cpp
     src/vision/multipleViewTriangulation.cpp
     src/firmwareUpgrade/firmwareUpgrade.cpp
@@ -78,6 +80,7 @@ include_directories(
                     src/formVioWindow
                     src/formVisionWindow
                     src/form3DViewWindow
+                    src/formLogWindow
                     src/formCvWindow
                     src/firmwareUpgrade
                     src/gl_protocol

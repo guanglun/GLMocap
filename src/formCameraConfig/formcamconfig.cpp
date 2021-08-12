@@ -37,15 +37,15 @@ FormCamConfig::FormCamConfig(QWidget *parent) :
     ui(new Ui::FormCamConfig)
 {
     ui->setupUi(this);
-    this->setWindowTitle("摄像头设置");
+    this->setWindowTitle("camera config");
     ui->comboBoxCamSize->addItems(FrameSizeStr);
 
     ui->le_exposure->setValidator(new QIntValidator(0,99999999,this));
 }
 
-void FormCamConfig::setQData(WinUSBDriver *qwinusb)
+void FormCamConfig::setQData(OPENVIO *vio)
 {
-    this->qwinusb = qwinusb;
+    this->vio = vio;
 }
 
 FormCamConfig::~FormCamConfig()
@@ -55,9 +55,6 @@ FormCamConfig::~FormCamConfig()
 
 void FormCamConfig::on_pb_set_config_clicked()
 {
-
-
-
 
 }
 
@@ -87,8 +84,8 @@ void FormCamConfig::on_pb_set_config_exposure_clicked()
         exposure_value = -exposure_value;
     }
 
-    DBG("exposure_value %d",exposure_value);
-    //qwinusb->ctrlCamSetExposure(exposure_value);
+    //DBG("exposure_value %d",exposure_value);
+    vio->ctrlCamSetExposure(exposure_value);
 }
 
 void FormCamConfig::on_pb_set_config_image_size_clicked()

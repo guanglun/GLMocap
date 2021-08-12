@@ -11,6 +11,9 @@
 #include "image.h"
 #include "findstr.h"
 
+class FormCamConfig;
+#include "FormCamConfig.h"
+
 class FormVioWindow;
 #include "FormVioWindow.h"
 
@@ -29,8 +32,8 @@ class USBThread;
 #define REQUEST_GET_CAMERA_STATUS 	0x10
 #define REQUEST_GET_VERSION 		0x00
 
-#define REQUEST_CAMERA_SET_FRAME_SIZE_NUM 0xA2
-#define REQUEST_CAMERA_SET_EXPOSURE 0xA3
+#define REQUEST_CAMERA_SET_FRAME_SIZE_NUM   0xA2
+#define REQUEST_CAMERA_SET_EXPOSURE         0xA3
 
 #define REQUEST_IMU_START 0xB0
 #define REQUEST_IMU_STOP 0xB1
@@ -57,9 +60,11 @@ public:
 
     unsigned char version[3];
     
+    int exposure;
     pixformat_t pixformat;
     QString saveImagePath;
     FormVioWindow *formVioWindow = NULL;
+    FormCamConfig *formCamConfig = NULL;
 
     int saveCount = 0;
     

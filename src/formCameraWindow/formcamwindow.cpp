@@ -16,6 +16,8 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
     qwinusb = new WinUSBDriver();
 
     mlog = new Log();
+
+    connect(mlog, SIGNAL(logSignal(QString)), &fLogWindow, SLOT(logSlot(QString)));
     mlog->show("OPENVIO StartUp", LOG_DEBUG);
 
     QStandardItemModel *pModelOpenvio = new QStandardItemModel();
@@ -48,8 +50,6 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
     {
         setting->loadVisionParam(path);
     }
-
-    qwinusb->scan();
 }
 
 void FormCamWindow::ProvideContextMenu(const QPoint &pos)
@@ -61,13 +61,20 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
     QPoint item = ui->lv_openvio->mapToGlobal(pos);
 
     QMenu submenu;
+    submenu.addAction("Setup");
     submenu.addAction("Rename");
     submenu.addAction("Upgrade Firmware");
     submenu.addAction("Reboot Now");
     submenu.addAction("Reboot To Bootloader");
 
     QAction *rightClickItem = submenu.exec(item);
-    if (rightClickItem && rightClickItem->text().contains("Rename"))
+    if (rightClickItem && rightClickItem->text().contains("Setup"))
+    {
+        vio->formCamConfig = new FormCamConfig();
+        vio->formCamConfig->setQData(vio);
+        vio->formCamConfig->show();
+    }
+    else if (rightClickItem && rightClickItem->text().contains("Rename"))
     {
 
         QString dlgTitle = QString(vio->idShort);
@@ -80,7 +87,8 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
         {
             openvioList.at(ui->lv_openvio->indexAt(pos).row())->setName(text);
         }
-    }else if (rightClickItem && rightClickItem->text().contains("Upgrade Firmware"))
+    }
+    else if (rightClickItem && rightClickItem->text().contains("Upgrade Firmware"))
     {
         QString path = setting->getFirmwarePath();
         if (path.length() == 0)
@@ -100,15 +108,17 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
         {
             setting->setFirmwarePath(filePath);
             upgrade = new FirmwareUpgrade(vio);
-            connect(qwinusb, SIGNAL(newSignal(OPENVIO *)),upgrade->upgradeThread, SLOT(newSlot(OPENVIO *)));
+            connect(qwinusb, SIGNAL(newSignal(OPENVIO *)), upgrade->upgradeThread, SLOT(newSlot(OPENVIO *)));
             upgrade->setBinPath(filePath);
             upgrade->upgradeStart();
         }
-    }else if (rightClickItem && rightClickItem->text().contains("Reboot Now"))
+    }
+    else if (rightClickItem && rightClickItem->text().contains("Reboot Now"))
     {
         vio->open();
         vio->ctrlReboot(1);
-    }else if (rightClickItem && rightClickItem->text().contains("Reboot To Bootloader"))
+    }
+    else if (rightClickItem && rightClickItem->text().contains("Reboot To Bootloader"))
     {
         vio->open();
         vio->ctrlReboot(0);
@@ -181,7 +191,7 @@ void FormCamWindow::doubleClickedSlot(const QModelIndex &index)
 
     if (vio->isCamRecv == false && vio->type == TYPE_OPENVIO)
     {
-        if(vio->formVioWindow == NULL)
+        if (vio->formVioWindow == NULL)
         {
             vio->formVioWindow = new FormVioWindow();
             vio->formVioWindow->setQData(openvioList.at(index.row()));
@@ -189,15 +199,14 @@ void FormCamWindow::doubleClickedSlot(const QModelIndex &index)
             connect(vio->formVioWindow->formCvWindow, SIGNAL(positionSignals(int, double, double)), &multipleViewTriangulation, SLOT(positionSlot(int, double, double)));
         }
 
-        if(vio->formVioWindow->isVisible() == false)
+        if (vio->formVioWindow->isVisible() == false)
         {
             vio->formVioWindow->show();
-            if(vio->open())
+            if (vio->open())
             {
                 vio->camStart();
             }
         }
-
     }
 }
 
@@ -240,7 +249,7 @@ void FormCamWindow::onTimeOut()
 
         vio->recv_count_1s = 0;
 
-        if(vio->isShowSpeed)
+        if (vio->isShowSpeed)
             vio->setStatus(speedStr);
     }
 
@@ -262,6 +271,15 @@ void FormCamWindow::on_action3d_view_triggered()
     {
         connect(&multipleViewTriangulation, SIGNAL(onXYZSignals(double, double, double)), &f3DViewWindow, SLOT(onXYZSlot(double, double, double)));
         f3DViewWindow.show();
+    }
+}
+
+void FormCamWindow::on_actionLog_view_triggered()
+{
+    if (!fLogWindow.isActiveWindow())
+    {
+        
+        fLogWindow.show();
     }
 }
 

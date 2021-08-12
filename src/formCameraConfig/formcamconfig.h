@@ -3,7 +3,9 @@
 
 #include <QWidget>
 #include "workspace.h"
-#include "winusbdriver.h"
+
+class OPENVIO;
+#include "openvio.h"
 
 namespace Ui {
 class FormCamConfig;
@@ -16,8 +18,8 @@ class FormCamConfig : public QWidget
 public:
     explicit FormCamConfig(QWidget *parent = 0);
     ~FormCamConfig();
-    WinUSBDriver *qwinusb;
-    void setQData(WinUSBDriver *qwinusb);
+    OPENVIO *vio;
+    void setQData(OPENVIO *vio);
 private slots:
     void on_pb_set_config_clicked();
     

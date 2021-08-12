@@ -23,6 +23,7 @@
 
 #include "formvisionwindow.h"
 #include "form3dviewwindow.h"
+#include "formlogwindow.h"
 
 namespace Ui {
 class FormCamWindow;
@@ -36,7 +37,6 @@ private:
 public:
     QList<OPENVIO*> openvioList;
     WinUSBDriver *qwinusb;
-    Log *mlog;
     QLabel *status_msg,*status_speed;
     int recv_count_1s;
     FirmwareUpgrade *upgrade;
@@ -44,6 +44,7 @@ public:
     MultipleViewTriangulation multipleViewTriangulation;
     FormVisionWindow fVisionWindow;
     Form3DViewWindow f3DViewWindow;
+    FormLogWindow fLogWindow;
 
     explicit FormCamWindow(QWidget *parent = nullptr);
     ~FormCamWindow();
@@ -59,6 +60,7 @@ private slots:
     void on_action_position_triggered();
     void on_action3d_view_triggered();
     void on_actionLoad_vision_param_triggered();
+    void on_actionLog_view_triggered();
     
 private:
     Ui::FormCamWindow *ui;

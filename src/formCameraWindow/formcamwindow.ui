@@ -85,6 +85,7 @@
     </property>
     <addaction name="action_position"/>
     <addaction name="action3d_view"/>
+    <addaction name="actionLog_view"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menuWindow"/>
@@ -116,6 +117,11 @@
   <action name="actionLoad_vision_param">
    <property name="text">
     <string>load vision param</string>
+   </property>
+  </action>
+  <action name="actionLog_view">
+   <property name="text">
+    <string>log view</string>
    </property>
   </action>
  </widget>

@@ -21,6 +21,10 @@ public:
     
     Log();
     void show(QString str,enum LOG_TYPE type = LOG_ALL);
+private slots:
+
+signals:
+    void logSignal(QString msg);
 };
 
 #endif // LOG_H
