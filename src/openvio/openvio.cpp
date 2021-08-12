@@ -8,12 +8,8 @@ OPENVIO::OPENVIO(libusb_device *dev)
     camThread = new USBThread();
     imuThread = new USBThread();
 
-    
-
     camThread->init(this, "cam");
     imuThread->init(this, "imu");
-
-    ctrl_buffer = (unsigned char *)malloc(1024);
 
     camStatus = SENSOR_STATUS_STOP;
     imuStatus = SENSOR_STATUS_STOP;
@@ -26,7 +22,7 @@ bool OPENVIO::open(void)
 {
     int ret = 0;
 
-    if (is_open)
+    if (dev_handle != NULL)
     {
         DBG("already open");
         return true;
@@ -67,8 +63,6 @@ bool OPENVIO::open(void)
         DBG("claim interface success");
     }
 
-    is_open = true;
-
     DBG("open success");
 
     //emit sendStatusSignals(USB_MSG_OPEN_SUCCESS);
@@ -76,10 +70,9 @@ bool OPENVIO::open(void)
 
     return true;
 
-close_fail:
-    is_open = false;
 claim_fail:
     libusb_close(dev_handle);
+    dev_handle = NULL;
 open_fail:
 init_fail:
     DBG("open fail");
@@ -116,7 +109,7 @@ void OPENVIO::CamRecv(void)
                 //DBG("cam recv time out");
             }
         }
-        else if (camStatus == SENSOR_STATUS_RUNNING)
+        else if (camStatus != SENSOR_STATUS_STOP)
         {
             //DBG("cam recv %d %d %d",recv_head_status,camRecvLen,recv_index);
             recv_count_1s += camRecvLen;
@@ -265,6 +258,10 @@ void OPENVIO::setItem(QStandardItemModel *pModelOpenvio)
 {
     this->pModelOpenvio = pModelOpenvio;
     itemCamData.id = &idStr[16];
+    itemCamData.ver = QString("v" +
+                              QString::number(version[0]) + "." +
+                              QString::number(version[1]) + "." +
+                              QString::number(version[2]));
     itemCamData.status = "wait";
     itemCamData.name = setting->getNameById(idStr);
     itemCamData.type = type;
@@ -272,7 +269,6 @@ void OPENVIO::setItem(QStandardItemModel *pModelOpenvio)
 
     pItem->setData(QVariant::fromValue(itemCamData), Qt::UserRole + 1);
     pModelOpenvio->appendRow(pItem);
-    //row = pModelOpenvio->rowCount() - 1;
 }
 
 void OPENVIO::removeItem(void)
@@ -310,7 +306,7 @@ void OPENVIO::closeSlot(void)
 {
     int close_try_cnt = 0;
 
-    if (is_open)
+    if (dev_handle != NULL)
     {
         close_try_cnt = 0;
         while (ctrlCamStop() != 0 && close_try_cnt > 2)
@@ -325,8 +321,6 @@ void OPENVIO::closeSlot(void)
             close_try_cnt++;
             mlog->show("close imu fail");
         }
-
-        is_open = false;
 
         //DBG("closeSlot");
 
@@ -344,32 +338,23 @@ void OPENVIO::closeSlot(void)
     }
 }
 
-#define REQUEST_CAMERA_START 0xA0
-#define REQUEST_CAMERA_STOP 0xA1
-#define REQUEST_CAMERA_SET_FRAME_SIZE_NUM 0xA2
-#define REQUEST_CAMERA_SET_EXPOSURE 0xA3
-
-#define REQUEST_IMU_START 0xB0
-#define REQUEST_IMU_STOP 0xB1
-
-int OPENVIO::sendCtrl(char request, uint16_t wValue, uint16_t wIndex, unsigned char *buffer)
+int OPENVIO::sendCtrl(char request, uint8_t type, unsigned char *buffer, uint16_t len)
 {
     int ret = 0;
-    if (is_open)
+    if (dev_handle != NULL)
     {
-
-        ret = libusb_control_transfer(dev_handle, LIBUSB_REQUEST_TYPE_VENDOR + LIBUSB_ENDPOINT_IN, request, wValue, wIndex, buffer, 128, 1000);
+        ret = libusb_control_transfer(dev_handle, LIBUSB_REQUEST_TYPE_VENDOR + type, request, 0, 0, buffer, len, 100);
 
         if (ret < 0)
         {
-            DBG("sendCtrl fail");
+            DBG("sendCtrl fail ret:%d", ret);
             return -1;
         }
         else
         {
-            DBG("sendCtrl success. ret:%d buffer:%c", ret, buffer[0]);
+            //DBG("sendCtrl success. ret:%d", ret);
 
-            return ret;
+            return 0;
         }
     }
 
@@ -378,7 +363,7 @@ int OPENVIO::sendCtrl(char request, uint16_t wValue, uint16_t wIndex, unsigned c
 
 int OPENVIO::camStart()
 {
-    DBG("cam start");
+    //DBG("cam start");
     isCamRecv = true;
     camThread->start();
     ctrlCamStart();
@@ -397,7 +382,7 @@ int OPENVIO::camStop()
     isCamRecv = false;
     camThread->waitClose();
 
-    DBG("cam stop");
+    //DBG("cam stop");
 
     return true;
 }
@@ -405,43 +390,119 @@ int OPENVIO::camStop()
 int OPENVIO::ctrlCamStart()
 {
     uint8_t ret = 0;
-    recv_index = 0;
 
-    ret = sendCtrl(REQUEST_CAMERA_START, 0, 0, ctrl_buffer);
-    if ((ret >= 0) && (ctrl_buffer[0] == 'S'))
+    ctrl_buffer[0] = 1;
+    ret = sendCtrl(REQUEST_SET_CAMERA_STATUS, LIBUSB_ENDPOINT_OUT, ctrl_buffer, 1);
+    if (ret < 0)
     {
-        camStatus = SENSOR_STATUS_RUNNING;
+        return -1;
+    }
+    ret = sendCtrl(REQUEST_GET_CAMERA_STATUS, LIBUSB_ENDPOINT_IN, ctrl_buffer, 128);
+    if (ret < 0)
+    {
+        return -1;
+    }
+    else
+    {
+        DBG("run:%d  id:%d  bpp:%d  size:%d  pixformat:%d", ctrl_buffer[0],
+            ctrl_buffer[1], ctrl_buffer[3], ctrl_buffer[2], ctrl_buffer[4]);
+
         recv_index = 0;
-        DBG("ret:%d\t id:%d \t bpp:%d\t size:%d\t pixformat:%d", ret, ctrl_buffer[1], ctrl_buffer[3], ctrl_buffer[2], ctrl_buffer[4]);
+        camStatus = (enum SENSOR_STATUS)ctrl_buffer[0];
         cam_id = ctrl_buffer[1];
         img.gs_bpp = ctrl_buffer[3];
         img.setImgSize(ctrl_buffer[2]);
         pixformat = (pixformat_t)ctrl_buffer[4];
 
-        return 0;
+        if (camStatus == SENSOR_STATUS_STOP)
+        {
+            return -1;
+        }
     }
 
-    return -1;
+    DBG("cam ctrl start success");
+
+    return 0;
+}
+
+int OPENVIO::ctrlReboot(uint8_t boot)
+{
+    uint8_t ret = 0;
+
+    ctrl_buffer[0] = boot;
+    ret = sendCtrl(REQUEST_SET_REBOOT, LIBUSB_ENDPOINT_OUT, ctrl_buffer, 1);
+    if (ret < 0)
+    {
+        return -1;
+    }
+    return 0;
+}
+
+int OPENVIO::getVersion()
+{
+    uint8_t ret = 0;
+
+    ret = sendCtrl(REQUEST_GET_VERSION, LIBUSB_ENDPOINT_IN, ctrl_buffer, 128);
+    if (ret < 0)
+    {
+        return -1;
+    }
+    else
+    {
+        version[0] = ctrl_buffer[0];
+        version[1] = ctrl_buffer[1];
+        version[2] = ctrl_buffer[2];
+
+        mlog->show("get version v" +
+                   QString::number(version[0]) + "." +
+                   QString::number(version[1]) + "." +
+                   QString::number(version[2]));
+    }
+
+    return 0;
 }
 
 int OPENVIO::ctrlCamStop()
 {
     uint8_t ret = 0;
 
-    ret = sendCtrl(REQUEST_CAMERA_STOP, 0, 0, ctrl_buffer);
-
-    if ((ret > 0) && (ctrl_buffer[0] == 'S'))
+    ctrl_buffer[0] = 0;
+    ret = sendCtrl(REQUEST_SET_CAMERA_STATUS, LIBUSB_ENDPOINT_OUT, ctrl_buffer, 1);
+    if (ret < 0)
     {
-        camStatus = SENSOR_STATUS_STOP;
-        return 0;
+        return -1;
+    }
+    ret = sendCtrl(REQUEST_GET_CAMERA_STATUS, LIBUSB_ENDPOINT_IN, ctrl_buffer, 128);
+    if (ret < 0)
+    {
+        return -1;
+    }
+    else
+    {
+        DBG("run:%d  id:%d  bpp:%d  size:%d  pixformat:%d", ctrl_buffer[0],
+            ctrl_buffer[1], ctrl_buffer[3], ctrl_buffer[2], ctrl_buffer[4]);
+
+        recv_index = 0;
+        camStatus = (enum SENSOR_STATUS)ctrl_buffer[0];
+        cam_id = ctrl_buffer[1];
+        img.gs_bpp = ctrl_buffer[3];
+        img.setImgSize(ctrl_buffer[2]);
+        pixformat = (pixformat_t)ctrl_buffer[4];
+
+        if (camStatus != SENSOR_STATUS_STOP)
+        {
+            return -1;
+        }
     }
 
-    return -1;
+    DBG("cam ctrl stop success");
+
+    return 0;
 }
 
 int OPENVIO::IMUStart()
 {
-    DBG("imu start");
+    //DBG("imu start");
     isIMURecv = true;
     imuThread->start();
     ctrlIMUStart();
@@ -467,64 +528,64 @@ int OPENVIO::IMUStop()
 
 int OPENVIO::ctrlIMUStart()
 {
-    uint8_t ret = 0;
+    // uint8_t ret = 0;
 
-    ret = sendCtrl(REQUEST_IMU_START, 0, 0, ctrl_buffer);
-    if ((ret > 0) && (ctrl_buffer[0] == 'S'))
-    {
-        imuStatus = SENSOR_STATUS_RUNNING;
-        return 0;
-    }
-    return -1;
+    // ret = sendCtrl(REQUEST_IMU_START, 0, 0, ctrl_buffer);
+    // if ((ret > 0) && (ctrl_buffer[0] == 'S'))
+    // {
+    //     imuStatus = SENSOR_STATUS_RUNNING;
+    //     return 0;
+    // }
+    // return -1;
 }
 
 int OPENVIO::ctrlIMUStop()
 {
 
-    uint8_t ret = 0;
+    // uint8_t ret = 0;
 
-    ret = sendCtrl(REQUEST_IMU_STOP, 0, 0, ctrl_buffer);
-    if ((ret > 0) && (ctrl_buffer[0] == 'S'))
-    {
-        imuStatus = SENSOR_STATUS_STOP;
-        return 0;
-    }
-    return -1;
+    // ret = sendCtrl(REQUEST_IMU_STOP, 0, 0, ctrl_buffer);
+    // if ((ret > 0) && (ctrl_buffer[0] == 'S'))
+    // {
+    //     imuStatus = SENSOR_STATUS_STOP;
+    //     return 0;
+    // }
+    // return -1;
 }
 
 int OPENVIO::ctrlCamSetFrameSizeNum(uint16_t num)
 {
 
-    uint8_t ret = 0;
+    // uint8_t ret = 0;
 
-    ret = sendCtrl(REQUEST_CAMERA_SET_FRAME_SIZE_NUM, num, 0, ctrl_buffer);
-    if ((ret >= 0) && (ctrl_buffer[0] == 'S'))
-    {
-        DBG("ret:%d\t id:%d \t bpp:%d\t size:%d\t pixformat:%d", ret, ctrl_buffer[1], ctrl_buffer[3], ctrl_buffer[2], ctrl_buffer[4]);
-        cam_id = ctrl_buffer[1];
-        img.gs_bpp = ctrl_buffer[3];
-        img.setImgSize(ctrl_buffer[2]);
-        pixformat = (pixformat_t)ctrl_buffer[4];
+    // ret = sendCtrl(REQUEST_CAMERA_SET_FRAME_SIZE_NUM, num, 0, ctrl_buffer);
+    // if ((ret >= 0) && (ctrl_buffer[0] == 'S'))
+    // {
+    //     DBG("ret:%d\t id:%d \t bpp:%d\t size:%d\t pixformat:%d", ret, ctrl_buffer[1], ctrl_buffer[3], ctrl_buffer[2], ctrl_buffer[4]);
+    //     cam_id = ctrl_buffer[1];
+    //     img.gs_bpp = ctrl_buffer[3];
+    //     img.setImgSize(ctrl_buffer[2]);
+    //     pixformat = (pixformat_t)ctrl_buffer[4];
 
-        return 0;
-    }
-    return -1;
+    //     return 0;
+    // }
+    // return -1;
 }
 
 int OPENVIO::ctrlCamSetExposure(int value)
 {
 
-    uint8_t ret = 0;
-    uint16_t wValue, wIndex;
-    wValue = (uint16_t)(value >> 16);
-    wIndex = (uint16_t)(value >> 0);
+    // uint8_t ret = 0;
+    // uint16_t wValue, wIndex;
+    // wValue = (uint16_t)(value >> 16);
+    // wIndex = (uint16_t)(value >> 0);
 
-    ret = sendCtrl(REQUEST_CAMERA_SET_EXPOSURE, wValue, wIndex, ctrl_buffer);
-    if ((ret >= 0) && (ctrl_buffer[0] == 'S'))
-    {
-        DBG("ret:%d\t", ret);
+    // ret = sendCtrl(REQUEST_CAMERA_SET_EXPOSURE, wValue, wIndex, ctrl_buffer);
+    // if ((ret >= 0) && (ctrl_buffer[0] == 'S'))
+    // {
+    //     DBG("ret:%d\t", ret);
 
-        return 0;
-    }
-    return -1;
+    //     return 0;
+    // }
+    // return -1;
 }

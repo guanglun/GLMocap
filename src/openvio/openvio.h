@@ -21,6 +21,19 @@ class USBThread;
 #include "usbthread.h"
 
 
+//OUT
+#define REQUEST_SET_CAMERA_STATUS 0xA0
+#define REQUEST_SET_REBOOT 					0x01
+
+//IN
+#define REQUEST_GET_CAMERA_STATUS 	0x10
+#define REQUEST_GET_VERSION 		0x00
+
+#define REQUEST_CAMERA_SET_FRAME_SIZE_NUM 0xA2
+#define REQUEST_CAMERA_SET_EXPOSURE 0xA3
+
+#define REQUEST_IMU_START 0xB0
+#define REQUEST_IMU_STOP 0xB1
 
 class OPENVIO : public QObject
 {
@@ -35,13 +48,15 @@ public:
     int recv_len_count = 0;
     bool isShowSpeed = false;
     int isCamRecv=false,isIMURecv=false;
-    unsigned char *ctrl_buffer;
+    unsigned char ctrl_buffer[128];
     int camRecvLen,imuRecvLen,recv_index;
-    bool is_open;
+    
     unsigned int recv_count_1s = 0,frame_fps = 0,imu_hz = 0;
     Image img;
     unsigned char cam_id;
 
+    unsigned char version[3];
+    
     pixformat_t pixformat;
     QString saveImagePath;
     FormVioWindow *formVioWindow = NULL;
@@ -69,7 +84,7 @@ public:
     void setName(QString name);
     void CamRecv(void);
     void IMURecv(void);
-    int sendCtrl(char request, uint16_t wValue,uint16_t wIndex,unsigned char *buffer);
+    int sendCtrl(char request, uint8_t type, unsigned char *buffer,uint16_t len);
     bool sendBulk(unsigned char * buffer,int len);
     int ctrlCamStart();
     int ctrlCamStop();
@@ -84,6 +99,8 @@ public:
     int IMUStop();
     int recvBulk(unsigned char *buffer, int len);
     void removeItem(void);
+    int getVersion();
+    int ctrlReboot(uint8_t boot);
 signals:
     void camSignals(int index);
     void imuSignals(int index);   

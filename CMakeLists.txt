@@ -16,7 +16,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # set(CMAKE_GENERATOR "MinGW Makefiles")
 
 QT5_WRAP_UI( UI_HEADERS 
-    ${CMAKE_SOURCE_DIR}/src/formMainWindow/mainwindow.ui
     ${CMAKE_SOURCE_DIR}/src/formCameraConfig/formcamconfig.ui
     ${CMAKE_SOURCE_DIR}/src/formCameraWindow/formcamwindow.ui
     ${CMAKE_SOURCE_DIR}/src/formVioWindow/formviowindow.ui
@@ -31,7 +30,6 @@ add_executable(MultiCam
     src/resource.qrc
     
     src/formCameraConfig/formcamconfig.cpp
-    src/formMainWindow/mainwindow.cpp
     src/formCameraWindow/formcamwindow.cpp
     src/formVioWindow/formviowindow.cpp
     src/formVisionWindow/formvisionwindow.cpp

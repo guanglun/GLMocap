@@ -45,9 +45,11 @@ void MuItemCam::paint(QPainter *painter, const QStyleOptionViewItem &option, con
         }
 
         QRectF iconRect = QRect(rect.left()+5, rect.top()+5, 60, 60);
-        QRectF idRect = QRect(iconRect.right()+5, iconRect.top(), rect.width()-10-iconRect.width(), 20);
-        QRectF statusRect = QRect(idRect.left(), idRect.bottom(), rect.width()-10-iconRect.width(), 20);
-        QRectF nameRect = QRect(statusRect.left(), statusRect.bottom(), rect.width()-10-iconRect.width(), 20);
+        QRectF idRect = QRect(iconRect.right()+5, iconRect.top(), (rect.width()-10-iconRect.width())/2, 20);
+        QRectF verRect = QRect(idRect.right()+5, idRect.top(), (rect.width()-10-iconRect.width())/2, 20);
+        
+        QRectF nameRect = QRect(idRect.left(), idRect.bottom(), rect.width()-10-iconRect.width(), 20);
+        QRectF statusRect = QRect(nameRect.left(), nameRect.bottom(), rect.width()-10-iconRect.width(), 20);
 
         if(itemData.type == TYPE_OPENVIO)
         {
@@ -60,6 +62,7 @@ void MuItemCam::paint(QPainter *painter, const QStyleOptionViewItem &option, con
         painter->setPen(QPen(Qt::black));
         painter->setFont(QFont("Microsoft Yahei", 10));
         painter->drawText(idRect, itemData.id);
+        painter->drawText(verRect, itemData.ver);
         painter->drawText(nameRect, itemData.name);
 
         painter->setPen(QPen(Qt::gray));

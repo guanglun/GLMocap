@@ -68,12 +68,12 @@ void FormCamConfig::on_pb_exit_clicked()
 
 void FormCamConfig::on_pb_cam_start_clicked()
 {
-    qwinusb->ctrlCamStart();
+    //qwinusb->ctrlCamStart();
 }
 
 void FormCamConfig::on_pb_cam_stop_clicked()
 {
-    qwinusb->ctrlCamStop();
+    //qwinusb->ctrlCamStop();
 }
 
 void FormCamConfig::on_pb_set_config_exposure_clicked()
@@ -88,12 +88,12 @@ void FormCamConfig::on_pb_set_config_exposure_clicked()
     }
 
     DBG("exposure_value %d",exposure_value);
-    qwinusb->ctrlCamSetExposure(exposure_value);
+    //qwinusb->ctrlCamSetExposure(exposure_value);
 }
 
 void FormCamConfig::on_pb_set_config_image_size_clicked()
 {
     int num = ui->comboBoxCamSize->currentIndex();
     DBG("set frame num %d",num);
-    qwinusb->ctrlCamSetFrameSizeNum(num);
+    //qwinusb->ctrlCamSetFrameSizeNum(num);
 }

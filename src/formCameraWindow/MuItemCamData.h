@@ -7,6 +7,7 @@
 
 typedef struct {
     QString id;
+    QString ver;
     QString status;
     QString name;
     enum OPENVIO_TYPE type;

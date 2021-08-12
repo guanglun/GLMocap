@@ -90,13 +90,6 @@ public:
     void send(QByteArray byte);
     void CamRecv(void);
     void IMURecv(void);
-    int sendCtrl(char request, uint16_t wValue,uint16_t wIndex,unsigned char *buffer);
-    int ctrlCamStart();
-    int ctrlCamStop();
-    int ctrlIMUStart();
-    int ctrlIMUStop();
-    int ctrlCamSetFrameSizeNum(uint16_t num);
-    int ctrlCamSetExposure(int value);
     void scan(void);
     void autoScan();
     void setModule(QStandardItemModel *pModelOpenvio);
@@ -114,8 +107,8 @@ signals:
     void newSignal(OPENVIO *vio);
     void removeSignal(OPENVIO *vio);
 private slots:
-    void closeSlot(void);
-    void openSlot(int vid,int pid);
+    //void closeSlot(void);
+    //void openSlot(int vid,int pid);
     void scanSlot(void);
     void onTimeOut(); 
 };

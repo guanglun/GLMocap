@@ -2,6 +2,7 @@
 #include "ui_formcamwindow.h"
 
 Setting *setting;
+Log *mlog;
 
 FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
                                                 ui(new Ui::FormCamWindow)
@@ -62,6 +63,9 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
     QMenu submenu;
     submenu.addAction("Rename");
     submenu.addAction("Upgrade Firmware");
+    submenu.addAction("Reboot Now");
+    submenu.addAction("Reboot To Bootloader");
+
     QAction *rightClickItem = submenu.exec(item);
     if (rightClickItem && rightClickItem->text().contains("Rename"))
     {
@@ -76,8 +80,7 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
         {
             openvioList.at(ui->lv_openvio->indexAt(pos).row())->setName(text);
         }
-    }
-    if (rightClickItem && rightClickItem->text().contains("Upgrade Firmware"))
+    }else if (rightClickItem && rightClickItem->text().contains("Upgrade Firmware"))
     {
         QString path = setting->getFirmwarePath();
         if (path.length() == 0)
@@ -101,6 +104,14 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
             upgrade->setBinPath(filePath);
             upgrade->upgradeStart();
         }
+    }else if (rightClickItem && rightClickItem->text().contains("Reboot Now"))
+    {
+        vio->open();
+        vio->ctrlReboot(1);
+    }else if (rightClickItem && rightClickItem->text().contains("Reboot To Bootloader"))
+    {
+        vio->open();
+        vio->ctrlReboot(0);
     }
 }
 
@@ -134,7 +145,7 @@ void FormCamWindow::on_pb_capture_clicked()
     for (int i = 0; i < openvioList.length(); i++)
     {
         OPENVIO *vio = openvioList.at(i);
-        if (vio->is_open == true)
+        if (vio->dev_handle != NULL)
         {
             if (vio->name.isEmpty() == true)
             {
@@ -154,7 +165,7 @@ void FormCamWindow::on_pb_capture_clicked()
     for (int i = 0; i < openvioList.length(); i++)
     {
         OPENVIO *vio = openvioList.at(i);
-        if (vio->is_open == true)
+        if (vio->dev_handle != NULL)
         {
             vio->isCapImage = true;
         }
@@ -168,7 +179,7 @@ void FormCamWindow::doubleClickedSlot(const QModelIndex &index)
 {
     OPENVIO *vio = openvioList.at(index.row());
 
-    if (vio->isCamRecv == false)
+    if (vio->isCamRecv == false && vio->type == TYPE_OPENVIO)
     {
         if(vio->formVioWindow == NULL)
         {

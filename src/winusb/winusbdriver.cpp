@@ -16,8 +16,8 @@ WinUSBDriver::WinUSBDriver()
 
     libusb_init(&m_libusb_context);
 
-    connect(this, SIGNAL(closeSignals()), this, SLOT(closeSlot()));
-    connect(this, SIGNAL(openSignals(int, int)), this, SLOT(openSlot(int, int)));
+    // connect(this, SIGNAL(closeSignals()), this, SLOT(closeSlot()));
+    // connect(this, SIGNAL(openSignals(int, int)), this, SLOT(openSlot(int, int)));
     connect(this, SIGNAL(scanSignals()), this, SLOT(scanSlot()));
 
     timer = new QTimer(this);
@@ -139,12 +139,15 @@ void WinUSBDriver::autoScan(void)
             if (ii >= size)
             {
                 OPENVIO *vio = new OPENVIO(device);
+                bool isNew = false;
+
                 vio->dev = device;
                 vio->type = type;
                 vio->devAddr = libusb_get_device_address(device);
 
                 //DBG("new addr : %d ",vio->devAddr);
                 ret = libusb_open(device, &vio->dev_handle);
+
                 if (ret < 0)
                 {
                     DBG("open fail %d", ret);
@@ -171,17 +174,29 @@ void WinUSBDriver::autoScan(void)
                 if (QString(vio->productStr).length() >= 7 &&
                     QString(vio->idStr).length() == 24)
                 {
-                    DBG("found %s %s %d", vio->productStr, vio->idShort, vio->devAddr);
-                    openvioList->append(vio);
 
-                    vio->setItem(pModelOpenvio);
+                    if (vio->getVersion() != -1)
+                    {
+                        DBG("found %s %s %d v%d.%d.%d", vio->productStr, vio->idShort, vio->devAddr,vio->version[0],vio->version[1],vio->version[2]);
+                        openvioList->append(vio);
+                        vio->setItem(pModelOpenvio);
+                        isNew = true;
+                    }
+
                     libusb_close(vio->dev_handle);
-                    emit newSignal(vio);
+                    vio->dev_handle = NULL;
+                    
                 }
                 else
                 {
                     libusb_close(vio->dev_handle);
+                    vio->dev_handle = NULL;
                     delete vio;
+                }
+
+                if(isNew)
+                {
+                    emit newSignal(vio);
                 }
             }
         }
@@ -193,84 +208,6 @@ void WinUSBDriver::autoScan(void)
     //libusb_exit(m_libusb_context);
 
     //return;
-}
-
-void WinUSBDriver::openSlot(int vid, int pid)
-{
-    int close_try_cnt = 0;
-    dev_handle = NULL;
-
-    ret = libusb_init(&m_libusb_context);
-    if (ret < 0)
-    {
-        mlog->show("libusb init fail " + ret);
-        goto init_fail;
-    }
-    else
-    {
-        mlog->show("libusb init success");
-    }
-
-    dev_handle = libusb_open_device_with_vid_pid(m_libusb_context, vid, pid);
-    if (dev_handle == NULL)
-    {
-        mlog->show("device open fail " + ret);
-        goto open_fail;
-    }
-    else
-    {
-        mlog->show("device open success");
-    }
-
-    //    if (libusb_kernel_driver_active(dev_handle, 0) == 1) {
-    //		DBG("Kernel Driver Active\n");
-    //		if (libusb_detach_kernel_driver(dev_handle, 0) == 0) {
-    //			DBG("Kernel Driver Detached!\n");
-    //		}
-    //	}
-
-    ret = libusb_claim_interface(dev_handle, 0);
-    if (ret < 0)
-    {
-        mlog->show("claim interface fail " + ret);
-        goto claim_fail;
-    }
-    else
-    {
-        mlog->show("claim interface success");
-    }
-
-    is_open = true;
-
-    close_try_cnt = 0;
-    while (ctrlCamStop() != 0 && close_try_cnt < 4)
-    {
-        close_try_cnt++;
-    }
-
-    close_try_cnt = 0;
-    while (ctrlIMUStop() != 0 && close_try_cnt < 4)
-    {
-        close_try_cnt++;
-    }
-
-    camThread->start();
-    imuThread->start();
-
-    mlog->show("open success");
-    emit sendStatusSignals(USB_MSG_OPEN_SUCCESS);
-
-    return;
-
-close_fail:
-    is_open = false;
-claim_fail:
-    libusb_close(dev_handle);
-open_fail:
-init_fail:
-    mlog->show("open fail");
-    emit sendStatusSignals(USB_MSG_OPEN_FAIL);
-    return;
 }
 
 void WinUSBDriver::CamRecv(void)
@@ -415,180 +352,5 @@ void WinUSBDriver::send(QByteArray byte)
 
 int WinUSBDriver::close(void)
 {
-    emit closeSignals();
-}
-
-void WinUSBDriver::closeSlot(void)
-{
-    int close_try_cnt = 0;
-
-    if (is_open)
-    {
-        close_try_cnt = 0;
-        while (ctrlCamStop() != 0 && close_try_cnt > 2)
-        {
-            close_try_cnt++;
-            mlog->show("close cam fail");
-        }
-
-        close_try_cnt = 0;
-        while (ctrlIMUStop() != 0 && close_try_cnt > 2)
-        {
-            close_try_cnt++;
-            mlog->show("close imu fail");
-        }
-
-        is_open = false;
-
-        camThread->waitClose();
-        DBG("camThread->waitClose()");
-
-        imuThread->waitClose();
-        DBG("imuThread->waitClose()");
-
-        DBG("closeSlot");
-
-        //libusb_release_interface(dev_handle, 0);
-
-        //        libusb_close(dev_handle);
-
-        //        libusb_release_interface(dev_handle, 0);
-
-        libusb_close(dev_handle);
-        libusb_exit(m_libusb_context);
-
-        mlog->show("close success");
-        emit sendStatusSignals(USB_MSG_CLOSE_SUCCESS);
-    }
-}
-
-#define REQUEST_CAMERA_START 0xA0
-#define REQUEST_CAMERA_STOP 0xA1
-#define REQUEST_CAMERA_SET_FRAME_SIZE_NUM 0xA2
-#define REQUEST_CAMERA_SET_EXPOSURE 0xA3
-
-#define REQUEST_IMU_START 0xB0
-#define REQUEST_IMU_STOP 0xB1
-
-int WinUSBDriver::sendCtrl(char request, uint16_t wValue, uint16_t wIndex, unsigned char *buffer)
-{
-    if (is_open)
-    {
-
-        ret = libusb_control_transfer(dev_handle, LIBUSB_REQUEST_TYPE_VENDOR + LIBUSB_ENDPOINT_IN, request, wValue, wIndex, buffer, 128, 1000);
-
-        if (ret < 0)
-        {
-            DBG("sendCtrl fail");
-            return -1;
-        }
-        else
-        {
-            DBG("sendCtrl success %d %c", ret, buffer[0]);
-
-            return ret;
-        }
-    }
-
-    return -1;
-}
-
-int WinUSBDriver::ctrlCamStart()
-{
-    uint8_t ret = 0;
-    recv_index = 0;
-
-    ret = sendCtrl(REQUEST_CAMERA_START, 0, 0, ctrl_buffer);
-    if ((ret >= 0) && (ctrl_buffer[0] == 'S'))
-    {
-        camStatus = SENSOR_STATUS_RUNNING;
-        recv_index = 0;
-        DBG("ret:%d\t id:%d \t bpp:%d\t size:%d\t pixformat:%d", ret, ctrl_buffer[1], ctrl_buffer[3], ctrl_buffer[2], ctrl_buffer[4]);
-        cam_id = ctrl_buffer[1];
-        img.gs_bpp = ctrl_buffer[3];
-        img.setImgSize(ctrl_buffer[2]);
-        pixformat = (pixformat_t)ctrl_buffer[4];
-
-        return 0;
-    }
-
-    return -1;
-}
-
-int WinUSBDriver::ctrlCamStop()
-{
-    uint8_t ret = 0;
-
-    ret = sendCtrl(REQUEST_CAMERA_STOP, 0, 0, ctrl_buffer);
-    if ((ret > 0) && (ctrl_buffer[0] == 'S'))
-    {
-        camStatus = SENSOR_STATUS_STOP;
-        return 0;
-    }
-
-    return -1;
-}
-
-int WinUSBDriver::ctrlIMUStart()
-{
-    uint8_t ret = 0;
-
-    ret = sendCtrl(REQUEST_IMU_START, 0, 0, ctrl_buffer);
-    if ((ret > 0) && (ctrl_buffer[0] == 'S'))
-    {
-        imuStatus = SENSOR_STATUS_RUNNING;
-        return 0;
-    }
-    return -1;
-}
-
-int WinUSBDriver::ctrlIMUStop()
-{
-
-    uint8_t ret = 0;
-
-    ret = sendCtrl(REQUEST_IMU_STOP, 0, 0, ctrl_buffer);
-    if ((ret > 0) && (ctrl_buffer[0] == 'S'))
-    {
-        imuStatus = SENSOR_STATUS_STOP;
-        return 0;
-    }
-    return -1;
-}
-
-int WinUSBDriver::ctrlCamSetFrameSizeNum(uint16_t num)
-{
-
-    uint8_t ret = 0;
-
-    ret = sendCtrl(REQUEST_CAMERA_SET_FRAME_SIZE_NUM, num, 0, ctrl_buffer);
-    if ((ret >= 0) && (ctrl_buffer[0] == 'S'))
-    {
-        DBG("ret:%d\t id:%d \t bpp:%d\t size:%d\t pixformat:%d", ret, ctrl_buffer[1], ctrl_buffer[3], ctrl_buffer[2], ctrl_buffer[4]);
-        cam_id = ctrl_buffer[1];
-        img.gs_bpp = ctrl_buffer[3];
-        img.setImgSize(ctrl_buffer[2]);
-        pixformat = (pixformat_t)ctrl_buffer[4];
-
-        return 0;
-    }
-    return -1;
-}
-
-int WinUSBDriver::ctrlCamSetExposure(int value)
-{
-
-    uint8_t ret = 0;
-    uint16_t wValue, wIndex;
-    wValue = (uint16_t)(value >> 16);
-    wIndex = (uint16_t)(value >> 0);
-
-    ret = sendCtrl(REQUEST_CAMERA_SET_EXPOSURE, wValue, wIndex, ctrl_buffer);
-    if ((ret >= 0) && (ctrl_buffer[0] == 'S'))
-    {
-        DBG("ret:%d\t", ret);
-
-        return 0;
-    }
-    return -1;
+    //emit closeSignals();
 }
