@@ -42,6 +42,9 @@ add_executable(MultiCam
     src/firmwareUpgrade/upgradeRecvThread.cpp
     src/firmwareUpgrade/upgradeThread.cpp
     src/formCameraWindow/MuItemCam.cpp
+    src/MuItemCtrl/MuItemCtrl.cpp
+    src/MuItemCtrl/MuItemCtrlThread.cpp
+
     src/main.cpp
     src/openvio/openvio.cpp
     src/winusb/winusbdriver.cpp
@@ -84,6 +87,7 @@ include_directories(
                     src/formCvWindow
                     src/firmwareUpgrade
                     src/gl_protocol
+                    src/MuItemCtrl
                     src/vision
                     src/openvio
                     lib/eigen-3.2.10

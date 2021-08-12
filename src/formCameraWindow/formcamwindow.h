@@ -64,6 +64,9 @@ private slots:
     
 private:
     Ui::FormCamWindow *ui;
+    
+protected: 
+     void closeEvent(QCloseEvent *event);     
 };
 
 #endif

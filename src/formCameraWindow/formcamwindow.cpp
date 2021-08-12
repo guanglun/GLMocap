@@ -136,6 +136,11 @@ void FormCamWindow::on_pb_scan_camera_clicked()
     qwinusb->scan();
 }
 
+void FormCamWindow::closeEvent(QCloseEvent *event) 
+{ 
+    fLogWindow.close();
+} 
+
 static bool isDirExist(QString fullPath)
 {
     QDir dir(fullPath);
