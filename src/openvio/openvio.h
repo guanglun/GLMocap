@@ -83,8 +83,8 @@ public:
     //int row;
 
     OPENVIO(libusb_device *dev);
-    bool open(void);
-    void close(void);
+    int open(void);
+    int close(void);
     
     void setItem(QStandardItemModel *pModelOpenvio);
     void setStatus(QString status);

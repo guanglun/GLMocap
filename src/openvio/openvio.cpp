@@ -18,20 +18,20 @@ OPENVIO::OPENVIO(libusb_device *dev)
     connect(this, SIGNAL(setStatusSignal(QString)), this, SLOT(setStatusSlot(QString)));
 }
 
-bool OPENVIO::open(void)
+int OPENVIO::open(void)
 {
     int ret = 0;
 
     if (dev_handle != NULL)
     {
-        DBG("already open");
-        return true;
+        DBG("already %s open",idShort);
+        return 0;
     }
 
     ret = libusb_open(dev, &dev_handle);
     if (ret < 0)
     {
-        DBG("device open fail " + ret);
+        DBG("device open fail %d ",ret);
         goto open_fail;
     }
     else
@@ -42,7 +42,7 @@ bool OPENVIO::open(void)
     ret = libusb_claim_interface(dev_handle, 0);
     if (ret < 0)
     {
-        DBG("claim interface fail " + ret);
+        DBG("claim interface fail %d ",ret);
         goto claim_fail;
     }
     else
@@ -50,28 +50,30 @@ bool OPENVIO::open(void)
         //DBG("claim interface success");
     }
 
-    DBG("open success");
+    DBG("open %s success",idShort);
 
-    return true;
+    return 0;
 
 claim_fail:
     libusb_close(dev_handle);
-    
 open_fail:
     dev_handle = NULL;
 init_fail:
     DBG("open fail");
     //emit sendStatusSignals(USB_MSG_OPEN_FAIL);
-    return false;
+    return -1;
 }
 
-void OPENVIO::close(void)
+int OPENVIO::close(void)
 {
     if(dev_handle != NULL)
     {
+        libusb_release_interface(dev_handle,0);
         libusb_close(dev_handle);
     }
+    DBG("close %s",idShort);
     dev_handle = NULL;    
+    return 0;
 }
 
 void OPENVIO::CamRecv(void)
@@ -213,11 +215,11 @@ bool OPENVIO::sendBulk(unsigned char *buffer, int len)
     int recvLen = 0;
     int ret = 0;
 
-    ret = libusb_bulk_transfer(dev_handle, 0x01, buffer, len, &recvLen, 0);
+    ret = libusb_bulk_transfer(dev_handle, CTRL_EPADDR, buffer, len, &recvLen, 0);
 
     if (ret < 0)
     {
-        DBG("sendBulk fail");
+        DBG("sendBulk fail %d",ret);
         return false;
     }
     else
@@ -232,7 +234,7 @@ int OPENVIO::recvBulk(unsigned char *buffer, int len)
     int recvLen = 0;
     int ret = 0;
 
-    ret = libusb_bulk_transfer(dev_handle, CAM_EPADDR, buffer, len, &recvLen, 10);
+    ret = libusb_bulk_transfer(dev_handle, CAM_EPADDR, buffer, len, &recvLen, 1);
 
     if (ret < 0 && ret != -7)
     {
@@ -297,38 +299,7 @@ void OPENVIO::setName(QString name)
 
 void OPENVIO::closeSlot(void)
 {
-    int close_try_cnt = 0;
 
-    if (dev_handle != NULL)
-    {
-        close_try_cnt = 0;
-        while (ctrlCamStop() != 0 && close_try_cnt > 2)
-        {
-            close_try_cnt++;
-            mlog->show("close cam fail");
-        }
-
-        close_try_cnt = 0;
-        while (ctrlIMUStop() != 0 && close_try_cnt > 2)
-        {
-            close_try_cnt++;
-            mlog->show("close imu fail");
-        }
-
-        //DBG("closeSlot");
-
-        //libusb_release_interface(dev_handle, 0);
-
-        //        libusb_close(dev_handle);
-
-        //        libusb_release_interface(dev_handle, 0);
-
-        libusb_close(dev_handle);
-        //libusb_exit(m_libusb_context);
-
-        mlog->show("close success");
-        //emit sendStatusSignals(USB_MSG_CLOSE_SUCCESS);
-    }
 }
 
 int OPENVIO::sendCtrl(char request, uint8_t type, unsigned char *buffer, uint16_t len)

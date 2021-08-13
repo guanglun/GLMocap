@@ -42,7 +42,7 @@ public:
     WinUSBDriver *qwinusb;
     QLabel *status_msg,*status_speed;
     int recv_count_1s;
-    FirmwareUpgrade *upgrade;
+    FirmwareUpgrade *upgrade = nullptr;
     
     MultipleViewTriangulation multipleViewTriangulation;
     FormVisionWindow fVisionWindow;

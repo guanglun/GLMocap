@@ -23,9 +23,9 @@ void UpgradeThread::newSlot(OPENVIO *vio)
         if (QString::compare(QString(vio->idStr), wait_id) == 0 && vio->type == wait_type)
         {
             DBG("the wait id come in");
-            if(wait_type ==TYPE_BOOTLOADER)
+            if(wait_type == TYPE_BOOTLOADER)
                 firmwareUpgrade->setOPENVIO(vio);
-            else if(wait_type ==TYPE_OPENVIO)
+            else if(wait_type == TYPE_OPENVIO)
                 firmwareUpgrade->setOPENVIO(vio,false);
             wait_id = nullptr;
         }
@@ -68,11 +68,11 @@ void UpgradeThread::run()
     {
         wait_id = QString(firmwareUpgrade->vio->idStr);
 
-        showStatus("Reboot To Bootloader ...");
+        showStatus("WAIT Bootloader ...");
 
         firmwareUpgrade->send_iap_reboot_to_bootloader();
-
-        showStatus("WAIT Bootloader ...");
+        firmwareUpgrade->vio = nullptr;
+        
         wait_type = TYPE_BOOTLOADER;
 
         while (waitCount--)
@@ -101,6 +101,7 @@ void UpgradeThread::run()
     str.sprintf("firmeare size : %d", size);
     showStatus(str);
 
+    msleep(100);
     firmwareUpgrade->send_iap_begin(size);
 
     showStatus("IAP START ERASE ");
@@ -183,11 +184,10 @@ void UpgradeThread::run()
 
     wait_id = QString(firmwareUpgrade->vio->idStr);
 
+    showStatus("WAIT Reboot ...");
     //reboot
     firmwareUpgrade->send_iap_reboot();
-    
-
-    showStatus("WAIT Reboot ...");
+    firmwareUpgrade->vio = nullptr;
 
     waitCount = 500;
     wait_type = TYPE_OPENVIO;
@@ -210,8 +210,8 @@ void UpgradeThread::run()
     showStatus("IAP SUCCESS");
     firmwareUpgrade->vio->close();
 exit:
+    wait_id = nullptr;
     mlog->show("IAP Thread Exit");
-
     emit endSignals();
 }
 

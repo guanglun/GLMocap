@@ -13,6 +13,12 @@ void UpgradeRecvThread::run()
     
     while(is_loop)
     {
+        if(vio == nullptr)
+        {
+            is_loop = false;
+            break;
+        }
+        
         recvLen = vio->recvBulk(recvBuffer,512);
         if(recvLen > 0)
         {

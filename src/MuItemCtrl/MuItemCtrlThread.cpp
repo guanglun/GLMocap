@@ -50,17 +50,22 @@ void MuItemCtrlThread::run()
 
 int MuItemCtrlThread::upgrade(OPENVIO *vio)
 {
+    int waitCount = 3000;
     mlog->show("upgrade " + QString(vio->idShort) + " start");
 
     muItemCtrl->firmwareUpgrade->setOPENVIO(vio);
-    connect(muItemCtrl->formCamWindow->qwinusb, SIGNAL(newSignal(OPENVIO *)), muItemCtrl->firmwareUpgrade->upgradeThread, SLOT(newSlot(OPENVIO *)));
     muItemCtrl->firmwareUpgrade->setBinPath(muItemCtrl->binPath);
     muItemCtrl->firmwareUpgrade->upgradeStart();
 
-    while(muItemCtrl->firmwareUpgrade->state != FirmwareUpgrade::STATE_SUCCESS)
+    while(muItemCtrl->firmwareUpgrade->state != FirmwareUpgrade::STATE_SUCCESS && waitCount > 0)
     {
         msleep(10);
+        waitCount--;
     }
 
+    if(waitCount <= 0)
+    {
+        mlog->show("upgrade " + QString(vio->idShort) + " timeout");
+    }
     mlog->show("upgrade " + QString(vio->idShort) + " exit");
 }

@@ -53,6 +53,9 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
     {
         setting->loadVisionParam(path);
     }
+
+    upgrade = new FirmwareUpgrade();
+    connect(qwinusb, SIGNAL(newSignal(OPENVIO *)), upgrade->upgradeThread, SLOT(newSlot(OPENVIO *)));
 }
 
 void FormCamWindow::ProvideContextMenu(const QPoint &pos)
@@ -110,9 +113,8 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
         else
         {
             setting->setFirmwarePath(filePath);
-            upgrade = new FirmwareUpgrade();
+            
             upgrade->setOPENVIO(vio);
-            connect(qwinusb, SIGNAL(newSignal(OPENVIO *)), upgrade->upgradeThread, SLOT(newSlot(OPENVIO *)));
             upgrade->setBinPath(filePath);
             upgrade->upgradeStart();
         }

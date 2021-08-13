@@ -9,12 +9,20 @@
 #define QDBG(tag, args...) do{\
     char temp[4096] = tag;\
     sprintf(temp + 7, ##args);\
+    mlog->show(temp);\
     qDebug()<<temp;\
+}while(0)
+
+#define QLOG(args...) do{\
+    char temp[4096];\
+    sprintf(temp, ##args);\
+    mlog->show(temp);\
 }while(0)
 
 #define ERR(args...)      QDBG("ERROR   ", ##args)
 #define WARNING(args...)  QDBG("WARNING ", ##args)
-#define DBG(args...)      QDBG("DEBUG   ", ##args)
+#define DBG(args...)      QLOG(args)
+//#define DBG(args...)      QDBG("DEBUG   ", ##args)
 
 extern Setting *setting;
 extern Log *mlog;

@@ -59,8 +59,8 @@ public:
     OPENVIO *vio;
     enum REPLY reply_status;
     int errorCode;
-    UpgradeRecvThread *upgradeRecvThread;
-    UpgradeThread *upgradeThread;
+    UpgradeRecvThread *upgradeRecvThread = nullptr;
+    UpgradeThread *upgradeThread = nullptr;
 
     FirmwareUpgrade();
     void setOPENVIO(OPENVIO *vio,bool isOpen=true);

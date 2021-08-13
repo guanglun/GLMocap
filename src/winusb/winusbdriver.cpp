@@ -96,9 +96,9 @@ void WinUSBDriver::autoScan(void)
         if (ii >= num_devs)
         {
             DBG("remove %s %s %d", openvioList->at(i)->productStr, openvioList->at(i)->idShort, openvioList->at(i)->devAddr);
-
             openvioList->at(i)->removeItem();
             openvioList->removeAt(i);
+
             i--;
             size--;
             DBG("remove success");
@@ -146,8 +146,13 @@ void WinUSBDriver::autoScan(void)
                 vio->devAddr = libusb_get_device_address(device);
 
                 //DBG("new addr : %d ",vio->devAddr);
-                ret = libusb_open(device, &vio->dev_handle);
-                
+                ret = vio->open();
+                if(ret < 0)
+                {
+                    delete vio;
+                    break;
+                }
+
                 ret = libusb_get_string_descriptor_ascii(vio->dev_handle,
                                                          desc.iSerialNumber,
                                                          (unsigned char *)vio->idStr,
@@ -169,7 +174,6 @@ void WinUSBDriver::autoScan(void)
                 if (QString(vio->productStr).length() >= 7 &&
                     QString(vio->idStr).length() == 24)
                 {
-
                     if (vio->getVersion() != -1)
                     {
                         DBG("found %s %s %d v%d.%d.%d", vio->productStr, vio->idShort, vio->devAddr,vio->version[0],vio->version[1],vio->version[2]);
@@ -177,15 +181,12 @@ void WinUSBDriver::autoScan(void)
                         vio->setItem(pModelOpenvio);
                         isNew = true;
                     }
-
-                    libusb_close(vio->dev_handle);
-                    vio->dev_handle = NULL;
+                    vio->close();
                     
                 }
                 else
                 {
-                    libusb_close(vio->dev_handle);
-                    vio->dev_handle = NULL;
+                    vio->close();
                     delete vio;
                 }
 

@@ -5,6 +5,7 @@ MuItemCtrl::MuItemCtrl(FormCamWindow *formCamWindow)
 {
     this->formCamWindow = formCamWindow;
     firmwareUpgrade = new FirmwareUpgrade();
+    connect(formCamWindow->qwinusb, SIGNAL(newSignal(OPENVIO *)), firmwareUpgrade->upgradeThread, SLOT(newSlot(OPENVIO *)));
     muItemCtrlThread = new MuItemCtrlThread(this);
 }
 

@@ -74,7 +74,8 @@ void FirmwareUpgrade::setBinPath(QString binPath)
 void FirmwareUpgrade::endSlot(void)
 {
     DBG("recv endSlot");
-    upgradeRecvThread->is_loop = false;
+    if(upgradeRecvThread != nullptr)
+        upgradeRecvThread->is_loop = false;
     state = STATE_SUCCESS;
 }
 
