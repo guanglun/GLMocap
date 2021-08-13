@@ -15,7 +15,7 @@ class FormCamConfig;
 #include "FormCamConfig.h"
 
 class FormVioWindow;
-#include "FormVioWindow.h"
+#include "formviowindow.h"
 
 class FirmwareUpgrade;
 #include "firmwareUpgrade.h"
@@ -63,8 +63,8 @@ public:
     int exposure;
     pixformat_t pixformat;
     QString saveImagePath;
-    FormVioWindow *formVioWindow = NULL;
-    FormCamConfig *formCamConfig = NULL;
+    FormVioWindow *formVioWindow;
+    
 
     int saveCount = 0;
     

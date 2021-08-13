@@ -69,7 +69,7 @@
      <x>0</x>
      <y>0</y>
      <width>314</width>
-     <height>26</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -96,6 +96,7 @@
       <string>All</string>
      </property>
      <addaction name="actionUpgrade"/>
+     <addaction name="actionConfig"/>
     </widget>
     <addaction name="menuAll"/>
    </widget>
@@ -139,7 +140,12 @@
   </action>
   <action name="actionUpgrade">
    <property name="text">
-    <string>Upgrade</string>
+    <string>upgrade</string>
+   </property>
+  </action>
+  <action name="actionConfig">
+   <property name="text">
+    <string>config</string>
    </property>
   </action>
  </widget>

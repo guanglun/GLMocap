@@ -1,6 +1,8 @@
 #ifndef FORMVIOWINDOW_H
 #define FORMVIOWINDOW_H
 
+#include "workspace.h"
+
 #include <QWidget>
 #include <QDateTime>
 #include <QCloseEvent> 
@@ -8,8 +10,6 @@
 #include <QStatusBar>
 #include <QLabel>
 #include <QTimer>
-
-#include "workspace.h"
 
 class OPENVIO;
 #include "openvio.h"

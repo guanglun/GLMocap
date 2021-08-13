@@ -60,7 +60,6 @@ open_fail:
     dev_handle = NULL;
 init_fail:
     DBG("open fail");
-    //emit sendStatusSignals(USB_MSG_OPEN_FAIL);
     return -1;
 }
 
@@ -332,7 +331,7 @@ int OPENVIO::sendCtrl(char request, uint8_t type, unsigned char *buffer, uint16_
 
 int OPENVIO::camStart()
 {
-    //DBG("cam start");
+    DBG("cam start");
     isCamRecv = true;
     camThread->start();
     ctrlCamStart();
@@ -580,4 +579,6 @@ int OPENVIO::ctrlCamSetExposure(int value)
             return -1;
         }
     }
+
+    return 0;
 }

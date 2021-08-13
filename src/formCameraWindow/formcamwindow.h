@@ -15,7 +15,10 @@
 
 #include "MuItemCam.h"
 #include "winusbdriver.h"
-#include "FormVioWindow.h"
+
+class FormVioWindow;
+#include "formviowindow.h"
+
 #include <QTimer>
 #include <QLabel>
 #include <QInputDialog>
@@ -49,6 +52,7 @@ public:
     Form3DViewWindow f3DViewWindow;
     FormLogWindow fLogWindow;
     MuItemCtrl *muItemCtrl;
+    FormCamConfig formCamConfig;
 
     explicit FormCamWindow(QWidget *parent = nullptr);
     ~FormCamWindow();
@@ -66,6 +70,7 @@ private slots:
     void on_actionLoad_vision_param_triggered();
     void on_actionLog_view_triggered();
     void on_actionUpgrade_triggered();
+    void on_actionConfig_triggered();
 private:
     Ui::FormCamWindow *ui;
     

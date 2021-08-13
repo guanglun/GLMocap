@@ -18,8 +18,9 @@ class FormCamConfig : public QWidget
 public:
     explicit FormCamConfig(QWidget *parent = 0);
     ~FormCamConfig();
+    QList<OPENVIO *> *vioList;
     OPENVIO *vio;
-    void setQData(OPENVIO *vio);
+    void setQData(QList<OPENVIO *> *vioList = NULL,OPENVIO *vio = NULL);
 private slots:
     void on_pb_set_config_clicked();
     

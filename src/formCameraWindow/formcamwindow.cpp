@@ -11,7 +11,6 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
 
     this->setWindowTitle("OPENVIO");
 
-
     setting = new Setting();
 
     qwinusb = new WinUSBDriver();
@@ -76,9 +75,11 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
     QAction *rightClickItem = submenu.exec(item);
     if (rightClickItem && rightClickItem->text().contains("Setup"))
     {
-        vio->formCamConfig = new FormCamConfig();
-        vio->formCamConfig->setQData(vio);
-        vio->formCamConfig->show();
+        formCamConfig.setQData(NULL,vio);
+        if (formCamConfig.isVisible() == false)
+        {
+            formCamConfig.show();
+        }
     }
     else if (rightClickItem && rightClickItem->text().contains("Rename"))
     {
@@ -113,7 +114,7 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
         else
         {
             setting->setFirmwarePath(filePath);
-            
+
             upgrade->setOPENVIO(vio);
             upgrade->setBinPath(filePath);
             upgrade->upgradeStart();
@@ -142,10 +143,10 @@ void FormCamWindow::on_pb_scan_camera_clicked()
     qwinusb->scan();
 }
 
-void FormCamWindow::closeEvent(QCloseEvent *event) 
-{ 
+void FormCamWindow::closeEvent(QCloseEvent *event)
+{
     fLogWindow.close();
-} 
+}
 
 static bool isDirExist(QString fullPath)
 {
@@ -161,12 +162,21 @@ static bool isDirExist(QString fullPath)
     }
 }
 
+void FormCamWindow::on_actionConfig_triggered()
+{
+    formCamConfig.setQData(qwinusb->openvioList);
+    if (formCamConfig.isVisible() == false)
+    {
+        formCamConfig.show();
+    }
+}
+
 void FormCamWindow::on_actionUpgrade_triggered()
 {
 
-    if(!muItemCtrl->muItemCtrlThread->isRunning())
+    if (!muItemCtrl->muItemCtrlThread->isRunning())
     {
-        muItemCtrl->setCtrl(CTRL_TYPE_UPGRADE,qwinusb->openvioList);
+        muItemCtrl->setCtrl(CTRL_TYPE_UPGRADE, qwinusb->openvioList);
         muItemCtrl->start();
     }
 }
@@ -206,6 +216,7 @@ void FormCamWindow::on_pb_capture_clicked()
 void FormCamWindow::vioItemSelected(const QModelIndex &index)
 {
 }
+
 void FormCamWindow::doubleClickedSlot(const QModelIndex &index)
 {
     OPENVIO *vio = openvioList.at(index.row());
@@ -215,7 +226,7 @@ void FormCamWindow::doubleClickedSlot(const QModelIndex &index)
         if (vio->formVioWindow == NULL)
         {
             vio->formVioWindow = new FormVioWindow();
-            vio->formVioWindow->setQData(openvioList.at(index.row()));
+            vio->formVioWindow->setQData(vio);
 
             connect(vio->formVioWindow->formCvWindow, SIGNAL(positionSignals(int, double, double)), &multipleViewTriangulation, SLOT(positionSlot(int, double, double)));
         }
@@ -223,10 +234,8 @@ void FormCamWindow::doubleClickedSlot(const QModelIndex &index)
         if (vio->formVioWindow->isVisible() == false)
         {
             vio->formVioWindow->show();
-            if (vio->open())
-            {
-                vio->camStart();
-            }
+            vio->open();
+            vio->camStart();
         }
     }
 }
@@ -299,7 +308,7 @@ void FormCamWindow::on_actionLog_view_triggered()
 {
     if (!fLogWindow.isActiveWindow())
     {
-        
+
         fLogWindow.show();
     }
 }
