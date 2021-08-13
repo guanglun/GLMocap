@@ -234,7 +234,7 @@ int OPENVIO::recvBulk(unsigned char *buffer, int len)
     int recvLen = 0;
     int ret = 0;
 
-    ret = libusb_bulk_transfer(dev_handle, CAM_EPADDR, buffer, len, &recvLen, 1);
+    ret = libusb_bulk_transfer(dev_handle, CAM_EPADDR, buffer, len, &recvLen, 0);
 
     if (ret < 0 && ret != -7)
     {

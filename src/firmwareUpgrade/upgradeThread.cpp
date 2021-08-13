@@ -223,18 +223,19 @@ void UpgradeThread::waitClose()
     }
 }
 
+extern FirmwareUpgrade *fUpgrade;
 enum REPLY UpgradeThread::waitReply(int wait_delay)
 {
     int delay_cnt = wait_delay / 10;
-    firmwareUpgrade->reply_status = REPLY_WAIT;
+    fUpgrade->reply_status = REPLY_WAIT;
 
     while (delay_cnt--)
     {
-        if (firmwareUpgrade->reply_status == REPLY_OK)
+        if (fUpgrade->reply_status == REPLY_OK)
         {
             return REPLY_OK;
         }
-        else if (firmwareUpgrade->reply_status == REPLY_FAIL)
+        else if (fUpgrade->reply_status == REPLY_FAIL)
         {
             return REPLY_FAIL;
         }

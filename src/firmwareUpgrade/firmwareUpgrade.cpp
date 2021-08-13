@@ -1,7 +1,7 @@
 #include "firmwareUpgrade.h"
 
 OPENVIO *globalVio;
-FirmwareUpgrade *firmwareUpgrade;
+FirmwareUpgrade *fUpgrade;
 PARSE_STRUCT parse_usb;
 uint8_t is_usb_recv = 0;
 
@@ -27,16 +27,13 @@ void recv_usb_farme(void *arg)
             {
                 if(parse_usb.frame_s.DataIndex == IAP_OK)
                 {
-                    firmwareUpgrade->reply_status = REPLY_OK;
+                    fUpgrade->reply_status = REPLY_OK;
                 }else{
-                    firmwareUpgrade->reply_status = REPLY_FAIL;
-                    firmwareUpgrade->errorCode = parse_usb.frame_s.DataIndex;
+                    fUpgrade->reply_status = REPLY_FAIL;
+                    fUpgrade->errorCode = parse_usb.frame_s.DataIndex;
                 }
             }
         }
-    }
-    else
-    {
     }
 }
 
@@ -47,15 +44,14 @@ void send_usb_data(uint8_t *send_buffer, uint16_t send_len)
 
 FirmwareUpgrade::FirmwareUpgrade()
 {
+    
     parse_struct_init(&parse_usb);
     parse_set_rec_callback(&parse_usb, (rec_frame_callback)recv_usb_farme);
     parse_set_send_fun(&parse_usb, send_usb_data);
 
-    firmwareUpgrade = this;
-
     upgradeThread = new UpgradeThread(this);
     connect(upgradeThread, SIGNAL(endSignals()), this, SLOT(endSlot()));
-
+        
 }
 
 void FirmwareUpgrade::setOPENVIO(OPENVIO *vio,bool isOpen)
@@ -99,6 +95,7 @@ int send_hello(void)
 
 void FirmwareUpgrade::upgradeStart()
 {
+    fUpgrade = this;
     state = STATE_RUNNING;
     upgradeThread->start();
 }
