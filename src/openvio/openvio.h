@@ -84,6 +84,8 @@ public:
 
     OPENVIO(libusb_device *dev);
     bool open(void);
+    void close(void);
+    
     void setItem(QStandardItemModel *pModelOpenvio);
     void setStatus(QString status);
     void setName(QString name);
@@ -97,7 +99,7 @@ public:
     int ctrlIMUStop();
     int ctrlCamSetFrameSizeNum(uint16_t num);
     int ctrlCamSetExposure(int value);
-    int close(void);
+    
     int camStart();
     int IMUStart();
     int camStop();

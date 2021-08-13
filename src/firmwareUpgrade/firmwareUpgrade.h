@@ -50,21 +50,32 @@ private:
     FRAME_STRUCT frame_s_tmp;
 
 public:
+    enum UPGRADE_STATE{
+        STATE_WAIT,
+        STATE_RUNNING,
+        STATE_SUCCESS
+    };
+
     OPENVIO *vio;
     enum REPLY reply_status;
     int errorCode;
     UpgradeRecvThread *upgradeRecvThread;
     UpgradeThread *upgradeThread;
 
-    FirmwareUpgrade(OPENVIO *vio);
-    void setOPENVIO(OPENVIO *vio);
+    FirmwareUpgrade();
+    void setOPENVIO(OPENVIO *vio,bool isOpen=true);
     void setBinPath(QString binPath);
     void upgradeStart();
+    enum UPGRADE_STATE state;
+
+
     void send_iap_begin(unsigned int size);
     void send_iap_trans(unsigned short index,unsigned char *buffer,unsigned int len);
     void send_iap_crc(unsigned int crc);
     void send_iap_reboot();
     void send_iap_reboot_to_bootloader();
+    
+
 signals:
     //void camSignals(int index);
     //void imuSignals(int index);

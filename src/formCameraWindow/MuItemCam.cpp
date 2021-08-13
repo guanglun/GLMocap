@@ -60,7 +60,7 @@ void MuItemCam::paint(QPainter *painter, const QStyleOptionViewItem &option, con
         }
         
         painter->setPen(QPen(Qt::black));
-        painter->setFont(QFont("Microsoft Yahei", 10));
+        painter->setFont(QFont("Microsoft Yahei", 9));
         painter->drawText(idRect, itemData.id);
         painter->drawText(verRect, itemData.ver);
         painter->drawText(nameRect, itemData.name);

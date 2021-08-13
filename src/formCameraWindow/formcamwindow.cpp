@@ -11,6 +11,7 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
 
     this->setWindowTitle("OPENVIO");
 
+
     setting = new Setting();
 
     qwinusb = new WinUSBDriver();
@@ -36,6 +37,8 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
 
     qwinusb->setModule(pModelOpenvio);
     qwinusb->setOpenvioList(&openvioList);
+
+    muItemCtrl = new MuItemCtrl(this);
 
     status_speed = new QLabel(this);
     ui->statusBar->addWidget(status_speed);
@@ -107,7 +110,8 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
         else
         {
             setting->setFirmwarePath(filePath);
-            upgrade = new FirmwareUpgrade(vio);
+            upgrade = new FirmwareUpgrade();
+            upgrade->setOPENVIO(vio);
             connect(qwinusb, SIGNAL(newSignal(OPENVIO *)), upgrade->upgradeThread, SLOT(newSlot(OPENVIO *)));
             upgrade->setBinPath(filePath);
             upgrade->upgradeStart();
@@ -152,6 +156,16 @@ static bool isDirExist(QString fullPath)
     {
         bool ok = dir.mkdir(fullPath); //只创建一级子目录，即必须保证上级目录存在
         return ok;
+    }
+}
+
+void FormCamWindow::on_actionUpgrade_triggered()
+{
+
+    if(!muItemCtrl->muItemCtrlThread->isRunning())
+    {
+        muItemCtrl->setCtrl(CTRL_TYPE_UPGRADE,qwinusb->openvioList);
+        muItemCtrl->start();
     }
 }
 

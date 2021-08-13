@@ -147,12 +147,7 @@ void WinUSBDriver::autoScan(void)
 
                 //DBG("new addr : %d ",vio->devAddr);
                 ret = libusb_open(device, &vio->dev_handle);
-
-                if (ret < 0)
-                {
-                    DBG("open fail %d", ret);
-                }
-
+                
                 ret = libusb_get_string_descriptor_ascii(vio->dev_handle,
                                                          desc.iSerialNumber,
                                                          (unsigned char *)vio->idStr,

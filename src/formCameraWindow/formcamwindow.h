@@ -25,6 +25,9 @@
 #include "form3dviewwindow.h"
 #include "formlogwindow.h"
 
+class MuItemCtrl;
+#include "MuItemCtrl.h"
+
 namespace Ui {
 class FormCamWindow;
 }
@@ -45,6 +48,7 @@ public:
     FormVisionWindow fVisionWindow;
     Form3DViewWindow f3DViewWindow;
     FormLogWindow fLogWindow;
+    MuItemCtrl *muItemCtrl;
 
     explicit FormCamWindow(QWidget *parent = nullptr);
     ~FormCamWindow();
@@ -61,7 +65,7 @@ private slots:
     void on_action3d_view_triggered();
     void on_actionLoad_vision_param_triggered();
     void on_actionLog_view_triggered();
-    
+    void on_actionUpgrade_triggered();
 private:
     Ui::FormCamWindow *ui;
     

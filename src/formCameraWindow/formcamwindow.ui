@@ -87,8 +87,21 @@
     <addaction name="action3d_view"/>
     <addaction name="actionLog_view"/>
    </widget>
+   <widget class="QMenu" name="menuOperations">
+    <property name="title">
+     <string>Operations </string>
+    </property>
+    <widget class="QMenu" name="menuAll">
+     <property name="title">
+      <string>All</string>
+     </property>
+     <addaction name="actionUpgrade"/>
+    </widget>
+    <addaction name="menuAll"/>
+   </widget>
    <addaction name="menu"/>
    <addaction name="menuWindow"/>
+   <addaction name="menuOperations"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -122,6 +135,11 @@
   <action name="actionLog_view">
    <property name="text">
     <string>log view</string>
+   </property>
+  </action>
+  <action name="actionUpgrade">
+   <property name="text">
+    <string>Upgrade</string>
    </property>
   </action>
  </widget>

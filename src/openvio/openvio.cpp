@@ -65,6 +65,15 @@ init_fail:
     return false;
 }
 
+void OPENVIO::close(void)
+{
+    if(dev_handle != NULL)
+    {
+        libusb_close(dev_handle);
+    }
+    dev_handle = NULL;    
+}
+
 void OPENVIO::CamRecv(void)
 {
     DBG("cam recv start");
@@ -214,7 +223,6 @@ bool OPENVIO::sendBulk(unsigned char *buffer, int len)
     else
     {
         //DBG("sendBulk success. ret:%d", ret);
-
         return true;
     }
 }
@@ -282,10 +290,10 @@ void OPENVIO::setName(QString name)
     setting->setNameById(idStr, name);
 }
 
-int OPENVIO::close(void)
-{
-    emit closeSignals();
-}
+// int OPENVIO::close(void)
+// {
+//     emit closeSignals();
+// }
 
 void OPENVIO::closeSlot(void)
 {

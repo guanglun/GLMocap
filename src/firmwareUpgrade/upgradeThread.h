@@ -4,6 +4,7 @@
 #include <QThread>
 #include "libusb.h"
 #include "workspace.h"
+#include <QList>
 
 enum REPLY
 {
@@ -31,6 +32,8 @@ private:
     QString binPath;
 public:
     QString wait_id;
+    enum OPENVIO_TYPE wait_type;
+    
     UpgradeThread(FirmwareUpgrade *firmwareUpgrade);
     void run();
     void waitClose();

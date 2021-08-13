@@ -45,25 +45,25 @@ void send_usb_data(uint8_t *send_buffer, uint16_t send_len)
     globalVio->sendBulk(send_buffer, send_len);
 }
 
-FirmwareUpgrade::FirmwareUpgrade(OPENVIO *vio)
+FirmwareUpgrade::FirmwareUpgrade()
 {
     parse_struct_init(&parse_usb);
     parse_set_rec_callback(&parse_usb, (rec_frame_callback)recv_usb_farme);
     parse_set_send_fun(&parse_usb, send_usb_data);
 
     firmwareUpgrade = this;
-    setOPENVIO(vio);
 
     upgradeThread = new UpgradeThread(this);
     connect(upgradeThread, SIGNAL(endSignals()), this, SLOT(endSlot()));
 
 }
 
-void FirmwareUpgrade::setOPENVIO(OPENVIO *vio)
+void FirmwareUpgrade::setOPENVIO(OPENVIO *vio,bool isOpen)
 {
     globalVio = vio;
     this->vio = vio;
-    vio->open();
+    if(isOpen)
+        vio->open();
 }
 
 void FirmwareUpgrade::setBinPath(QString binPath)
@@ -73,7 +73,9 @@ void FirmwareUpgrade::setBinPath(QString binPath)
 
 void FirmwareUpgrade::endSlot(void)
 {
+    DBG("recv endSlot");
     upgradeRecvThread->is_loop = false;
+    state = STATE_SUCCESS;
 }
 
 int send_hello(void)
@@ -96,7 +98,7 @@ int send_hello(void)
 
 void FirmwareUpgrade::upgradeStart()
 {
-    
+    state = STATE_RUNNING;
     upgradeThread->start();
 }
 

@@ -2,7 +2,7 @@
 
 #define IAP_START_WAIT  10000
 #define IAP_TRANS_WAIT  5000
-#define IAP_CRC_WAIT    1000
+#define IAP_CRC_WAIT    5000
 
 UpgradeThread::UpgradeThread(FirmwareUpgrade *firmwareUpgrade)
 {
@@ -18,11 +18,15 @@ void UpgradeThread::setBinPath(QString binPath)
 
 void UpgradeThread::newSlot(OPENVIO *vio)
 {
-    if(wait_id != nullptr)
+    if (wait_id != nullptr)
     {
-        if(QString::compare(QString(vio->idStr),wait_id) == 0 && vio->type == TYPE_BOOTLOADER)
+        if (QString::compare(QString(vio->idStr), wait_id) == 0 && vio->type == wait_type)
         {
-            firmwareUpgrade->setOPENVIO(vio);
+            DBG("the wait id come in");
+            if(wait_type ==TYPE_BOOTLOADER)
+                firmwareUpgrade->setOPENVIO(vio);
+            else if(wait_type ==TYPE_OPENVIO)
+                firmwareUpgrade->setOPENVIO(vio,false);
             wait_id = nullptr;
         }
     }
@@ -31,55 +35,56 @@ void UpgradeThread::newSlot(OPENVIO *vio)
 void UpgradeThread::showStatus(QString str)
 {
     mlog->show(str);
-    if(firmwareUpgrade->vio != nullptr)
+    if (firmwareUpgrade->vio != nullptr)
         firmwareUpgrade->vio->setStatus(str);
 }
 
 void UpgradeThread::run()
 {
-    
+
     unsigned int size;
     unsigned int crc = 0;
     int transNum;
     QString str;
     REPLY ret;
+    int waitCount = 500;
 
     wait_id = nullptr;
 
-    int step = (FRAME_DATA_MAX_SIZE/32*32);
+    int step = (FRAME_DATA_MAX_SIZE / 32 * 32);
 
     showStatus("IAP Thread Start");
     showStatus("firmware path : " + binPath);
     showStatus("start upgrade");
 
     QFile binFile(binPath);
-    if(!binFile.open(QIODevice::ReadOnly)){
+    if (!binFile.open(QIODevice::ReadOnly))
+    {
         showStatus("firmware open fail");
         goto exit;
     }
 
-    if(firmwareUpgrade->vio->type == TYPE_OPENVIO)
+    if (firmwareUpgrade->vio->type == TYPE_OPENVIO)
     {
         wait_id = QString(firmwareUpgrade->vio->idStr);
 
         showStatus("Reboot To Bootloader ...");
 
         firmwareUpgrade->send_iap_reboot_to_bootloader();
-        
+
         showStatus("WAIT Bootloader ...");
+        wait_type = TYPE_BOOTLOADER;
 
-        int waitCount = 500;
-
-        while(waitCount--)
+        while (waitCount--)
         {
-            if(wait_id == nullptr)
+            if (wait_id == nullptr)
             {
                 break;
             }
             msleep(10);
         }
 
-        if(waitCount == 0)
+        if (waitCount <= 0)
         {
             showStatus("WAIT Bootloader Timeout");
             goto exit;
@@ -93,7 +98,7 @@ void UpgradeThread::run()
     //IAP BEGIN
     size = binFile.size();
 
-    str.sprintf("firmeare size : %d",size);
+    str.sprintf("firmeare size : %d", size);
     showStatus(str);
 
     firmwareUpgrade->send_iap_begin(size);
@@ -101,50 +106,56 @@ void UpgradeThread::run()
     showStatus("IAP START ERASE ");
 
     ret = waitReply(IAP_START_WAIT);
-    if(ret == REPLY_WAIT)
+    if (ret == REPLY_WAIT)
     {
         showStatus("IAP START Timeout");
         goto exit;
-    }else if(ret == REPLY_FAIL)
+    }
+    else if (ret == REPLY_FAIL)
     {
-        str.sprintf("IAP START Fail ERRORCODE : %d",firmwareUpgrade->errorCode);
+        str.sprintf("IAP START Fail ERRORCODE : %d", firmwareUpgrade->errorCode);
         showStatus(str);
         goto exit;
-    }else{
+    }
+    else
+    {
         showStatus("IAP START Success");
     }
 
     //IAP TRANS
-    transNum = size/step;
-    if(size % step > 0)
+    transNum = size / step;
+    if (size % step > 0)
     {
         transNum += 1;
     }
 
-    for(int tarnsCnt = 0;tarnsCnt < transNum;tarnsCnt++)
+    for (int tarnsCnt = 0; tarnsCnt < transNum; tarnsCnt++)
     {
         QByteArray arry = binFile.read(step);
 
-        firmwareUpgrade->send_iap_trans(tarnsCnt,(unsigned char *)arry.data(),arry.length());
+        firmwareUpgrade->send_iap_trans(tarnsCnt, (unsigned char *)arry.data(), arry.length());
 
-        ret = waitReply(IAP_CRC_WAIT);
-        if(ret == REPLY_WAIT)
+        ret = waitReply(IAP_TRANS_WAIT);
+        if (ret == REPLY_WAIT)
         {
-            str.sprintf("IAP TRANS %d timeout",tarnsCnt);
+            str.sprintf("IAP TRANS %d timeout", tarnsCnt);
             showStatus(str);
             goto exit;
-        }else if(ret == REPLY_FAIL)
+        }
+        else if (ret == REPLY_FAIL)
         {
-            str.sprintf("IAP TRANS %d Fail ERRORCODE : %d",tarnsCnt,firmwareUpgrade->errorCode);
+            str.sprintf("IAP TRANS %d Fail ERRORCODE : %d", tarnsCnt, firmwareUpgrade->errorCode);
             showStatus(str);
             goto exit;
-        }else{
-            str.sprintf("IAP TRANS %d %d%%",tarnsCnt,(tarnsCnt+1)*100/transNum);
+        }
+        else
+        {
+            str.sprintf("IAP TRANS %d %d%%", tarnsCnt, (tarnsCnt + 1) * 100 / transNum);
             showStatus(str);
             //emit iapStatusSignals((tarnsCnt+1)*100/transNum,str);
         }
 
-        for(int cnt = 0;cnt<arry.length();cnt++)
+        for (int cnt = 0; cnt < arry.length(); cnt++)
         {
             crc += (unsigned char)arry[cnt];
         }
@@ -154,32 +165,59 @@ void UpgradeThread::run()
     //CRC
     firmwareUpgrade->send_iap_crc(crc);
     ret = waitReply(IAP_CRC_WAIT);
-    if(ret == REPLY_WAIT)
+    if (ret == REPLY_WAIT)
     {
         showStatus("IAP CRC Timeout");
         goto exit;
-    }else if(ret == REPLY_FAIL)
+    }
+    else if (ret == REPLY_FAIL)
     {
-        str.sprintf("IAP CRC Fail ERRORCODE : %d",firmwareUpgrade->errorCode);
+        str.sprintf("IAP CRC Fail ERRORCODE : %d", firmwareUpgrade->errorCode);
         showStatus(str);
         goto exit;
-    }else{
+    }
+    else
+    {
         showStatus("IAP CRC Success");
     }
 
+    wait_id = QString(firmwareUpgrade->vio->idStr);
+
     //reboot
     firmwareUpgrade->send_iap_reboot();
+    
+
+    showStatus("WAIT Reboot ...");
+
+    waitCount = 500;
+    wait_type = TYPE_OPENVIO;
+
+    while (waitCount--)
+    {
+        if (wait_id == nullptr)
+        {
+            break;
+        }
+        msleep(10);
+    }
+
+    if (waitCount <= 0)
+    {
+        showStatus("WAIT Reboot Timeout");
+        goto exit;
+    }
+
     showStatus("IAP SUCCESS");
+    firmwareUpgrade->vio->close();
+exit:
+    mlog->show("IAP Thread Exit");
 
-    exit:
-    showStatus("IAP Thread Exit");
     emit endSignals();
-
 }
 
 void UpgradeThread::waitClose()
 {
-    while(is_loop)
+    while (is_loop)
     {
         msleep(10);
     }
@@ -187,15 +225,16 @@ void UpgradeThread::waitClose()
 
 enum REPLY UpgradeThread::waitReply(int wait_delay)
 {
-    int delay_cnt = wait_delay/10;
+    int delay_cnt = wait_delay / 10;
     firmwareUpgrade->reply_status = REPLY_WAIT;
 
-    while(delay_cnt--)
+    while (delay_cnt--)
     {
-        if(firmwareUpgrade->reply_status == REPLY_OK)
+        if (firmwareUpgrade->reply_status == REPLY_OK)
         {
             return REPLY_OK;
-        }else if(firmwareUpgrade->reply_status == REPLY_FAIL)
+        }
+        else if (firmwareUpgrade->reply_status == REPLY_FAIL)
         {
             return REPLY_FAIL;
         }
@@ -205,5 +244,3 @@ enum REPLY UpgradeThread::waitReply(int wait_delay)
 
     return REPLY_WAIT;
 }
-
-
