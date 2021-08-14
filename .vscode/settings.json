@@ -60,6 +60,8 @@
         "qfileinfo": "cpp",
         "qlabel": "cpp",
         "string": "cpp",
-        "qfiledialog": "cpp"
+        "qfiledialog": "cpp",
+        "qthread": "cpp",
+        "algorithm": "cpp"
     }
 }

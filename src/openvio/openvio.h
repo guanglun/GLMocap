@@ -23,9 +23,11 @@ class FirmwareUpgrade;
 class USBThread;
 #include "usbthread.h"
 
+class CamProcess;
+#include "CamProcess.h"
 
 //OUT
-#define REQUEST_SET_CAMERA_STATUS 0xA0
+#define REQUEST_SET_CAMERA_STATUS           0xA0
 #define REQUEST_SET_REBOOT 					0x01
 
 //IN
@@ -34,6 +36,9 @@ class USBThread;
 
 #define REQUEST_CAMERA_SET_FRAME_SIZE_NUM   0xA2
 #define REQUEST_CAMERA_SET_EXPOSURE         0xA3
+#define REQUEST_CAMERA_SET_SYNC_STATUS 	    0xA4
+#define REQUEST_CAMERA_SET_SYNC_MODE 	    0xA5
+#define REQUEST_CAMERA_SET_FPS              0xA6
 
 #define REQUEST_IMU_START 0xB0
 #define REQUEST_IMU_STOP 0xB1
@@ -42,9 +47,10 @@ class OPENVIO : public QObject
 {
     Q_OBJECT
 private:
-
+    QThread camProcessThread;
     
 public:
+    CamProcess *camProcess;
     boolean isCapImage;
     USBThread *camThread,*imuThread;
     enum SENSOR_STATUS camStatus,imuStatus;
@@ -61,6 +67,10 @@ public:
     unsigned char version[3];
     
     int exposure;
+    uint8_t is_sync_mode;
+    uint8_t is_sync_start;
+    uint8_t camera_fps;
+
     pixformat_t pixformat;
     QString saveImagePath;
     FormVioWindow *formVioWindow;
@@ -83,6 +93,8 @@ public:
     //int row;
 
     OPENVIO(libusb_device *dev);
+    ~OPENVIO();
+
     int open(void);
     int close(void);
     
@@ -93,8 +105,8 @@ public:
     void IMURecv(void);
     int sendCtrl(char request, uint8_t type, unsigned char *buffer,uint16_t len);
     bool sendBulk(unsigned char * buffer,int len);
-    int ctrlCamStart();
-    int ctrlCamStop();
+    int ctrlCamStatus(uint8_t state);
+
     int ctrlIMUStart();
     int ctrlIMUStop();
     int ctrlCamSetFrameSizeNum(uint16_t num);
@@ -108,6 +120,10 @@ public:
     void removeItem(void);
     int getVersion();
     int ctrlReboot(uint8_t boot);
+    int getCameraStatus();
+    int ctrlCamSyncStatus(uint8_t state);
+    int ctrlCamSyncMode(uint8_t mode);
+    int ctrlCamFps(uint8_t fps);
 signals:
     void camSignals(int index);
     void imuSignals(int index);   

@@ -84,9 +84,9 @@ void FormCvWindow::imageSlot(QImage qImage,int flag)
     {
         cv::cvtColor(sourceImg, sourceImg, cv::COLOR_BGR2RGB);
         QImage qSourceImg = QImage((const unsigned char *)(sourceImg.data), sourceImg.cols, sourceImg.rows, sourceImg.step, QImage::Format_RGB888);
-        emit visionImageSignals(qSourceImg);
+        emit visionImageSignals(QPixmap::fromImage(qSourceImg));
     }
         
     else if(flag == Qt::CheckState::Checked)
-        emit visionImageSignals(qImg);
+        emit visionImageSignals(QPixmap::fromImage(qImg));
 }

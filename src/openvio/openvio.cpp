@@ -16,6 +16,19 @@ OPENVIO::OPENVIO(libusb_device *dev)
 
     connect(this, SIGNAL(closeSignals()), this, SLOT(closeSlot()));
     connect(this, SIGNAL(setStatusSignal(QString)), this, SLOT(setStatusSlot(QString)));
+
+    
+    camProcess = new CamProcess(this);
+    camProcess->moveToThread(&camProcessThread); 
+    connect(this, SIGNAL(camSignals(int)), camProcess, SLOT(camSlot(int)));
+    camProcessThread.start();
+}
+
+
+OPENVIO::~OPENVIO()
+{
+    camProcessThread.quit();
+    camProcessThread.wait();
 }
 
 int OPENVIO::open(void)
@@ -95,7 +108,7 @@ void OPENVIO::CamRecv(void)
         {
             if (ret != -7 && ret != -9)
             {
-                DBG("%s cam recv error %d", name.toStdString().c_str(), ret);
+                //DBG("%s cam recv error %d", name.toStdString().c_str(), ret);
                 //emit disconnectSignals();
                 break;
             }
@@ -136,7 +149,7 @@ void OPENVIO::CamRecv(void)
             }
             else if (recv_head_status == 0)
             {
-                DBG("%s cam recv error len %d", name.toStdString().c_str(), camRecvLen);
+                //DBG("%s cam recv error len %d", name.toStdString().c_str(), camRecvLen);
                 //                emit disconnectSignals();
                 //                break;
             }
@@ -311,7 +324,7 @@ int OPENVIO::sendCtrl(char request, uint8_t type, unsigned char *buffer, uint16_
 
     if (dev_handle != NULL)
     {
-        ret = libusb_control_transfer(dev_handle, LIBUSB_REQUEST_TYPE_VENDOR + type, request, 0, 0, buffer, len, 100);
+        ret = libusb_control_transfer(dev_handle, LIBUSB_REQUEST_TYPE_VENDOR + type, request, 0, 0, buffer, len, 0);
 
         if (ret < 0)
         {
@@ -334,7 +347,7 @@ int OPENVIO::camStart()
     DBG("cam start");
     isCamRecv = true;
     camThread->start();
-    ctrlCamStart();
+    ctrlCamStatus(1);
     return true;
 }
 
@@ -342,7 +355,7 @@ int OPENVIO::camStop()
 {
     int close_try_cnt = 0;
 
-    while (ctrlCamStop() != 0 && close_try_cnt < 4)
+    while (ctrlCamStatus(0) != 0 && close_try_cnt < 4)
     {
         close_try_cnt++;
     }
@@ -355,41 +368,26 @@ int OPENVIO::camStop()
     return true;
 }
 
-int OPENVIO::ctrlCamStart()
+int OPENVIO::ctrlCamStatus(uint8_t state)
 {
     uint8_t ret = 0;
 
-    ctrl_buffer[0] = 1;
+    ctrl_buffer[0] = state;
     ret = sendCtrl(REQUEST_SET_CAMERA_STATUS, LIBUSB_ENDPOINT_OUT, ctrl_buffer, 1);
     if (ret < 0)
     {
         return -1;
     }
-    ret = sendCtrl(REQUEST_GET_CAMERA_STATUS, LIBUSB_ENDPOINT_IN, ctrl_buffer, 128);
+    ret = getCameraStatus();
     if (ret < 0)
     {
         return -1;
-    }
-    else
+    }else if (camStatus != state)
     {
-        recv_index = 0;
-        camStatus = (enum SENSOR_STATUS)ctrl_buffer[0];
-        cam_id = ctrl_buffer[1];
-        img.gs_bpp = ctrl_buffer[3];
-        img.setImgSize(ctrl_buffer[2]);
-        pixformat = (pixformat_t)ctrl_buffer[4];
-        exposure = (int)((ctrl_buffer[5] << 24) | (ctrl_buffer[6] << 16) | (ctrl_buffer[7] << 8) | (ctrl_buffer[8] << 0));
-
-        DBG("run:%d  id:%d  bpp:%d  size:%d  pixformat:%d  exposure:%d", ctrl_buffer[0],
-            ctrl_buffer[1], ctrl_buffer[3], ctrl_buffer[2], ctrl_buffer[4],exposure);
-
-        if (camStatus == SENSOR_STATUS_STOP)
-        {
-            return -1;
-        }
+        return -1;
     }
 
-    DBG("cam ctrl start success");
+    //DBG("cam ctrl start success");
 
     return 0;
 }
@@ -427,45 +425,6 @@ int OPENVIO::getVersion()
         //           QString::number(version[1]) + "." +
         //           QString::number(version[2]));
     }
-
-    return 0;
-}
-
-int OPENVIO::ctrlCamStop()
-{
-    uint8_t ret = 0;
-
-    ctrl_buffer[0] = 0;
-    ret = sendCtrl(REQUEST_SET_CAMERA_STATUS, LIBUSB_ENDPOINT_OUT, ctrl_buffer, 1);
-    if (ret < 0)
-    {
-        return -1;
-    }
-    ret = sendCtrl(REQUEST_GET_CAMERA_STATUS, LIBUSB_ENDPOINT_IN, ctrl_buffer, 128);
-    if (ret < 0)
-    {
-        return -1;
-    }
-    else
-    {
-        recv_index = 0;
-        camStatus = (enum SENSOR_STATUS)ctrl_buffer[0];
-        cam_id = ctrl_buffer[1];
-        img.gs_bpp = ctrl_buffer[3];
-        img.setImgSize(ctrl_buffer[2]);
-        pixformat = (pixformat_t)ctrl_buffer[4];
-        exposure = (int)((ctrl_buffer[5] << 24) | (ctrl_buffer[6] << 16) | (ctrl_buffer[7] << 8) | (ctrl_buffer[8] << 0));
-
-        DBG("run:%d  id:%d  bpp:%d  size:%d  pixformat:%d  exposure:%d", ctrl_buffer[0],
-            ctrl_buffer[1], ctrl_buffer[3], ctrl_buffer[2], ctrl_buffer[4],exposure);
-
-        if (camStatus != SENSOR_STATUS_STOP)
-        {
-            return -1;
-        }
-    }
-
-    DBG("cam ctrl stop success");
 
     return 0;
 }
@@ -523,6 +482,74 @@ int OPENVIO::ctrlIMUStop()
     // return -1;
 }
 
+int OPENVIO::ctrlCamSyncStatus(uint8_t state)
+{
+    uint8_t ret = 0;
+
+    ctrl_buffer[0] = state;
+    ret = sendCtrl(REQUEST_CAMERA_SET_SYNC_STATUS, LIBUSB_ENDPOINT_OUT, ctrl_buffer, 1);
+    if (ret < 0)
+    {
+        return -1;
+    }
+    ret = getCameraStatus();
+    if (ret < 0)
+    {
+        return -1;
+    }else if (state != is_sync_start)
+    {
+        return -1;
+    }        
+    return 0;
+}
+
+int OPENVIO::ctrlCamSyncMode(uint8_t mode)
+{
+    uint8_t ret = 0;
+
+    ctrl_buffer[0] = mode;
+
+    ret = sendCtrl(REQUEST_CAMERA_SET_SYNC_MODE, LIBUSB_ENDPOINT_OUT, ctrl_buffer, 1);
+    if (ret < 0)
+    {
+        return -1;
+    }
+
+    ret = getCameraStatus();
+    if (ret < 0)
+    {
+        return -1;
+    }else if (mode != is_sync_mode)
+    {
+        return -1;
+    }    
+    return 0;
+}
+
+int OPENVIO::ctrlCamFps(uint8_t fps)
+{
+    uint8_t ret = 0;
+
+    ctrl_buffer[0] = fps;
+
+    ret = sendCtrl(REQUEST_CAMERA_SET_FPS, LIBUSB_ENDPOINT_OUT, ctrl_buffer, 1);
+    if (ret < 0)
+    {
+        return -1;
+    }
+
+    ret = getCameraStatus();
+    if (ret < 0)
+    {
+        return -1;
+    }else if (fps != camera_fps)
+    {
+        return -1;
+    }
+
+    return 0;
+}
+
 int OPENVIO::ctrlCamSetFrameSizeNum(uint16_t num)
 {
 
@@ -542,6 +569,35 @@ int OPENVIO::ctrlCamSetFrameSizeNum(uint16_t num)
     // return -1;
 }
 
+int OPENVIO::getCameraStatus()
+{
+    int ret = 0;
+    ret = sendCtrl(REQUEST_GET_CAMERA_STATUS, LIBUSB_ENDPOINT_IN, ctrl_buffer, 12);
+    if (ret < 0)
+    {
+        return -1;
+    }
+    else
+    {
+        recv_index = 0;
+        camStatus = (enum SENSOR_STATUS)ctrl_buffer[0];
+        cam_id = ctrl_buffer[1];
+        img.gs_bpp = ctrl_buffer[3];
+        img.setImgSize(ctrl_buffer[2]);
+        pixformat = (pixformat_t)ctrl_buffer[4];
+        exposure = (int)((ctrl_buffer[5] << 24) | (ctrl_buffer[6] << 16) | (ctrl_buffer[7] << 8) | (ctrl_buffer[8] << 0));
+        is_sync_mode = ctrl_buffer[9];
+        is_sync_start = ctrl_buffer[10];
+        camera_fps = ctrl_buffer[11];
+
+        DBG("run:%d  id:%d  bpp:%d  size:%d  pixformat:%d  exposure:%d", ctrl_buffer[0],
+            ctrl_buffer[1], ctrl_buffer[3], ctrl_buffer[2], ctrl_buffer[4],exposure);
+        DBG("is_sync_mode:%d  is_sync_start:%d  camera_fps:%d", is_sync_mode,
+            is_sync_start, camera_fps);            
+    }
+    return 0;
+}
+
 int OPENVIO::ctrlCamSetExposure(int value)
 {
     uint8_t ret = 0;
@@ -556,28 +612,14 @@ int OPENVIO::ctrlCamSetExposure(int value)
     {
         return -1;
     }
-    ret = sendCtrl(REQUEST_GET_CAMERA_STATUS, LIBUSB_ENDPOINT_IN, ctrl_buffer, 128);
+
+    ret = getCameraStatus();
     if (ret < 0)
     {
         return -1;
-    }
-    else
+    }else if (exposure != value)
     {
-        recv_index = 0;
-        camStatus = (enum SENSOR_STATUS)ctrl_buffer[0];
-        cam_id = ctrl_buffer[1];
-        img.gs_bpp = ctrl_buffer[3];
-        img.setImgSize(ctrl_buffer[2]);
-        pixformat = (pixformat_t)ctrl_buffer[4];
-        exposure = (int)((ctrl_buffer[5] << 24) | (ctrl_buffer[6] << 16) | (ctrl_buffer[7] << 8) | (ctrl_buffer[8] << 0));
-
-        DBG("run:%d  id:%d  bpp:%d  size:%d  pixformat:%d  exposure:%d", ctrl_buffer[0],
-            ctrl_buffer[1], ctrl_buffer[3], ctrl_buffer[2], ctrl_buffer[4],exposure);
-
-        if (exposure != value)
-        {
-            return -1;
-        }
+        return -1;
     }
 
     return 0;

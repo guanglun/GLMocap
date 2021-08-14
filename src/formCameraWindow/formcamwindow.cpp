@@ -164,7 +164,7 @@ static bool isDirExist(QString fullPath)
 
 void FormCamWindow::on_actionConfig_triggered()
 {
-    formCamConfig.setQData(qwinusb->openvioList);
+    formCamConfig.setQData(qwinusb->openvioList,NULL);
     if (formCamConfig.isVisible() == false)
     {
         formCamConfig.show();

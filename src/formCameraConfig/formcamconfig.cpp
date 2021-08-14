@@ -39,6 +39,19 @@ FormCamConfig::FormCamConfig(QWidget *parent) : QWidget(parent),
     ui->comboBoxCamSize->addItems(FrameSizeStr);
 
     ui->le_exposure->setValidator(new QIntValidator(0, 99999999, this));
+
+    ctrlProcess = new CtrlProcess(this);
+    ctrlProcess->moveToThread(&ctrlProcessThread); 
+    connect(this, SIGNAL(setExposureSignal(int)), ctrlProcess, SLOT(setExposureSlot(int)));
+    connect(this, SIGNAL(syncSignal()), ctrlProcess, SLOT(syncSlot()));
+
+
+    connect(this, SIGNAL(ctrlCamStatusSignal(unsigned char)), ctrlProcess, SLOT(ctrlCamStatusSlot(unsigned char)));
+    connect(this, SIGNAL(ctrlCamSyncStatusSignal(unsigned char)), ctrlProcess, SLOT(ctrlCamSyncStatusSlot(unsigned char)));
+    connect(this, SIGNAL(ctrlCamSyncModeSignal(unsigned char)), ctrlProcess, SLOT(ctrlCamSyncModeSlot(unsigned char)));
+    connect(this, SIGNAL(ctrlCamFpsSignal(unsigned char)), ctrlProcess, SLOT(ctrlCamFpsSlot(unsigned char)));
+
+    ctrlProcessThread.start();
 }
 
 void FormCamConfig::setQData(QList<OPENVIO *> *vioList, OPENVIO *vio)
@@ -55,10 +68,14 @@ void FormCamConfig::setQData(QList<OPENVIO *> *vioList, OPENVIO *vio)
     {
         this->setWindowTitle("camera config select " + QString(vio->idShort));
     }
+
+    ctrlProcess->setVio(vioList,vio);
 }
 
 FormCamConfig::~FormCamConfig()
 {
+    ctrlProcessThread.quit();
+    ctrlProcessThread.wait();
     delete ui;
 }
 
@@ -73,12 +90,12 @@ void FormCamConfig::on_pb_exit_clicked()
 
 void FormCamConfig::on_pb_cam_start_clicked()
 {
-    //qwinusb->ctrlCamStart();
+    emit ctrlCamStatusSignal(1);
 }
 
 void FormCamConfig::on_pb_cam_stop_clicked()
 {
-    //qwinusb->ctrlCamStop();
+    emit ctrlCamStatusSignal(0);
 }
 
 void FormCamConfig::on_pb_set_config_exposure_clicked()
@@ -92,35 +109,38 @@ void FormCamConfig::on_pb_set_config_exposure_clicked()
         exposure_value = -exposure_value;
     }
 
-    //DBG("exposure_value %d",exposure_value);
-    if (vioList != NULL)
+    emit setExposureSignal(exposure_value);
+}
+
+void FormCamConfig::on_pb_sync_clicked()
+{
+    emit syncSignal();
+}
+
+void FormCamConfig::on_pb_set_config_fps_clicked()
+{
+    uint8_t fps = ui->le_fps->text().toInt();
+    emit ctrlCamFpsSignal(fps);
+}
+
+void FormCamConfig::on_pb_set_config_sync_mode_clicked()
+{
+    if (ui->cb_syncmode->checkState() == Qt::CheckState::Checked)
     {
-        for (int i = 0; i < vioList->size(); i++)
-        {
-            OPENVIO *vio = vioList->at(i);
-            vio->open();
-            if (vio->ctrlCamSetExposure(exposure_value) == 0)
-            {
-                vio->setStatus("Set Exposure " + QString::number(exposure_value) + " Success");
-            }
-            else
-            {
-                vio->setStatus("Set Exposure " + QString::number(exposure_value) + " Fail");
-            }
-        }
+        emit ctrlCamSyncModeSignal(1);
+    }else{
+        emit ctrlCamSyncModeSignal(0);
     }
-    else if (vio != NULL)
-    {
-        vio->open();
-        if (vio->ctrlCamSetExposure(exposure_value) == 0)
-        {
-            vio->setStatus("Set Exposure " + QString::number(exposure_value) + " Success");
-        }
-        else
-        {
-            vio->setStatus("Set Exposure " + QString::number(exposure_value) + " Fail");
-        }
-    }
+}
+
+void FormCamConfig::on_pb_set_config_sync_start_clicked()
+{
+    emit ctrlCamSyncStatusSignal(1);
+}
+
+void FormCamConfig::on_pb_set_config_sync_stop_clicked()
+{
+    emit ctrlCamSyncStatusSignal(0);
 }
 
 void FormCamConfig::on_pb_set_config_image_size_clicked()

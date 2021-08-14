@@ -27,7 +27,7 @@ private slots:
     
 signals:
     void positionSignals(int camIndex, double x,double y);  
-    void visionImageSignals(QImage qImage);  
+    void visionImageSignals(QPixmap qImage);  
 
 private:
     Ui::FormCvWindow *ui;

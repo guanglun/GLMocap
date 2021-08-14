@@ -44,6 +44,7 @@ add_executable(MultiCam
     src/formCameraWindow/MuItemCam.cpp
     src/MuItemCtrl/MuItemCtrl.cpp
     src/MuItemCtrl/MuItemCtrlThread.cpp
+    src/process/CamProcess.cpp
 
     src/main.cpp
     src/openvio/openvio.cpp
@@ -51,6 +52,7 @@ add_executable(MultiCam
     src/winusb/usbthread.cpp
     src/easytool/easytool.cpp
     src/easytool/findstr.cpp
+    src/process/CtrlProcess.cpp
     src/image/image.cpp
     src/drow/camview.cpp
     src/drow/glview.cpp
@@ -87,6 +89,7 @@ include_directories(
                     src/formCvWindow
                     src/firmwareUpgrade
                     src/gl_protocol
+                    src/process
                     src/MuItemCtrl
                     src/vision
                     src/openvio

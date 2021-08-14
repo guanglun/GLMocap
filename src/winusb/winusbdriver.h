@@ -88,8 +88,6 @@ public:
     int close(void);
     static void LIBUSB_CALL completeCallback(libusb_transfer *xfer);
     void send(QByteArray byte);
-    void CamRecv(void);
-    void IMURecv(void);
     void scan(void);
     void autoScan();
     void setModule(QStandardItemModel *pModelOpenvio);

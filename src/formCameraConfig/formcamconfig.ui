@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>476</width>
+    <width>473</width>
     <height>345</height>
    </rect>
   </property>
@@ -19,11 +19,11 @@
      <x>10</x>
      <y>10</y>
      <width>451</width>
-     <height>281</height>
+     <height>291</height>
     </rect>
    </property>
    <property name="title">
-    <string>设置选项</string>
+    <string>Setting</string>
    </property>
    <widget class="QWidget" name="horizontalLayoutWidget">
     <property name="geometry">
@@ -38,7 +38,7 @@
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>图像大小</string>
+        <string>image size：</string>
        </property>
       </widget>
      </item>
@@ -51,7 +51,7 @@
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>写入</string>
+        <string>write</string>
        </property>
        <property name="checkable">
         <bool>false</bool>
@@ -73,14 +73,14 @@
      <item>
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>曝光设置        </string>
+        <string>exposure            </string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QCheckBox" name="cb_exposure">
        <property name="text">
-        <string>自动曝光</string>
+        <string>auto exposure</string>
        </property>
       </widget>
      </item>
@@ -94,7 +94,80 @@
      <item>
       <widget class="QPushButton" name="pb_set_config_exposure">
        <property name="text">
-        <string>写入</string>
+        <string>write</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_3">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>100</y>
+      <width>431</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>fps:                                  </string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="le_fps">
+       <property name="text">
+        <string>30</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pb_set_config_fps">
+       <property name="text">
+        <string>write</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_4">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>140</y>
+      <width>431</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QCheckBox" name="cb_syncmode">
+       <property name="text">
+        <string>sync mode      </string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pb_set_config_sync_mode">
+       <property name="text">
+        <string>write</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pb_set_config_sync_start">
+       <property name="text">
+        <string>start</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pb_set_config_sync_stop">
+       <property name="text">
+        <string>stop</string>
        </property>
       </widget>
      </item>
@@ -111,7 +184,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>设置</string>
+    <string>config</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pb_exit">
@@ -124,33 +197,46 @@
     </rect>
    </property>
    <property name="text">
-    <string>退出</string>
+    <string>exit</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pb_cam_stop">
    <property name="geometry">
     <rect>
-     <x>230</x>
+     <x>204</x>
      <y>310</y>
-     <width>75</width>
+     <width>101</width>
      <height>23</height>
     </rect>
    </property>
    <property name="text">
-    <string>关闭摄像头</string>
+    <string>close camera</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pb_cam_start">
    <property name="geometry">
     <rect>
-     <x>150</x>
+     <x>104</x>
+     <y>310</y>
+     <width>91</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>open camera</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pb_sync">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
      <y>310</y>
      <width>75</width>
      <height>23</height>
     </rect>
    </property>
    <property name="text">
-    <string>开启摄像头</string>
+    <string>sync</string>
    </property>
   </widget>
  </widget>
