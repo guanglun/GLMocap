@@ -13,11 +13,11 @@ void CtrlProcess::setVio(QList<OPENVIO *> *vioList,OPENVIO *setvio)
 OPENVIO *CtrlProcess::getEach()
 {
     OPENVIO *vio = NULL;
-    if (vio != NULL && vioList == NULL && count == 0)
+    if (setvio != NULL && vioList == NULL && count == 0)
     {
         vio = setvio;
     }
-    else if (vio == NULL && vioList != NULL)
+    else if (setvio == NULL && vioList != NULL)
     {
         if (count < vioList->size())
         {
@@ -178,6 +178,28 @@ void CtrlProcess::ctrlCamFpsSlot(unsigned char fps)
             else
             {
                 vio->setStatus("Set fps " + QString::number(fps) + " Fail");
+            }
+        }
+    } while (vio != NULL);
+}
+
+void CtrlProcess::ctrlInfraredPwmSlot(unsigned char pwm)
+{
+    OPENVIO *vio = NULL;
+    count = 0;
+    do
+    {
+        vio = getEach();
+        if (vio != NULL)
+        {
+            vio->open();
+            if(vio->ctrlInfraredPwm(pwm) == 0)
+            {
+                vio->setStatus("Set InfraredPwm " + QString::number(pwm) + " Success");
+            }
+            else
+            {
+                vio->setStatus("Set InfraredPwm " + QString::number(pwm) + " Fail");
             }
         }
     } while (vio != NULL);

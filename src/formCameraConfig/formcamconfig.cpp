@@ -50,6 +50,8 @@ FormCamConfig::FormCamConfig(QWidget *parent) : QWidget(parent),
     connect(this, SIGNAL(ctrlCamSyncStatusSignal(unsigned char)), ctrlProcess, SLOT(ctrlCamSyncStatusSlot(unsigned char)));
     connect(this, SIGNAL(ctrlCamSyncModeSignal(unsigned char)), ctrlProcess, SLOT(ctrlCamSyncModeSlot(unsigned char)));
     connect(this, SIGNAL(ctrlCamFpsSignal(unsigned char)), ctrlProcess, SLOT(ctrlCamFpsSlot(unsigned char)));
+    connect(this, SIGNAL(ctrlInfraredPwmSignal(unsigned char)), ctrlProcess, SLOT(ctrlInfraredPwmSlot(unsigned char)));
+
 
     ctrlProcessThread.start();
 }
@@ -141,6 +143,12 @@ void FormCamConfig::on_pb_set_config_sync_start_clicked()
 void FormCamConfig::on_pb_set_config_sync_stop_clicked()
 {
     emit ctrlCamSyncStatusSignal(0);
+}
+
+void FormCamConfig::on_pb_set_config_pwm_clicked()
+{
+    uint8_t pwm = ui->hs_pwm->value();
+    emit ctrlInfraredPwmSignal(pwm);
 }
 
 void FormCamConfig::on_pb_set_config_image_size_clicked()

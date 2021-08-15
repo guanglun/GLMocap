@@ -550,6 +550,30 @@ int OPENVIO::ctrlCamFps(uint8_t fps)
     return 0;
 }
 
+int OPENVIO::ctrlInfraredPwm(uint8_t pwm)
+{
+    uint8_t ret = 0;
+
+    ctrl_buffer[0] = pwm;
+
+    ret = sendCtrl(REQUEST_SET_INFRARED_PWM, LIBUSB_ENDPOINT_OUT, ctrl_buffer, 1);
+    if (ret < 0)
+    {
+        return -1;
+    }
+
+    ret = getCameraStatus();
+    if (ret < 0)
+    {
+        return -1;
+    }else if (pwm != infrared_pwm)
+    {
+        return -1;
+    }
+
+    return 0;
+}
+
 int OPENVIO::ctrlCamSetFrameSizeNum(uint16_t num)
 {
 
@@ -572,7 +596,7 @@ int OPENVIO::ctrlCamSetFrameSizeNum(uint16_t num)
 int OPENVIO::getCameraStatus()
 {
     int ret = 0;
-    ret = sendCtrl(REQUEST_GET_CAMERA_STATUS, LIBUSB_ENDPOINT_IN, ctrl_buffer, 12);
+    ret = sendCtrl(REQUEST_GET_CAMERA_STATUS, LIBUSB_ENDPOINT_IN, ctrl_buffer, 13);
     if (ret < 0)
     {
         return -1;
@@ -589,11 +613,12 @@ int OPENVIO::getCameraStatus()
         is_sync_mode = ctrl_buffer[9];
         is_sync_start = ctrl_buffer[10];
         camera_fps = ctrl_buffer[11];
+        infrared_pwm = ctrl_buffer[12];
 
         DBG("run:%d  id:%d  bpp:%d  size:%d  pixformat:%d  exposure:%d", ctrl_buffer[0],
             ctrl_buffer[1], ctrl_buffer[3], ctrl_buffer[2], ctrl_buffer[4],exposure);
-        DBG("is_sync_mode:%d  is_sync_start:%d  camera_fps:%d", is_sync_mode,
-            is_sync_start, camera_fps);            
+        DBG("is_sync_mode:%d  is_sync_start:%d  camera_fps:%d infrared_pwm:%d", is_sync_mode,
+            is_sync_start, camera_fps,infrared_pwm);            
     }
     return 0;
 }

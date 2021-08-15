@@ -47,6 +47,7 @@ private slots:
     void on_pb_set_config_sync_mode_clicked();
     void on_pb_set_config_sync_start_clicked();
     void on_pb_set_config_sync_stop_clicked();
+    void on_pb_set_config_pwm_clicked();
 private:
     Ui::FormCamConfig *ui;
 
@@ -57,6 +58,7 @@ signals:
     void ctrlCamSyncStatusSignal(unsigned char state);
     void ctrlCamSyncModeSignal(unsigned char mode);
     void ctrlCamFpsSignal(unsigned char fps);  
+    void ctrlInfraredPwmSignal(unsigned char pwm);  
 };
 
 #endif // FORMCAMCONFIG_H

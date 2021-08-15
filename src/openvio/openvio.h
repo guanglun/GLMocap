@@ -39,6 +39,7 @@ class CamProcess;
 #define REQUEST_CAMERA_SET_SYNC_STATUS 	    0xA4
 #define REQUEST_CAMERA_SET_SYNC_MODE 	    0xA5
 #define REQUEST_CAMERA_SET_FPS              0xA6
+#define REQUEST_SET_INFRARED_PWM            0xA7
 
 #define REQUEST_IMU_START 0xB0
 #define REQUEST_IMU_STOP 0xB1
@@ -70,6 +71,7 @@ public:
     uint8_t is_sync_mode;
     uint8_t is_sync_start;
     uint8_t camera_fps;
+    uint8_t infrared_pwm;
 
     pixformat_t pixformat;
     QString saveImagePath;
@@ -124,6 +126,7 @@ public:
     int ctrlCamSyncStatus(uint8_t state);
     int ctrlCamSyncMode(uint8_t mode);
     int ctrlCamFps(uint8_t fps);
+    int ctrlInfraredPwm(uint8_t pwm);
 signals:
     void camSignals(int index);
     void imuSignals(int index);   

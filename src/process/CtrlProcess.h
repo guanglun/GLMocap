@@ -32,6 +32,7 @@ public slots:
     void ctrlCamSyncStatusSlot(unsigned char state);
     void ctrlCamSyncModeSlot(unsigned char mode);
     void ctrlCamFpsSlot(unsigned char fps);    
+    void ctrlInfraredPwmSlot(unsigned char pwm);    
 };
  
 #endif // CAMPROCESS_H
