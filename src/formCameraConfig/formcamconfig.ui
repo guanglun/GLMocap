@@ -34,11 +34,11 @@
       <height>31</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1,1">
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>image size：</string>
+        <string>image size</string>
        </property>
       </widget>
      </item>
@@ -69,11 +69,11 @@
       <height>31</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,1,1,1">
      <item>
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>exposure            </string>
+        <string>exposure</string>
        </property>
       </widget>
      </item>
@@ -109,11 +109,11 @@
       <height>31</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,1,1">
      <item>
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>fps:                                  </string>
+        <string>fps</string>
        </property>
       </widget>
      </item>
@@ -142,11 +142,11 @@
       <height>31</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_4">
+    <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,1,1,1">
      <item>
       <widget class="QCheckBox" name="cb_syncmode">
        <property name="text">
-        <string>sync mode      </string>
+        <string>sync mode</string>
        </property>
       </widget>
      </item>
@@ -182,11 +182,11 @@
       <height>31</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_5">
+    <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,1,1">
      <item>
       <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>infrared pwm                          </string>
+        <string>infrared pwm</string>
        </property>
       </widget>
      </item>

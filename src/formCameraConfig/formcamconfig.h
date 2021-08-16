@@ -31,17 +31,11 @@ public:
     void setQData(QList<OPENVIO *> *vioList = NULL,OPENVIO *vio = NULL);
 private slots:
     void on_pb_set_config_clicked();
-    
     void on_pb_exit_clicked();
-    
     void on_pb_cam_start_clicked();
-    
     void on_pb_cam_stop_clicked();
-    
     void on_pb_set_config_exposure_clicked();
-
     void on_pb_set_config_image_size_clicked();
-
     void on_pb_sync_clicked();
     void on_pb_set_config_fps_clicked();
     void on_pb_set_config_sync_mode_clicked();

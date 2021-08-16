@@ -56,7 +56,7 @@ public:
     USBThread *camThread,*imuThread;
     enum SENSOR_STATUS camStatus,imuStatus;
     int recv_len_count = 0;
-    bool isShowSpeed = false;
+
     int isCamRecv=false,isIMURecv=false;
     unsigned char ctrl_buffer[128];
     int camRecvLen,imuRecvLen,recv_index;
@@ -102,6 +102,7 @@ public:
     
     void setItem(QStandardItemModel *pModelOpenvio);
     void setStatus(QString status);
+    void setSpeed(QString speed);
     void setName(QString name);
     void CamRecv(void);
     void IMURecv(void);
@@ -118,6 +119,9 @@ public:
     int IMUStart();
     int camStop();
     int IMUStop();
+
+    int camRecvStart();
+
     int recvBulk(unsigned char *buffer, int len);
     void removeItem(void);
     int getVersion();
@@ -132,9 +136,12 @@ signals:
     void imuSignals(int index);   
     void closeSignals(void);   
     void setStatusSignal(QString str); 
+    void setSpeedSignal(QString speed); 
+    void getCameraStatusSignal(void); 
 private slots:
     void closeSlot(void);    
     void setStatusSlot(QString str); 
+    void setSpeedSlot(QString speed);
 };
 
 #endif // SETTING_H

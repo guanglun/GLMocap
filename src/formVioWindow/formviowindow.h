@@ -18,6 +18,9 @@ class OPENVIO;
 class FormCvWindow;
 #include "formcvwindow.h"
 
+class CtrlProcess;
+#include "CtrlProcess.h"
+
 namespace Ui {
 class FormVioWindow;
 }
@@ -26,7 +29,11 @@ class FormVioWindow : public QWidget
 {
     Q_OBJECT
     
+private:
+    QThread ctrlProcessThread;
+    
 public:
+    CtrlProcess *ctrlProcess;
     explicit FormVioWindow(QWidget *parent = 0);
     ~FormVioWindow();
     OPENVIO *vio;
@@ -40,10 +47,15 @@ private:
 private slots:
     void onTimeOut(); 
     void on_pb_vision_clicked();
+    void on_pb_cam_clicked();
+    void on_pb_sync_clicked();
+
     void visionImageSlot(QPixmap qImage);  
+    void getCameraStatusSlot(void); 
 signals:
     void imageSignals(QImage qImage,int flag);
-    
+    void ctrlCamStatusSignal(unsigned char state);
+    void ctrlCamSyncStatusSignal(unsigned char state);
 private:
     Ui::FormVioWindow *ui;
     

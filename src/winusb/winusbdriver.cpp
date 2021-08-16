@@ -184,19 +184,20 @@ void WinUSBDriver::autoScan(void)
                             {
                                 openvioList->append(vio);
                                 vio->setItem(pModelOpenvio);
+                                vio->ctrlCamStatus(0);
+                                vio->camRecvStart();
                                 isNew = true;
                             }
                         }else if(vio->type == TYPE_BOOTLOADER)
                         {
                             openvioList->append(vio);
                             vio->setItem(pModelOpenvio);
+                            
                             isNew = true;
                         }
-
-
+                    }else{
+                        vio->close();
                     }
-                    vio->close();
-                    
                 }
                 else
                 {

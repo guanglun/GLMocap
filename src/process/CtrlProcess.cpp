@@ -47,7 +47,6 @@ void CtrlProcess::setExposureSlot(int exposure)
 {
     OPENVIO *vio = NULL;
     count = 0;
-    
 
     do
     {

@@ -18,6 +18,14 @@ FormVioWindow::FormVioWindow(QWidget *parent) :
     connect(formCvWindow, SIGNAL(visionImageSignals(QPixmap)), this, SLOT(visionImageSlot(QPixmap))); 
 
     this->ui->cb_vision->setCheckState(Qt::CheckState::Unchecked);
+
+    ctrlProcess = new CtrlProcess(this);
+    ctrlProcess->moveToThread(&ctrlProcessThread);
+
+    connect(this, SIGNAL(ctrlCamStatusSignal(unsigned char)), ctrlProcess, SLOT(ctrlCamStatusSlot(unsigned char)));
+    connect(this, SIGNAL(ctrlCamSyncStatusSignal(unsigned char)), ctrlProcess, SLOT(ctrlCamSyncStatusSlot(unsigned char)));
+
+    ctrlProcessThread.start();
 }
 
 FormVioWindow::~FormVioWindow()
@@ -27,7 +35,7 @@ FormVioWindow::~FormVioWindow()
 
 void FormVioWindow::closeEvent(QCloseEvent *event) 
 { 
-    this->vio->camStop();
+    //this->vio->camStop();
     DBG("exit");
 } 
 
@@ -43,10 +51,15 @@ void FormVioWindow::setQData(OPENVIO *vio)
     }
 
     connect(vio->camProcess, SIGNAL(visionImageSignals(QPixmap)), this, SLOT(visionImageSlot(QPixmap))); 
+    connect(vio, SIGNAL(getCameraStatusSignal()), this, SLOT(getCameraStatusSlot())); 
 
     this->setWindowTitle(this->vio->name +" : "+ this->vio->idShort);
     
     ui->lb_img->setScaledContents(true);
+
+    ctrlProcess->setVio(NULL,vio);
+
+    getCameraStatusSlot();
 
 }
 
@@ -141,6 +154,44 @@ void FormVioWindow::on_pb_vision_clicked()
     if(!formCvWindow->isActiveWindow())
     {
         formCvWindow->show();
+    }
+}
+
+void FormVioWindow::on_pb_cam_clicked()
+{
+    if(ui->pb_cam->text().contains("cam start"))
+    {
+        emit ctrlCamStatusSignal(1);
+    }else{
+        emit ctrlCamStatusSignal(0);
+    }
+}
+
+void FormVioWindow::on_pb_sync_clicked()
+{
+    DBG("sync start");
+    if(ui->pb_sync->text().contains("sync start"))
+    {
+        emit ctrlCamSyncStatusSignal(1);
+    }else{
+        emit ctrlCamSyncStatusSignal(0);
+    }
+}
+
+void FormVioWindow::getCameraStatusSlot(void)
+{
+    if(vio->camStatus != 0)
+    {
+        ui->pb_cam->setText("cam stop ");
+    }else{
+        ui->pb_cam->setText("cam start");
+    }
+
+    if(vio->is_sync_start != 0)
+    {
+        ui->pb_sync->setText("sync stop ");
+    }else{
+        ui->pb_sync->setText("sync start");
     }
 }
 

@@ -16,7 +16,7 @@ OPENVIO::OPENVIO(libusb_device *dev)
 
     connect(this, SIGNAL(closeSignals()), this, SLOT(closeSlot()));
     connect(this, SIGNAL(setStatusSignal(QString)), this, SLOT(setStatusSlot(QString)));
-
+    connect(this, SIGNAL(setSpeedSignal(QString)), this, SLOT(setSpeedSlot(QString)));
     
     camProcess = new CamProcess(this);
     camProcess->moveToThread(&camProcessThread); 
@@ -272,6 +272,7 @@ void OPENVIO::setItem(QStandardItemModel *pModelOpenvio)
     itemCamData.status = "wait";
     itemCamData.name = setting->getNameById(idStr);
     itemCamData.type = type;
+    itemCamData.speed = "";
     this->name = itemCamData.name;
 
     pItem->setData(QVariant::fromValue(itemCamData), Qt::UserRole + 1);
@@ -294,6 +295,18 @@ void OPENVIO::setStatusSlot(QString str)
 void OPENVIO::setStatus(QString status)
 {
     emit setStatusSignal(status);
+}
+
+void OPENVIO::setSpeedSlot(QString speed)
+{
+    itemCamData.speed = speed;
+    pItem->setData(QVariant::fromValue(itemCamData));
+}
+
+void OPENVIO::setSpeed(QString speed)
+{
+    emit setSpeedSignal(speed);
+
 }
 
 void OPENVIO::setName(QString name)
@@ -340,6 +353,13 @@ int OPENVIO::sendCtrl(char request, uint8_t type, unsigned char *buffer, uint16_
     }
 
     return -1;
+}
+
+int OPENVIO::camRecvStart()
+{
+    isCamRecv = true;
+    camThread->start();
+    return true;
 }
 
 int OPENVIO::camStart()
@@ -618,7 +638,9 @@ int OPENVIO::getCameraStatus()
         DBG("run:%d  id:%d  bpp:%d  size:%d  pixformat:%d  exposure:%d", ctrl_buffer[0],
             ctrl_buffer[1], ctrl_buffer[3], ctrl_buffer[2], ctrl_buffer[4],exposure);
         DBG("is_sync_mode:%d  is_sync_start:%d  camera_fps:%d infrared_pwm:%d", is_sync_mode,
-            is_sync_start, camera_fps,infrared_pwm);            
+            is_sync_start, camera_fps,infrared_pwm);     
+
+        emit getCameraStatusSignal();       
     }
     return 0;
 }

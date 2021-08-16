@@ -41,10 +41,11 @@ FormCamConfig::FormCamConfig(QWidget *parent) : QWidget(parent),
     ui->le_exposure->setValidator(new QIntValidator(0, 99999999, this));
 
     ctrlProcess = new CtrlProcess(this);
-    ctrlProcess->moveToThread(&ctrlProcessThread); 
+    ctrlProcess->moveToThread(&ctrlProcessThread);
+
+
     connect(this, SIGNAL(setExposureSignal(int)), ctrlProcess, SLOT(setExposureSlot(int)));
     connect(this, SIGNAL(syncSignal()), ctrlProcess, SLOT(syncSlot()));
-
 
     connect(this, SIGNAL(ctrlCamStatusSignal(unsigned char)), ctrlProcess, SLOT(ctrlCamStatusSlot(unsigned char)));
     connect(this, SIGNAL(ctrlCamSyncStatusSignal(unsigned char)), ctrlProcess, SLOT(ctrlCamSyncStatusSlot(unsigned char)));
@@ -58,20 +59,39 @@ FormCamConfig::FormCamConfig(QWidget *parent) : QWidget(parent),
 
 void FormCamConfig::setQData(QList<OPENVIO *> *vioList, OPENVIO *vio)
 {
+    OPENVIO *configvio = NULL;
     this->vioList = vioList;
     this->vio = vio;
 
     if (vioList != NULL)
     {
         this->setWindowTitle("camera config select " + QString::number(vioList->size()));
-    }
-
-    if (vio != NULL)
+        if(vioList->size() != 0)
+        {
+            configvio = vioList->at(0);
+        }
+    }else if (vio != NULL)
     {
         this->setWindowTitle("camera config select " + QString(vio->idShort));
+        configvio = vio;
     }
 
     ctrlProcess->setVio(vioList,vio);
+
+    if(configvio != NULL)
+    {
+        ui->le_exposure->setText(QString::number(configvio->exposure));
+        ui->le_fps->setText(QString::number(configvio->camera_fps));
+        ui->hs_pwm->setValue(configvio->infrared_pwm);
+
+        if(configvio->is_sync_mode)
+        {
+            ui->cb_syncmode->setCheckState(Qt::CheckState::Checked);
+        }else{
+            ui->cb_syncmode->setCheckState(Qt::CheckState::Unchecked);
+        }
+        
+    }
 }
 
 FormCamConfig::~FormCamConfig()

@@ -10,6 +10,7 @@ typedef struct {
     QString ver;
     QString status;
     QString name;
+    QString speed;
     enum OPENVIO_TYPE type;
 } MuItemCamData;
 

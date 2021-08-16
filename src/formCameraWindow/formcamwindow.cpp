@@ -221,7 +221,7 @@ void FormCamWindow::doubleClickedSlot(const QModelIndex &index)
 {
     OPENVIO *vio = openvioList.at(index.row());
 
-    if (vio->isCamRecv == false && vio->type == TYPE_OPENVIO)
+    if (vio->type == TYPE_OPENVIO)
     {
         if (vio->formVioWindow == NULL)
         {
@@ -234,8 +234,8 @@ void FormCamWindow::doubleClickedSlot(const QModelIndex &index)
         if (vio->formVioWindow->isVisible() == false)
         {
             vio->formVioWindow->show();
-            vio->open();
-            vio->camStart();
+            //vio->open();
+            //vio->camStart();
         }
     }
 }
@@ -278,9 +278,7 @@ void FormCamWindow::onTimeOut()
         vio->frame_fps = 0;
 
         vio->recv_count_1s = 0;
-
-        if (vio->isShowSpeed)
-            vio->setStatus(speedStr);
+        vio->setSpeed(speedStr);
     }
 
     status_speed->setText(getSpeed(recv_count_1s));
