@@ -282,7 +282,12 @@ void OPENVIO::setItem(QStandardItemModel *pModelOpenvio)
     itemCamData.type = type;
     itemCamData.speed = "";
     pItem->setData(QVariant::fromValue(itemCamData), Qt::UserRole + 1);
-    pModelOpenvio->appendRow(pItem);
+    if(number == -1 || pModelOpenvio->rowCount() < number)
+    {
+        pModelOpenvio->appendRow(pItem);
+    }else{
+        pModelOpenvio->insertRow(number,pItem);
+    }
 }
 
 void OPENVIO::removeItem(void)
@@ -294,7 +299,6 @@ void OPENVIO::removeItem(void)
 void OPENVIO::setStatusSlot(QString str)
 {
     itemCamData.status = str;
-
     pItem->setData(QVariant::fromValue(itemCamData));
 }
 
@@ -312,7 +316,6 @@ void OPENVIO::setSpeedSlot(QString speed)
 void OPENVIO::setSpeed(QString speed)
 {
     emit setSpeedSignal(speed);
-
 }
 
 void OPENVIO::setNumber(int number)

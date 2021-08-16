@@ -45,6 +45,7 @@ add_executable(MultiCam
     src/MuItemCtrl/MuItemCtrl.cpp
     src/MuItemCtrl/MuItemCtrlThread.cpp
     src/process/CamProcess.cpp
+    src/process/VisionProcess.cpp
 
     src/main.cpp
     src/openvio/openvio.cpp

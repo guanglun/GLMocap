@@ -2,8 +2,8 @@
 #define CTRLPROCESS_H
 
 #include <QObject>
-#include<QDebug>
-#include<QThread>
+#include <QDebug>
+#include <QThread>
 #include <QWidget>
 #include <QDateTime>
 #include <QList>

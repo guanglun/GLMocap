@@ -62,6 +62,8 @@
         "string": "cpp",
         "qfiledialog": "cpp",
         "qthread": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "qmetatype": "cpp",
+        "random": "cpp"
     }
 }

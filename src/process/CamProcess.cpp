@@ -12,7 +12,6 @@ CamProcess::CamProcess(OPENVIO *vio,QObject* parent)
 
 void CamProcess::setShowFlag(Qt::CheckState flag)
 {
-    DBG("set state %d",flag);
     showFlag = flag;
 }
 
@@ -67,7 +66,7 @@ void CamProcess::camSlot(int index)
                 emit visionImageSignals(QPixmap::fromImage(myImage));
             }
 
-            cvProcess(myImage);
+            cvProcess(myImage,vio->img.qtime[index]);
 
             if(vio->isCapImage)
             {
@@ -87,7 +86,7 @@ void CamProcess::camSlot(int index)
     //QImage myImage = QImage(vio->img.img,vio->img.width,vio->img.high,QImage::Format_);
 }
 
-void CamProcess::cvProcess(QImage qImage)
+void CamProcess::cvProcess(QImage qImage,QDateTime time)
 {
     Mat image;
     Mat sourceImg = cv::Mat(qImage.height(),qImage.width(),CV_8UC1,qImage.bits());
@@ -127,16 +126,24 @@ void CamProcess::cvProcess(QImage qImage)
         }
 	}
 
-    cv::cvtColor(imageContours, image, cv::COLOR_BGR2RGB);
-    QImage qImg = QImage((const unsigned char *)(image.data), image.cols, image.rows, image.step, QImage::Format_RGB888);
-
+    
     if(contours.size() > 0)
     {
-        // if(this->index != -1)
-        // {
-        //     emit positionSignals(this->index, centers[0].x,centers[0].y);    
-        // }
+
+        if(vio->number != -1)
+        {
+            CAMERA_RESULT result = {
+                .camIndex = vio->number,
+                .time = time,
+                .x = (double)centers[0].x,
+                .y = (double)centers[0].y,
+            };
+            emit positionSignals(result);    
+        }
     }
+
+    cv::cvtColor(imageContours, image, cv::COLOR_BGR2RGB);
+    QImage qImg = QImage((const unsigned char *)(image.data), image.cols, image.rows, image.step, QImage::Format_RGB888);
 
     if(showFlag == Qt::CheckState::PartiallyChecked)
     {

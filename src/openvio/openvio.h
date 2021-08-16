@@ -77,7 +77,6 @@ public:
     QString saveImagePath;
     FormVioWindow *formVioWindow;
     
-
     int saveCount = 0;
     
     MuItemCamData itemCamData;

@@ -20,6 +20,11 @@ WinUSBDriver::WinUSBDriver()
     // connect(this, SIGNAL(openSignals(int, int)), this, SLOT(openSlot(int, int)));
     connect(this, SIGNAL(scanSignals()), this, SLOT(scanSlot()));
 
+    qRegisterMetaType<CAMERA_RESULT>("CAMERA_RESULT");
+    visionProcess = new VisionProcess(this);
+    visionProcess->moveToThread(&visionProcessThread); 
+    visionProcessThread.start();
+
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
     timer->start(1000);
@@ -27,7 +32,7 @@ WinUSBDriver::WinUSBDriver()
 
 WinUSBDriver::~WinUSBDriver()
 {
-    free(ctrl_buffer);
+
 }
 
 void WinUSBDriver::setModule(QStandardItemModel *pModelOpenvio)
@@ -182,6 +187,7 @@ void WinUSBDriver::autoScan(void)
                         {
                             if(vio->getCameraStatus() == 0)
                             {
+                                connect(vio->camProcess, SIGNAL(positionSignals(CAMERA_RESULT)), visionProcess, SLOT(positionSlot(CAMERA_RESULT)));
                                 openvioList->append(vio);
                                 vio->setItem(pModelOpenvio);
                                 vio->ctrlCamStatus(0);

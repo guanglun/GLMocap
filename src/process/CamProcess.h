@@ -2,14 +2,16 @@
 #define CAMPROCESS_H
 
 #include <QObject>
-#include<QDebug>
-#include<QThread>
+#include <QDebug>
+#include <QThread>
 #include <QWidget>
 #include <QDateTime>
 #include <QTimer>
 
 class OPENVIO;
 #include "openvio.h"
+
+#include "VisionProcess.h"
 
 class CamProcess:public QObject        
 {
@@ -19,13 +21,14 @@ private:
     Qt::CheckState showFlag = Qt::CheckState::Unchecked;
 public:
     CamProcess(OPENVIO *vio,QObject* parent = nullptr);
-    void cvProcess(QImage qImage);
+    void cvProcess(QImage qImage,QDateTime time);
     void setShowFlag(Qt::CheckState flag);
 public slots:
     void camSlot(int index);
 
 signals:
     void visionImageSignals(QPixmap qImage);  
+    void positionSignals(CAMERA_RESULT result);  
 };
  
 #endif // CAMPROCESS_H

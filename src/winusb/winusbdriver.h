@@ -14,6 +14,9 @@
 #include "image.h"
 #include "findstr.h"
 
+#include "VisionProcess.h"
+#include <QMetaType>
+
 class OPENVIO;
 #include "openvio.h"
 
@@ -71,7 +74,10 @@ private:
 
     enum SENSOR_STATUS camStatus,imuStatus;
     QTimer *timer;
+
+    QThread visionProcessThread;
 public:
+    VisionProcess *visionProcess;
     QStandardItemModel *pModelOpenvio;
     Image img;
     unsigned char cam_id;

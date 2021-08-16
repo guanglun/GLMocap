@@ -55,6 +55,8 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
 
     upgrade = new FirmwareUpgrade();
     connect(qwinusb, SIGNAL(newSignal(OPENVIO *)), upgrade->upgradeThread, SLOT(newSlot(OPENVIO *)));
+
+
 }
 
 void FormCamWindow::ProvideContextMenu(const QPoint &pos)
@@ -66,9 +68,18 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
     QPoint item = ui->lv_openvio->mapToGlobal(pos);
 
     QMenu submenu;
-    submenu.addAction("Setup");
+    if(vio->type == TYPE_OPENVIO)
+    {
+        submenu.addAction("Setup");
+    }
     submenu.addAction("Set Camera Number");
     submenu.addAction("Upgrade Firmware");
+    if(vio->type == TYPE_OPENVIO)
+    {
+        submenu.addAction("Camera Start");
+        submenu.addAction("Camera Stop");
+    }
+    
     submenu.addAction("Reboot Now");
     submenu.addAction("Reboot To Bootloader");
 
@@ -127,6 +138,16 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
     {
         vio->open();
         vio->ctrlReboot(0);
+    }
+    else if (rightClickItem && rightClickItem->text().contains("Camera Start"))
+    {
+        vio->open();
+        vio->ctrlCamStatus(1);
+    }
+    else if (rightClickItem && rightClickItem->text().contains("Camera Stop"))
+    {
+        vio->open();
+        vio->ctrlCamStatus(0);
     }
 }
 
