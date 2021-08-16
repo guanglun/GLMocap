@@ -282,12 +282,15 @@ void OPENVIO::setItem(QStandardItemModel *pModelOpenvio)
     itemCamData.type = type;
     itemCamData.speed = "";
     pItem->setData(QVariant::fromValue(itemCamData), Qt::UserRole + 1);
-    if(number == -1 || pModelOpenvio->rowCount() < number)
-    {
-        pModelOpenvio->appendRow(pItem);
-    }else{
-        pModelOpenvio->insertRow(number,pItem);
-    }
+
+    pModelOpenvio->appendRow(pItem);
+    
+    // if(number == -1 || pModelOpenvio->rowCount() < number)
+    // {
+    //     pModelOpenvio->appendRow(pItem);
+    // }else{
+    //     pModelOpenvio->insertRow(number,pItem);
+    // }
 }
 
 void OPENVIO::removeItem(void)
@@ -352,7 +355,9 @@ int OPENVIO::sendCtrl(char request, uint8_t type, unsigned char *buffer, uint16_
 
     if (dev_handle != NULL)
     {
-        ret = libusb_control_transfer(dev_handle, LIBUSB_REQUEST_TYPE_VENDOR + type, request, 0, 0, buffer, len, 0);
+        DBG("sendCtrl Start");
+        ret = libusb_control_transfer(dev_handle, LIBUSB_REQUEST_TYPE_VENDOR + type, request, 0, 0, buffer, len, 1);
+        DBG("sendCtrl End");
 
         if (ret < 0)
         {
@@ -361,7 +366,7 @@ int OPENVIO::sendCtrl(char request, uint8_t type, unsigned char *buffer, uint16_
         }
         else
         {
-            //DBG("sendCtrl success. ret:%d", ret);
+            DBG("sendCtrl success. ret:%d", ret);
 
             return 0;
         }
@@ -376,6 +381,18 @@ int OPENVIO::camRecvStart()
     camThread->start();
     return true;
 }
+
+int OPENVIO::camRecvStop()
+{
+    isCamRecv = false;
+    //camThread->quit();
+    camThread->wait();
+
+    // isCamRecv = false;
+    // camThread->waitClose();
+    return true;
+}
+
 
 int OPENVIO::camStart()
 {
@@ -397,8 +414,6 @@ int OPENVIO::camStop()
 
     isCamRecv = false;
     camThread->waitClose();
-
-    //DBG("cam stop");
 
     return true;
 }

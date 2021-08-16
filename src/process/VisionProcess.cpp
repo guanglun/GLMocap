@@ -6,10 +6,25 @@ VisionProcess::VisionProcess(QObject* parent)
 
 }
 
+void VisionProcess::init(void)
+{
+
+}
+
 void VisionProcess::positionSlot(CAMERA_RESULT result)
 {
-    
-    QString current_date = result.time.toString("yyyy_MM_dd_hh_mm_ss_zzz");
-    //mlog->show(current_date);
-    DBG("recv %d %s %lf %lf",result.camIndex,(unsigned char *)current_date.toLatin1().data(),result.x,result.y);
+    camResult[result.camIndex] = result;
+
+mlog->show(QString::number(result.camIndex) +  + " " + QString::number(result.time));
+
+    if( qAbs(camResult[0].time-camResult[1].time) < 10 &&
+        qAbs(camResult[0].time-camResult[2].time) < 10 &&
+        qAbs(camResult[0].time-camResult[3].time) < 10)
+    {
+
+        mlog->show("====>>>" + QString::number(camResult[0].time) + " " + QString::number(camResult[0].time - lastTime));
+
+        lastTime = camResult[0].time;
+        
+    }
 }

@@ -134,7 +134,7 @@ void CamProcess::cvProcess(QImage qImage,QDateTime time)
         {
             CAMERA_RESULT result = {
                 .camIndex = vio->number,
-                .time = time,
+                .time = time.toMSecsSinceEpoch(),
                 .x = (double)centers[0].x,
                 .y = (double)centers[0].y,
             };

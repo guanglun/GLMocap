@@ -132,11 +132,13 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
     else if (rightClickItem && rightClickItem->text().contains("Reboot Now"))
     {
         vio->open();
+        //vio->camRecvStop();
         vio->ctrlReboot(1);
     }
     else if (rightClickItem && rightClickItem->text().contains("Reboot To Bootloader"))
     {
         vio->open();
+        //vio->camRecvStop();
         vio->ctrlReboot(0);
     }
     else if (rightClickItem && rightClickItem->text().contains("Camera Start"))

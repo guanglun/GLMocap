@@ -103,7 +103,6 @@ void WinUSBDriver::autoScan(void)
             DBG("remove %s %s %d", openvioList->at(i)->productStr, openvioList->at(i)->idShort, openvioList->at(i)->devAddr);
             openvioList->at(i)->removeItem();
             openvioList->removeAt(i);
-
             i--;
             size--;
             DBG("remove success");

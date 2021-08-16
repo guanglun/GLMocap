@@ -123,7 +123,8 @@ public:
     int IMUStop();
 
     int camRecvStart();
-
+    int camRecvStop();
+    
     int recvBulk(unsigned char *buffer, int len);
     void removeItem(void);
     int getVersion();
