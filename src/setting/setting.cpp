@@ -100,20 +100,21 @@ void Setting::setGyroOffset(T_int16_xyz *gyro)
     set->endGroup(); 
 }
 
-void Setting::setNameById(QString id,QString name)
+void Setting::setNumberById(QString id,int number)
 {
     set->beginGroup("openvio");
-    set->setValue(id,name);
+    set->setValue(id,number);
     set->endGroup(); 
 }
 
-QString Setting::getNameById(QString id)
+int Setting::getNumberById(QString id)
 {
-    QString name;
+    int number = -1;
     set->beginGroup("openvio");
-    name = set->value(id).toString();
+    if(set->contains(id))
+        number = set->value(id).toInt();
     set->endGroup(); 
-    return name;
+    return number;
 }
 
 void Setting::setImagePath(QString path)

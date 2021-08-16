@@ -67,7 +67,7 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
 
     QMenu submenu;
     submenu.addAction("Setup");
-    submenu.addAction("Rename");
+    submenu.addAction("Set Camera Number");
     submenu.addAction("Upgrade Firmware");
     submenu.addAction("Reboot Now");
     submenu.addAction("Reboot To Bootloader");
@@ -81,18 +81,16 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
             formCamConfig.show();
         }
     }
-    else if (rightClickItem && rightClickItem->text().contains("Rename"))
+    else if (rightClickItem && rightClickItem->text().contains("Set Camera Number"))
     {
 
         QString dlgTitle = QString(vio->idShort);
-        QString txtLabel = QStringLiteral("input new name：");
-        QString defaultInput = QStringLiteral("camera0");
-        QLineEdit::EchoMode echoMode = QLineEdit::Normal;
+        QString txtLabel = QStringLiteral("input camera number :");
         bool ok = false;
-        QString text = QInputDialog::getText(this, dlgTitle, txtLabel, echoMode, defaultInput, &ok);
-        if (ok && !text.isEmpty())
+        int number = QInputDialog::getInt(this, dlgTitle, txtLabel, 0, 0,255,1, &ok);
+        if (ok)
         {
-            openvioList.at(ui->lv_openvio->indexAt(pos).row())->setName(text);
+            openvioList.at(ui->lv_openvio->indexAt(pos).row())->setNumber(number);
         }
     }
     else if (rightClickItem && rightClickItem->text().contains("Upgrade Firmware"))
@@ -188,17 +186,16 @@ void FormCamWindow::on_pb_capture_clicked()
         OPENVIO *vio = openvioList.at(i);
         if (vio->dev_handle != NULL)
         {
-            if (vio->name.isEmpty() == true)
+            if (vio->number == -1)
             {
                 vio->saveImagePath = setting->imagePath + "/" + QString(vio->idShort);
             }
             else
             {
-                vio->saveImagePath = setting->imagePath + "/" + vio->name;
+                vio->saveImagePath = setting->imagePath + vio->name;
             }
             isDirExist(vio->saveImagePath);
             //mlog->show(vio->saveImagePath);
-
             //vio->saveImagePath = setting->imagePath;
         }
     }

@@ -52,6 +52,8 @@ private slots:
 
     void visionImageSlot(QPixmap qImage);  
     void getCameraStatusSlot(void); 
+
+    void cbVisionStateChangedSlot(int);
 signals:
     void imageSignals(QImage qImage,int flag);
     void ctrlCamStatusSignal(unsigned char state);

@@ -86,7 +86,10 @@ public:
     char *idShort = &idStr[16];
     char productStr[128];
     enum OPENVIO_TYPE type = TYPE_NULL;
-    QString name;
+
+    QString name = "";
+    int number = -1;
+
     libusb_device_handle *dev_handle = NULL;
     libusb_device *dev;
     uint8_t devAddr;
@@ -103,7 +106,7 @@ public:
     void setItem(QStandardItemModel *pModelOpenvio);
     void setStatus(QString status);
     void setSpeed(QString speed);
-    void setName(QString name);
+    void setNumber(int number);
     void CamRecv(void);
     void IMURecv(void);
     int sendCtrl(char request, uint8_t type, unsigned char *buffer,uint16_t len);

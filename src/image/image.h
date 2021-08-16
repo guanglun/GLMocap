@@ -2,6 +2,7 @@
 #define IMAGE_H
 
 #include <QObject>
+#include <QDateTime>
 
 #define IMG_MAX_WIDTH   752
 #define IMG_MAX_HIGH    480
@@ -17,6 +18,7 @@ class Image : public QObject
 public:
     unsigned char imu[IMU_FRAME_SIZE_MAX][IMU_PACKAGE_SIZE];
     unsigned char time[IMG_FRAME_SIZE_MAX][6];
+    QDateTime qtime[IMG_FRAME_SIZE_MAX];
     unsigned char img[IMG_FRAME_SIZE_MAX][IMG_MAX_WIDTH*IMG_MAX_HIGH*2];
     unsigned char img_tmp[IMG_MAX_WIDTH*IMG_MAX_HIGH*2];
     unsigned char img_rgb[IMG_MAX_WIDTH*IMG_MAX_HIGH*3];

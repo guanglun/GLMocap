@@ -39,8 +39,10 @@ public:
     void getIMUOffset(T_int16_xyz *acc,T_int16_xyz *gyro);
     void setAccOffset(T_int16_xyz *acc);
     void setGyroOffset(T_int16_xyz *gyro);
-    void setNameById(QString id,QString name);
-    QString getNameById(QString id);
+
+    void setNumberById(QString id,int number);
+    int getNumberById(QString id);
+
     void setImagePath(QString path);
     QString getImagePath();
     void setVisionParamPath(QString path);

@@ -100,9 +100,6 @@ void OPENVIO::CamRecv(void)
     findStr.config((unsigned char *)"CAMERA", 6);
     while (isCamRecv)
     {
-        //        if (recv_head_status == 0)
-        //            ret = libusb_bulk_transfer(dev_handle, CAM_EPADDR, (unsigned char *)(head_tmp), 1024, &camRecvLen, 1000);
-        //        else
         ret = libusb_bulk_transfer(dev_handle, CAM_EPADDR, (unsigned char *)(img.img[img_index] + recv_index), 512 * 1024, &camRecvLen, 1000);
         if (ret < 0)
         {
@@ -127,6 +124,7 @@ void OPENVIO::CamRecv(void)
                 findRet = findStr.input(img.img[img_index], camRecvLen);
                 if (findRet > 0)
                 {
+                    img.qtime[img_index] = QDateTime::currentDateTime();
                     recv_head_status = 1;
                     memcpy(img.time[img_index], img.img[img_index] + 6, 6);
                 }
@@ -136,6 +134,7 @@ void OPENVIO::CamRecv(void)
                 findRet = findStr.input(img.img[img_index] + recv_index, camRecvLen);
                 if (findRet > 0)
                 {
+                    img.qtime[img_index] = QDateTime::currentDateTime();
                     recv_head_status = 1;
                     memcpy(img.time[img_index], img.img[img_index] + recv_index + 6, 6);
                     recv_index = 0;
@@ -158,6 +157,7 @@ void OPENVIO::CamRecv(void)
                 recv_index += camRecvLen;
                 if (recv_index >= (img.size))
                 {
+                    
                     frame_fps++;
                     recv_index = 0;
                     recv_head_status = 0;
@@ -264,17 +264,23 @@ int OPENVIO::recvBulk(unsigned char *buffer, int len)
 void OPENVIO::setItem(QStandardItemModel *pModelOpenvio)
 {
     this->pModelOpenvio = pModelOpenvio;
+    number = setting->getNumberById(idStr);
+    if(number > -1)
+    {
+        name = "camera" + QString::number(number);
+    }else{
+        name = "";
+    }
+
     itemCamData.id = &idStr[16];
     itemCamData.ver = QString("v" +
                               QString::number(version[0]) + "." +
                               QString::number(version[1]) + "." +
                               QString::number(version[2]));
     itemCamData.status = "wait";
-    itemCamData.name = setting->getNameById(idStr);
+    itemCamData.name = name;
     itemCamData.type = type;
     itemCamData.speed = "";
-    this->name = itemCamData.name;
-
     pItem->setData(QVariant::fromValue(itemCamData), Qt::UserRole + 1);
     pModelOpenvio->appendRow(pItem);
 }
@@ -309,12 +315,18 @@ void OPENVIO::setSpeed(QString speed)
 
 }
 
-void OPENVIO::setName(QString name)
+void OPENVIO::setNumber(int number)
 {
+    this->number = number;
+    if(number > -1)
+    {
+        name = "camera" + QString::number(number);
+    }else{
+        name = "";
+    }
     itemCamData.name = name;
-    this->name = itemCamData.name;
     pItem->setData(QVariant::fromValue(itemCamData));
-    setting->setNameById(idStr, name);
+    setting->setNumberById(idStr, number);
 }
 
 // int OPENVIO::close(void)

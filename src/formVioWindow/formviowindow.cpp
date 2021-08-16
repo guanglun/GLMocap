@@ -18,6 +18,7 @@ FormVioWindow::FormVioWindow(QWidget *parent) :
     connect(formCvWindow, SIGNAL(visionImageSignals(QPixmap)), this, SLOT(visionImageSlot(QPixmap))); 
 
     this->ui->cb_vision->setCheckState(Qt::CheckState::Unchecked);
+    connect(this->ui->cb_vision,SIGNAL(stateChanged(int)), this, SLOT(cbVisionStateChangedSlot(int))); 
 
     ctrlProcess = new CtrlProcess(this);
     ctrlProcess->moveToThread(&ctrlProcessThread);
@@ -42,13 +43,6 @@ void FormVioWindow::closeEvent(QCloseEvent *event)
 void FormVioWindow::setQData(OPENVIO *vio)
 {
     this->vio = vio;
-    if(QString::compare(this->vio->name,"camera0") == 0)
-    {
-        formCvWindow->index = 0;
-    }else if(QString::compare(this->vio->name,"camera1") == 0)
-    {
-        formCvWindow->index = 1;
-    }
 
     connect(vio->camProcess, SIGNAL(visionImageSignals(QPixmap)), this, SLOT(visionImageSlot(QPixmap))); 
     connect(vio, SIGNAL(getCameraStatusSignal()), this, SLOT(getCameraStatusSlot())); 
@@ -71,6 +65,11 @@ static bool isDirExist(QString fullPath)
       return true;
     }
     return false;
+}
+
+void FormVioWindow::cbVisionStateChangedSlot(int)
+{
+    vio->camProcess->setShowFlag(this->ui->cb_vision->checkState());
 }
 
 // void FormVioWindow::imuSlot(int index)
