@@ -19,15 +19,14 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
     //            " ptnum: " + QString::number(result.pointNum) +
     //            " time: " + QString::number(result.time) +
     //            " diff: " + QString::number(result.time - lastTime[result.camIndex]));
-
-    lastTime[result.camIndex] = result.time;
+    //lastTime[result.camIndex] = result.time;
 
     if (camNum < 2)
         return;
 
     for (int i = 0; i < (camNum - 1); i++)
     {
-        if (qAbs(camResult[0].time - camResult[camNum + 1].time) > 4)
+        if (qAbs(camResult[0].time - camResult[i + 1].time) > 4)
         {
             check = false;
             break;

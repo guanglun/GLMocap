@@ -62,6 +62,7 @@ void CtrlProcess::setExposureSlot(int exposure)
             {
                 vio->setStatus("Set Exposure " + QString::number(exposure) + " Fail");
             }
+            QThread::msleep(10);
         }
 
     } while (vio != NULL);
@@ -89,6 +90,7 @@ void CtrlProcess::syncSlot(void)
         if (vio != NULL)
         {
             vio->ctrlCamStatus(1);
+            QThread::msleep(10);
         }
     } while (vio != NULL);
 
@@ -112,6 +114,7 @@ void CtrlProcess::ctrlCamStatusSlot(unsigned char state)
             {
                 vio->setStatus("Set CamStatus " + QString::number(state) + " Fail");
             }
+            QThread::msleep(10);
         }
     } while (vio != NULL);
 }
@@ -134,6 +137,7 @@ void CtrlProcess::ctrlCamSyncStatusSlot(unsigned char state)
             {
                 vio->setStatus("Set SyncStatus " + QString::number(state) + " Fail");
             }
+            QThread::msleep(10);
         }
     } while (vio != NULL);
 }
@@ -156,6 +160,7 @@ void CtrlProcess::ctrlCamSyncModeSlot(unsigned char mode)
             {
                 vio->setStatus("Set SyncMode " + QString::number(mode) + " Fail");
             }
+            QThread::msleep(10);
         }
     } while (vio != NULL);
 }
@@ -178,6 +183,7 @@ void CtrlProcess::ctrlCamFpsSlot(unsigned char fps)
             {
                 vio->setStatus("Set fps " + QString::number(fps) + " Fail");
             }
+            QThread::msleep(10);
         }
     } while (vio != NULL);
 }
@@ -200,6 +206,7 @@ void CtrlProcess::ctrlInfraredPwmSlot(unsigned char pwm)
             {
                 vio->setStatus("Set InfraredPwm " + QString::number(pwm) + " Fail");
             }
+            QThread::msleep(10);
         }
     } while (vio != NULL);
 }
