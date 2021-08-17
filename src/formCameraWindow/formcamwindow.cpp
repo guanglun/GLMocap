@@ -56,7 +56,13 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
     upgrade = new FirmwareUpgrade();
     connect(qwinusb, SIGNAL(newSignal(OPENVIO *)), upgrade->upgradeThread, SLOT(newSlot(OPENVIO *)));
 
+    ctrlProcess = new CtrlProcess(this);
+    ctrlProcess->moveToThread(&ctrlProcessThread);
+    ctrlProcessThread.start();
+    connect(this, SIGNAL(ctrlMultemCamStartSignal()), ctrlProcess, SLOT(ctrlMultemCamStartSlot()));
+    connect(this, SIGNAL(ctrlMultemCamStopSignal()), ctrlProcess, SLOT(ctrlMultemCamStopSlot()));
 
+    formCamConfig = new FormCamConfig(ctrlProcess);
 }
 
 void FormCamWindow::ProvideContextMenu(const QPoint &pos)
@@ -68,28 +74,28 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
     QPoint item = ui->lv_openvio->mapToGlobal(pos);
 
     QMenu submenu;
-    if(vio->type == TYPE_OPENVIO)
+    if (vio->type == TYPE_OPENVIO)
     {
         submenu.addAction("Setup");
     }
     submenu.addAction("Set Camera Number");
     submenu.addAction("Upgrade Firmware");
-    if(vio->type == TYPE_OPENVIO)
+    if (vio->type == TYPE_OPENVIO)
     {
         submenu.addAction("Camera Start");
         submenu.addAction("Camera Stop");
     }
-    
+
     submenu.addAction("Reboot Now");
     submenu.addAction("Reboot To Bootloader");
 
     QAction *rightClickItem = submenu.exec(item);
     if (rightClickItem && rightClickItem->text().contains("Setup"))
     {
-        formCamConfig.setQData(NULL,vio);
-        if (formCamConfig.isVisible() == false)
+        formCamConfig->setQData(NULL, vio);
+        if (formCamConfig->isVisible() == false)
         {
-            formCamConfig.show();
+            formCamConfig->show();
         }
     }
     else if (rightClickItem && rightClickItem->text().contains("Set Camera Number"))
@@ -98,7 +104,7 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
         QString dlgTitle = QString(vio->idShort);
         QString txtLabel = QStringLiteral("input camera number :");
         bool ok = false;
-        int number = QInputDialog::getInt(this, dlgTitle, txtLabel, 0, 0,255,1, &ok);
+        int number = QInputDialog::getInt(this, dlgTitle, txtLabel, 0, 0, 255, 1, &ok);
         if (ok)
         {
             openvioList.at(ui->lv_openvio->indexAt(pos).row())->setNumber(number);
@@ -155,13 +161,22 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
 
 FormCamWindow::~FormCamWindow()
 {
+    ctrlProcessThread.quit();
+    ctrlProcessThread.wait();
     delete ui;
 }
 
-void FormCamWindow::on_pb_scan_camera_clicked()
+void FormCamWindow::on_pb_start_clicked()
 {
-    //mlog->show("Scan",LOG_DEBUG);
-    qwinusb->scan();
+    ctrlProcess->setVio(qwinusb->openvioList, NULL);
+    qwinusb->visionProcess->init(qwinusb->openvioList->size());
+    emit ctrlMultemCamStartSignal();
+}
+
+void FormCamWindow::on_pb_stop_clicked()
+{
+    ctrlProcess->setVio(qwinusb->openvioList, NULL);
+    emit ctrlMultemCamStopSignal();
 }
 
 void FormCamWindow::closeEvent(QCloseEvent *event)
@@ -169,7 +184,7 @@ void FormCamWindow::closeEvent(QCloseEvent *event)
     fLogWindow.close();
 }
 
-static bool isDirExist(QString fullPath)
+static bool isDirExistOrCreat(QString fullPath)
 {
     QDir dir(fullPath);
     if (dir.exists())
@@ -183,12 +198,25 @@ static bool isDirExist(QString fullPath)
     }
 }
 
+static bool isDirExist(QString fullPath)
+{
+    QDir dir(fullPath);
+    if (dir.exists())
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 void FormCamWindow::on_actionConfig_triggered()
 {
-    formCamConfig.setQData(qwinusb->openvioList,NULL);
-    if (formCamConfig.isVisible() == false)
+    formCamConfig->setQData(qwinusb->openvioList, NULL);
+    if (formCamConfig->isVisible() == false)
     {
-        formCamConfig.show();
+        formCamConfig->show();
     }
 }
 
@@ -204,32 +232,49 @@ void FormCamWindow::on_actionUpgrade_triggered()
 
 void FormCamWindow::on_pb_capture_clicked()
 {
-    for (int i = 0; i < openvioList.length(); i++)
-    {
-        OPENVIO *vio = openvioList.at(i);
-        if (vio->dev_handle != NULL)
-        {
-            if (vio->number == -1)
-            {
-                vio->saveImagePath = setting->imagePath + "/" + QString(vio->idShort);
-            }
-            else
-            {
-                vio->saveImagePath = setting->imagePath + vio->name;
-            }
-            isDirExist(vio->saveImagePath);
-            //mlog->show(vio->saveImagePath);
-            //vio->saveImagePath = setting->imagePath;
-        }
-    }
+    QString savePath = setting->imagePath;
 
-    for (int i = 0; i < openvioList.length(); i++)
+    if (ui->pb_capture->text().contains("Capture"))
     {
-        OPENVIO *vio = openvioList.at(i);
-        if (vio->dev_handle != NULL)
+
+        if (isDirExistOrCreat(savePath) == false)
         {
-            vio->isCapImage = true;
+            mlog->show(setting->imagePath + " not exist!");
+            return;
         }
+
+        if (openvioList.size() > 0)
+        {
+            QDateTime time = QDateTime::currentDateTime();
+            QString current_date = time.toString("yyyy-MM-dd-hh-mm-ss-zzz");
+            savePath += +"/" + current_date;
+            isDirExistOrCreat(savePath);
+        }
+
+        for (int i = 0; i < openvioList.length(); i++)
+        {
+            OPENVIO *vio = openvioList.at(i);
+            if (vio->dev_handle != NULL)
+            {
+                if (vio->number == -1)
+                {
+                    vio->saveImagePath = savePath + "/" + QString(vio->idShort);
+                }
+                else
+                {
+                    vio->saveImagePath = savePath + "/" + vio->name;
+                }
+                isDirExistOrCreat(vio->saveImagePath);
+            }
+        }
+
+        qwinusb->visionProcess->isCapImage = true;
+        ui->pb_capture->setText("Stop");
+    }
+    else
+    {
+        qwinusb->visionProcess->isCapImage = false;
+        ui->pb_capture->setText("Capture");
     }
 }
 
@@ -245,10 +290,8 @@ void FormCamWindow::doubleClickedSlot(const QModelIndex &index)
     {
         if (vio->formVioWindow == NULL)
         {
-            vio->formVioWindow = new FormVioWindow();
+            vio->formVioWindow = new FormVioWindow(ctrlProcess);
             vio->formVioWindow->setQData(vio);
-
-            connect(vio->formVioWindow->formCvWindow, SIGNAL(positionSignals(int, double, double)), &multipleViewTriangulation, SLOT(positionSlot(int, double, double)));
         }
 
         if (vio->formVioWindow->isVisible() == false)
@@ -301,14 +344,15 @@ void FormCamWindow::onTimeOut()
         vio->setSpeed(speedStr);
     }
 
-    status_speed->setText(getSpeed(recv_count_1s));
+    status_speed->setText(getSpeed(recv_count_1s) + " " + QString::number(qwinusb->visionProcess->count) + "position/s");
+    qwinusb->visionProcess->count = 0;
 }
 
 void FormCamWindow::on_action_position_triggered()
 {
     if (!fVisionWindow.isActiveWindow())
     {
-        connect(&multipleViewTriangulation, SIGNAL(onXYZSignals(double, double, double)), &fVisionWindow, SLOT(onXYZSlot(double, double, double)));
+        connect(&qwinusb->visionProcess->multipleViewTriangulation, SIGNAL(onXYZSignals(double, double, double)), &fVisionWindow, SLOT(onXYZSlot(double, double, double)));
         fVisionWindow.show();
     }
 }
@@ -317,7 +361,7 @@ void FormCamWindow::on_action3d_view_triggered()
 {
     if (!f3DViewWindow.isActiveWindow())
     {
-        connect(&multipleViewTriangulation, SIGNAL(onXYZSignals(double, double, double)), &f3DViewWindow, SLOT(onXYZSlot(double, double, double)));
+        connect(&qwinusb->visionProcess->multipleViewTriangulation, SIGNAL(onXYZSignals(double, double, double)), &f3DViewWindow, SLOT(onXYZSlot(double, double, double)));
         f3DViewWindow.show();
     }
 }

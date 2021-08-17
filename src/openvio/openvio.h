@@ -23,6 +23,9 @@ class FirmwareUpgrade;
 class USBThread;
 #include "usbthread.h"
 
+class VisionProcess;
+#include "VisionProcess.h"
+
 class CamProcess;
 #include "CamProcess.h"
 
@@ -52,7 +55,7 @@ private:
     
 public:
     CamProcess *camProcess;
-    boolean isCapImage;
+
     USBThread *camThread,*imuThread;
     enum SENSOR_STATUS camStatus,imuStatus;
     int recv_len_count = 0;

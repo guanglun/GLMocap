@@ -1,6 +1,8 @@
 #ifndef CAMPROCESS_H
 #define CAMPROCESS_H
 
+#include "workspace.h"
+
 #include <QObject>
 #include <QDebug>
 #include <QThread>
@@ -8,10 +10,11 @@
 #include <QDateTime>
 #include <QTimer>
 
+//class VisionProcess;
+#include "VisionProcess.h"
+
 class OPENVIO;
 #include "openvio.h"
-
-#include "VisionProcess.h"
 
 class CamProcess:public QObject        
 {

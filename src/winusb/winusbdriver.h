@@ -14,8 +14,10 @@
 #include "image.h"
 #include "findstr.h"
 
-#include "VisionProcess.h"
 #include <QMetaType>
+
+class VisionProcess;
+#include "VisionProcess.h"
 
 class OPENVIO;
 #include "openvio.h"

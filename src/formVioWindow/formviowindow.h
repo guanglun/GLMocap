@@ -29,12 +29,9 @@ class FormVioWindow : public QWidget
 {
     Q_OBJECT
     
-private:
-    QThread ctrlProcessThread;
-    
 public:
     CtrlProcess *ctrlProcess;
-    explicit FormVioWindow(QWidget *parent = 0);
+    explicit FormVioWindow(CtrlProcess *ctrlProcess,QWidget *parent = 0);
     ~FormVioWindow();
     OPENVIO *vio;
     FormCvWindow *formCvWindow;

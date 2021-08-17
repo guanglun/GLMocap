@@ -28,7 +28,7 @@ class FormVioWindow;
 #include "form3dviewwindow.h"
 #include "formlogwindow.h"
 
-
+#include "CtrlProcess.h"
 
 class MuItemCtrl;
 #include "MuItemCtrl.h"
@@ -42,25 +42,28 @@ class FormCamWindow : public QMainWindow
     Q_OBJECT
 private:
     QTimer *timer;
+    QThread ctrlProcessThread;
+    
 public:
+    CtrlProcess *ctrlProcess;
     QList<OPENVIO*> openvioList;
     WinUSBDriver *qwinusb;
     QLabel *status_msg,*status_speed;
     int recv_count_1s;
     FirmwareUpgrade *upgrade = nullptr;
     
-    MultipleViewTriangulation multipleViewTriangulation;
     FormVisionWindow fVisionWindow;
     Form3DViewWindow f3DViewWindow;
     FormLogWindow fLogWindow;
     MuItemCtrl *muItemCtrl;
-    FormCamConfig formCamConfig;
+    FormCamConfig *formCamConfig;
 
     explicit FormCamWindow(QWidget *parent = nullptr);
     ~FormCamWindow();
 
 private slots:
-    void on_pb_scan_camera_clicked();
+    void on_pb_start_clicked();
+    void on_pb_stop_clicked();
     void on_pb_capture_clicked();
     void vioItemSelected(const QModelIndex &index);
     void doubleClickedSlot(const QModelIndex &index);
@@ -73,9 +76,13 @@ private slots:
     void on_actionLog_view_triggered();
     void on_actionUpgrade_triggered();
     void on_actionConfig_triggered();
+    
 private:
     Ui::FormCamWindow *ui;
     
+signals:
+    void ctrlMultemCamStartSignal(void);
+    void ctrlMultemCamStopSignal(void);
 protected: 
      void closeEvent(QCloseEvent *event);     
 };

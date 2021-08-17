@@ -9,27 +9,42 @@
 #include <QDateTime>
 #include <QTimer>
 #include <QMetaType>
+#include <QImage>
+
+#include "multipleViewTriangulation.h"
 
 typedef struct CAMERA_RESULT{
     int camIndex;
+    int pointNum;
     qint64 time;
-    double x;
-    double y;
+    QString path;
+    QImage image;
+    double x[PT_NUM_MAX];
+    double y[PT_NUM_MAX];
 }CAMERA_RESULT;
 
 class VisionProcess:public QObject        
 {
     Q_OBJECT
 private:
+    int camNum = 0;
+    
 public:
-    CAMERA_RESULT camResult[4];
-    qint64 lastTime;
+    int count = 0;
+    bool isCapImage = false;
+    
+    CAMERA_RESULT camResult[CAM_NUM_MAX];
+
+    qint64 lastTime[CAM_NUM_MAX];
+    qint64 saveLastTime = 0;
+
+    MultipleViewTriangulation multipleViewTriangulation;
     VisionProcess(QObject* parent = nullptr);
-    void init(void);
+    void init(int camNum);
 public slots:
     void positionSlot(CAMERA_RESULT result);  
 signals:
 
 };
  
-#endif // CAMPROCESS_H
+#endif // VISIONPROCESS_H

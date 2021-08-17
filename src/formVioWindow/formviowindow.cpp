@@ -3,11 +3,13 @@
 
 
 
-FormVioWindow::FormVioWindow(QWidget *parent) :
+FormVioWindow::FormVioWindow(CtrlProcess *ctrlProcess,QWidget *parent) :
     QWidget(parent),
     ui(new Ui::FormVioWindow)
 {
     ui->setupUi(this);
+
+    this->ctrlProcess = ctrlProcess;
 
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
@@ -20,13 +22,9 @@ FormVioWindow::FormVioWindow(QWidget *parent) :
     this->ui->cb_vision->setCheckState(Qt::CheckState::Unchecked);
     connect(this->ui->cb_vision,SIGNAL(stateChanged(int)), this, SLOT(cbVisionStateChangedSlot(int))); 
 
-    ctrlProcess = new CtrlProcess(this);
-    ctrlProcess->moveToThread(&ctrlProcessThread);
-
     connect(this, SIGNAL(ctrlCamStatusSignal(unsigned char)), ctrlProcess, SLOT(ctrlCamStatusSlot(unsigned char)));
     connect(this, SIGNAL(ctrlCamSyncStatusSignal(unsigned char)), ctrlProcess, SLOT(ctrlCamSyncStatusSlot(unsigned char)));
 
-    ctrlProcessThread.start();
 }
 
 FormVioWindow::~FormVioWindow()
@@ -158,6 +156,7 @@ void FormVioWindow::on_pb_vision_clicked()
 
 void FormVioWindow::on_pb_cam_clicked()
 {
+    ctrlProcess->setVio(NULL,vio);
     if(ui->pb_cam->text().contains("cam start"))
     {
         emit ctrlCamStatusSignal(1);
@@ -169,6 +168,7 @@ void FormVioWindow::on_pb_cam_clicked()
 void FormVioWindow::on_pb_sync_clicked()
 {
     DBG("sync start");
+    ctrlProcess->setVio(NULL,vio);
     if(ui->pb_sync->text().contains("sync start"))
     {
         emit ctrlCamSyncStatusSignal(1);
@@ -179,6 +179,7 @@ void FormVioWindow::on_pb_sync_clicked()
 
 void FormVioWindow::getCameraStatusSlot(void)
 {
+    ctrlProcess->setVio(NULL,vio);
     if(vio->camStatus != 0)
     {
         ui->pb_cam->setText("cam stop ");

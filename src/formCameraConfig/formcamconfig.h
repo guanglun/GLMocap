@@ -19,12 +19,11 @@ class FormCamConfig : public QWidget
     Q_OBJECT
     
 private:
-    QThread ctrlProcessThread;
     
 public:
     CtrlProcess *ctrlProcess;
 
-    explicit FormCamConfig(QWidget *parent = 0);
+    explicit FormCamConfig(CtrlProcess *ctrlProcess,QWidget *parent = 0);
     ~FormCamConfig();
     QList<OPENVIO *> *vioList;
     OPENVIO *vio;

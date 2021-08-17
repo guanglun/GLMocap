@@ -1,7 +1,7 @@
 #include "multipleViewTriangulation.h"
 #include <iostream>
 
-struct VISION_PARAM vision_param={
+struct VISION_PARAM vision_param = {
     .CamNum = 0,
 };
 
@@ -81,7 +81,7 @@ MultipleViewTriangulation::triangulation_all(
     MatrixXd x[],
     Vector3d Xr[],
     int PtNum,
-    const MatrixXi& idx,
+    Matrix<double,PT_NUM_MAX,CAM_NUM_MAX>& idx,
     double f0)
 {
     int CamNum;
@@ -131,27 +131,33 @@ void MultipleViewTriangulation::positionSlot(int camIndex, double x,double y)
 {
     //DBG("position %d %f %f",camIndex,x,y);
 
-    MatrixXi idx(PT_NUM,CAM_NUM_ALL);
+    // MatrixXi idx(PT_NUM,CAM_NUM_ALL);
 
-    positionFlag[camIndex] = 1;
-    vision_param.xy[0].col(camIndex)(0) = x;
-    vision_param.xy[0].col(camIndex)(1) = y;
+    // positionFlag[camIndex] = 1;
+    // vision_param.xy[0].col(camIndex)(0) = x;
+    // vision_param.xy[0].col(camIndex)(1) = y;
 
-    if(positionFlag[0] && positionFlag[1])
-    {
-        idx << 
-        1,
-        1;
+    // if(positionFlag[0] && positionFlag[1])
+    // {
+    //     idx << 
+    //     1,
+    //     1;
 
-        positionFlag[0] = 0;
-        positionFlag[1] = 0;
-        triangulation_all(vision_param.P,vision_param.CamNum,vision_param.xy,Xr,PT_NUM,idx);
+    //     positionFlag[0] = 0;
+    //     positionFlag[1] = 0;
+    //     triangulation_all(vision_param.P,vision_param.CamNum,vision_param.xy,Xr,PT_NUM,idx);
         
-        //std::cout << Xr[0](0,0)<< "\t" << Xr[0](1,0)<< "\t\t"<< Xr[0](2,0)<< std::endl;
+    //     //std::cout << Xr[0](0,0)<< "\t" << Xr[0](1,0)<< "\t\t"<< Xr[0](2,0)<< std::endl;
 
-        emit onXYZSignals(Xr[0](0,0),Xr[0](1,0),Xr[0](2,0));
-    }
+    //     emit onXYZSignals(Xr[0](0,0),Xr[0](1,0),Xr[0](2,0));
+    // }
     
+}
+
+void MultipleViewTriangulation::triangulation(void)
+{
+    triangulation_all(vision_param.P,vision_param.CamNum,vision_param.xy,Xr,vision_param.ptNum,vision_param.idx);
+    emit onXYZSignals(Xr[0](0,0),Xr[0](1,0),Xr[0](2,0));
 }
 
 Matrix3d MultipleViewTriangulation::eulerAnglesToRotationMatrix(Vector3d &theta)

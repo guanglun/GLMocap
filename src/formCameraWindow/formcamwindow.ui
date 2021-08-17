@@ -25,34 +25,48 @@
   <property name="windowTitle">
    <string>FormCamWindow</string>
   </property>
-  <widget class="QWidget" name="centralWidget">
-   <widget class="QListView" name="lv_openvio">
-    <property name="geometry">
-     <rect>
-      <x>5</x>
-      <y>0</y>
-      <width>301</width>
-      <height>441</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pb_scan_camera">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>450</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Refresh</string>
-    </property>
-   </widget>
+    <widget class="QWidget" name="centralWidget">
+        <widget class="QListView" name="lv_openvio">
+            <property name="geometry">
+                <rect>
+                    <x>5</x>
+                    <y>0</y>
+                    <width>301</width>
+                    <height>441</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QPushButton" name="pb_start">
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>450</y>
+                    <width>75</width>
+                    <height>23</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Start</string>
+            </property>
+        </widget>
+
+        <widget class="QPushButton" name="pb_stop">
+            <property name="geometry">
+            <rect>
+            <x>90</x>
+            <y>450</y>
+            <width>75</width>
+            <height>23</height>
+            </rect>
+            </property>
+            <property name="text">
+            <string>Stop</string>
+            </property>
+        </widget>
    <widget class="QPushButton" name="pb_capture">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>170</x>
       <y>450</y>
       <width>75</width>
       <height>23</height>

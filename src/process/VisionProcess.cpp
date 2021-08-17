@@ -1,30 +1,79 @@
 #include "VisionProcess.h"
 
-
-VisionProcess::VisionProcess(QObject* parent)
+VisionProcess::VisionProcess(QObject *parent)
 {
-
 }
 
-void VisionProcess::init(void)
+void VisionProcess::init(int camNum)
 {
-
+    this->camNum = camNum;
 }
 
 void VisionProcess::positionSlot(CAMERA_RESULT result)
 {
+    bool check = true;
+
     camResult[result.camIndex] = result;
 
-mlog->show(QString::number(result.camIndex) +  + " " + QString::number(result.time));
+    // mlog->show("index: " + QString::number(result.camIndex) +
+    //            " ptnum: " + QString::number(result.pointNum) +
+    //            " time: " + QString::number(result.time) +
+    //            " diff: " + QString::number(result.time - lastTime[result.camIndex]));
 
-    if( qAbs(camResult[0].time-camResult[1].time) < 10 &&
-        qAbs(camResult[0].time-camResult[2].time) < 10 &&
-        qAbs(camResult[0].time-camResult[3].time) < 10)
+    lastTime[result.camIndex] = result.time;
+
+    if (camNum < 2)
+        return;
+
+    for (int i = 0; i < (camNum - 1); i++)
     {
+        if (qAbs(camResult[0].time - camResult[camNum + 1].time) > 4)
+        {
+            check = false;
+            break;
+        }
+    }
 
-        mlog->show("====>>>" + QString::number(camResult[0].time) + " " + QString::number(camResult[0].time - lastTime));
+    if (check == true)
+    {
+        mlog->show("====>>>" + QString::number(camResult[0].time) + " " + QString::number(camResult[0].time - lastTime[0]));
+        lastTime[0] = camResult[0].time;
 
-        lastTime = camResult[0].time;
-        
+        if (isCapImage == true)
+        {
+            if (camResult[0].time - saveLastTime >= 500)
+            {
+                for (int i = 0; i < camNum; i++)
+                {
+                    QString filePath = camResult[i].path + "/" + QString::number(camResult[0].time) + ".png";
+                    //mlog->show("save "+filePath);
+                    camResult[i].image.save(filePath);
+                }
+                saveLastTime = camResult[0].time;
+            }
+        }
+        else
+        {
+            count++;
+            for (int i = 0; i < camNum; i++)
+            {
+                if (camResult[i].pointNum <= 0)
+                {
+                    return;
+                }
+            }
+
+            vision_param.CamNum = camNum;
+            vision_param.ptNum = 1;
+
+            for (int i = 0; i < camNum; i++)
+            {
+                vision_param.idx.row(0)(i) = 1;
+                vision_param.xy[0].col(i)(0) = camResult[i].x[0];
+                vision_param.xy[0].col(i)(1) = camResult[i].y[0];
+            }
+
+            multipleViewTriangulation.triangulation();
+        }
     }
 }

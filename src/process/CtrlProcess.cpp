@@ -203,3 +203,16 @@ void CtrlProcess::ctrlInfraredPwmSlot(unsigned char pwm)
         }
     } while (vio != NULL);
 }
+
+void CtrlProcess::ctrlMultemCamStartSlot(void)
+{
+    ctrlCamStatusSlot(1);
+    QThread::msleep(100);
+    ctrlCamSyncStatusSlot(1);
+}
+
+void CtrlProcess::ctrlMultemCamStopSlot(void)
+{
+    ctrlCamStatusSlot(0);
+    ctrlCamSyncStatusSlot(0);
+}

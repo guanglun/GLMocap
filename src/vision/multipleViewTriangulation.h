@@ -31,10 +31,13 @@ typedef DiagonalMatrix<double,9> DiagMatrix9d;
 
 struct VISION_PARAM{
     int CamNum;
+    int ptNum;
     Matrix34d   P[CAM_NUM_MAX];
     Matrix33d   R[CAM_NUM_MAX];
     RowVector3d T[CAM_NUM_MAX];
     MatrixXd    xy[PT_NUM_MAX];
+    Matrix<double,PT_NUM_MAX,CAM_NUM_MAX> idx;
+
     // Vector3d    Xr[PT_NUM_MAX];
 };
 
@@ -58,12 +61,13 @@ public:
                           MatrixXd x[],
                           Vector3d Xr[],
                           int PtNum,
-                          const MatrixXi& idx,
+                          Matrix<double,PT_NUM_MAX,CAM_NUM_MAX>& idx,
                           double f0 = Default_f0);
 
     static Matrix3d eulerAnglesToRotationMatrix(Vector3d &theta);
     static bool isRotationMatirx(Matrix3d R);
     static Vector3d rotationMatrixToEulerAngles(Matrix3d &R);
+    void triangulation(void);
 private slots:
     void positionSlot(int camIndex, double x,double y);
 signals:
