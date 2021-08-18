@@ -9,7 +9,7 @@ Setting::Setting()
     QApplication::setApplicationName("openvio");
 
     QString setFile= QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/.settings.ini";
-    qDebug() << "configure file path：" << setFile;
+    qDebug() << "configure file path:" << setFile;
     set = new QSettings(setFile,QSettings::IniFormat);    
 
     getImagePath();
@@ -179,7 +179,7 @@ bool Setting::loadVisionParam(QString path)
         QString P = set_vision->value(QString("P"+QString::number(i))).toString();
         //qDebug() << QString("P"+QString::number(i)) << " = " << P;
 
-        sscanf(P.toStdString().data(), "%lf,%lf,%lf,%lf;%lf,%lf,%lf,%lf;%lf,%lf,%lf,%lf", 
+        sscanf_s(P.toStdString().data(), "%lf,%lf,%lf,%lf;%lf,%lf,%lf,%lf;%lf,%lf,%lf,%lf", 
         &p11, &p12, &p13, &p14,
         &p21, &p22, &p23, &p24,
         &p31, &p32, &p33, &p34);
@@ -188,7 +188,7 @@ bool Setting::loadVisionParam(QString path)
         //std::cout << "P" <<i<<":\n"<< vision_param.P[i] << std::endl;
 
         QString R = set_vision->value(QString("R"+QString::number(i))).toString();
-        sscanf(R.toStdString().data(), "%lf,%lf,%lf;%lf,%lf,%lf;%lf,%lf,%lf", 
+        sscanf_s(R.toStdString().data(), "%lf,%lf,%lf;%lf,%lf,%lf;%lf,%lf,%lf", 
         &p11, &p12, &p13,
         &p21, &p22, &p23,
         &p31, &p32, &p33);
@@ -197,7 +197,7 @@ bool Setting::loadVisionParam(QString path)
         //std::cout << "R" <<i<<":\n"<< vision_param.R[i] << std::endl;
 
         QString T = set_vision->value(QString("T"+QString::number(i))).toString();
-        sscanf(T.toStdString().data(), "%lf,%lf,%lf", 
+        sscanf_s(T.toStdString().data(), "%lf,%lf,%lf", 
         &p11, &p12, &p13);
 
         vision_param.T[i] << p11, p12, p13;

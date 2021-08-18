@@ -15,14 +15,15 @@ class CtrlProcess:public QObject
 {
     Q_OBJECT
 private:
-    OPENVIO *vio = NULL;    
     int count = 0;
+    OPENVIO *vio = NULL;    
 public:
-    QList<OPENVIO *> *vioList;
+    QMap<uint8_t, OPENVIO*> *vioMap;
+    QMap<uint8_t, OPENVIO*>::Iterator it;
     OPENVIO *setvio;
 
     CtrlProcess(QObject* parent = nullptr);
-    void setVio(QList<OPENVIO *> *vioList,OPENVIO *setvio);
+    void setVio(QMap<uint8_t, OPENVIO*> *vioMap,OPENVIO *setvio);
     OPENVIO * getEach();
     int getLen(void);
 public slots:

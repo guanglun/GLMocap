@@ -4,25 +4,31 @@ CtrlProcess::CtrlProcess(QObject *parent)
 {
 }
 
-void CtrlProcess::setVio(QList<OPENVIO *> *vioList,OPENVIO *setvio)
+void CtrlProcess::setVio(QMap<uint8_t, OPENVIO*> *vioMap,OPENVIO *setvio)
 {
-    this->vioList = vioList;
+    this->vioMap = vioMap;
     this->setvio = setvio;
 }
 
 OPENVIO *CtrlProcess::getEach()
 {
     OPENVIO *vio = NULL;
-    if (setvio != NULL && vioList == NULL && count == 0)
+    
+    if (setvio != NULL && vioMap == NULL && count == 0)
     {
         vio = setvio;
     }
-    else if (setvio == NULL && vioList != NULL)
+    else if (setvio == NULL && vioMap != NULL && count == 0)
     {
-        if (count < vioList->size())
-        {
-            vio = vioList->at(count);
-        }
+        
+        it = vioMap->begin();
+        if(it != vioMap->end())
+            vio = it.value();
+    }else if (setvio == NULL && vioMap != NULL)
+    {
+        it++;
+        if(it != vioMap->end())
+            vio = it.value();
     }
     count++;
     return vio;
@@ -31,14 +37,13 @@ OPENVIO *CtrlProcess::getEach()
 int CtrlProcess::getLen(void)
 {
     OPENVIO *vio = NULL;
-    if (vio != NULL && vioList == NULL)
+    if (vio != NULL && vioMap == NULL)
     {
         return 1;
     }
-    else if (vio == NULL && vioList != NULL)
+    else if (vio == NULL && vioMap != NULL)
     {
-        return vioList->size();
-        
+        return vioMap->size();
     }
     return -1;
 }

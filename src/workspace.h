@@ -2,26 +2,40 @@
 #define WORKSPACE_H
 
 #include <QDebug>
+#include <QMap>
 #include "setting.h"
 #include "log.h"
 
 
-#define QDBG(tag, args...) do{\
-    char temp[4096] = tag;\
-    sprintf(temp + 7, ##args);\
-    mlog->show(temp);\
-    qDebug()<<temp;\
-}while(0)
-
-#define QLOG(args...) do{\
+#define QLOG(fmt,...) do{\
     char temp[4096];\
-    sprintf(temp, ##args);\
+    sprintf_s(temp,fmt, ##__VA_ARGS__);\
     mlog->show(temp);\
 }while(0)
 
-#define ERR(args...)      QDBG("ERROR   ", ##args)
-#define WARNING(args...)  QDBG("WARNING ", ##args)
-#define DBG(args...)      QLOG(args)
+// #define QDBG(tag, args...) do{\
+//     char temp[4096] = tag;\
+//     sprintf(temp + 7, ##args);\
+//     mlog->show(temp);\
+//     qDebug()<<temp;\
+// }while(0)
+
+// #define QLOG(args...) do{\
+//     char temp[4096];\
+//     sprintf(temp, ##args);\
+//     mlog->show(temp);\
+// }while(0)
+
+// #define ERR(args...)      QDBG("ERROR   ", ##args)
+// #define WARNING(args...)  QDBG("WARNING ", ##args)
+// #define DBG(args...)      QLOG(args)
+
+// #define errprintf(fmt, ...){fprintf(stderr, __FUNCTION__ fmt, __VAR_ARGS__); }
+
+#define ERR(fmt, ...)      
+#define WARNING(fmt, ...)  
+#define DBG(fmt,...)      QLOG(fmt, __VA_ARGS__)
+
 //#define DBG(args...)      QDBG("DEBUG   ", ##args)
 
 extern Setting *setting;

@@ -78,7 +78,7 @@ public:
 
     pixformat_t pixformat;
     QString saveImagePath;
-    FormVioWindow *formVioWindow;
+    FormVioWindow *formVioWindow = nullptr;
     
     int saveCount = 0;
     
@@ -105,6 +105,7 @@ public:
     int open(void);
     int close(void);
     
+    int getRow(void);
     void setItem(QStandardItemModel *pModelOpenvio);
     void setStatus(QString status);
     void setSpeed(QString speed);

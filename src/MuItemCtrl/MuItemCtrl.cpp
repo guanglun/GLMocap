@@ -9,10 +9,10 @@ MuItemCtrl::MuItemCtrl(FormCamWindow *formCamWindow)
     muItemCtrlThread = new MuItemCtrlThread(this);
 }
 
-void MuItemCtrl::setCtrl(enum CTRL_TYPE type,QList<OPENVIO*> *vioList)
+void MuItemCtrl::setCtrl(enum CTRL_TYPE type,QMap<uint8_t, OPENVIO*> *vioMap)
 {
     this->type = type;
-    this->vioList = vioList;
+    this->vioMap = vioMap;
 
     if(type == CTRL_TYPE_UPGRADE)
     {

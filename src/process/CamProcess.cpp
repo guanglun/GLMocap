@@ -105,13 +105,12 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
     vector<Point2f> centers(contours.size()); //圆心
     vector<float> radius(contours.size());    //半径
 
-    CAMERA_RESULT result = {
-        .camIndex = vio->number,
-        .pointNum = (int)0,
-        .time = time.toMSecsSinceEpoch(),
-        .path = vio->saveImagePath,
-        .image = qImage,
-    };
+    CAMERA_RESULT result;
+    result.camIndex = vio->number;
+    result.pointNum = (int)0;
+    result.time = time.toMSecsSinceEpoch();
+    result.path = vio->saveImagePath;
+    result.image = qImage;
 
     if (contours.size() >= 36)
     {

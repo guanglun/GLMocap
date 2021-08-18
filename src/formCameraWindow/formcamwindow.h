@@ -46,7 +46,6 @@ private:
     
 public:
     CtrlProcess *ctrlProcess;
-    QList<OPENVIO*> openvioList;
     WinUSBDriver *qwinusb;
     QLabel *status_msg,*status_speed;
     int recv_count_1s;
@@ -60,7 +59,7 @@ public:
 
     explicit FormCamWindow(QWidget *parent = nullptr);
     ~FormCamWindow();
-
+    OPENVIO *getIndexVio(const QModelIndex &index);
 private slots:
     void on_pb_start_clicked();
     void on_pb_stop_clicked();

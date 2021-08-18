@@ -13,8 +13,6 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# set(CMAKE_GENERATOR "MinGW Makefiles")
-
 QT5_WRAP_UI( UI_HEADERS 
     ${CMAKE_SOURCE_DIR}/src/formCameraConfig/formcamconfig.ui
     ${CMAKE_SOURCE_DIR}/src/formCameraWindow/formcamwindow.ui
@@ -96,6 +94,7 @@ include_directories(
                     src/openvio
                     lib/eigen-3.2.10
                     lib/glut
+                    lib/libusb
                     ${OpenCV_INCLUDE_DIRS}
 )
 
@@ -104,14 +103,13 @@ link_directories(
                     lib/glut
                     )
 
+set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO /NODEFAULTLIB:${CMAKE_SOURCE_DIR}/lib/usb/libusb-1.0.lib")
 target_link_libraries(MultiCam 
                         Qt5::Widgets
                         Qt5::Core
                         Qt5::Gui
-                        ${CMAKE_SOURCE_DIR}/lib/usb/libusb-1.0.a
-                        -lopengl32
-				        -lglu32
-                        -lglut32
+                        ${CMAKE_SOURCE_DIR}/lib/libusb/win32/libusb-1.0.lib
+                        ${CMAKE_SOURCE_DIR}/lib/glut/glut32.lib
                         ${OpenCV_LIBS}
                         
 )

@@ -35,7 +35,6 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
     connect(ui->lv_openvio, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(doubleClickedSlot(QModelIndex)));
 
     qwinusb->setModule(pModelOpenvio);
-    qwinusb->setOpenvioList(&openvioList);
 
     muItemCtrl = new MuItemCtrl(this);
 
@@ -67,7 +66,7 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
 
 void FormCamWindow::ProvideContextMenu(const QPoint &pos)
 {
-    OPENVIO *vio = openvioList.at(ui->lv_openvio->indexAt(pos).row());
+    OPENVIO *vio = getIndexVio(ui->lv_openvio->indexAt(pos));
 
     mlog->show("[[[SELECT]]] " + QString(vio->idShort));
 
@@ -107,7 +106,7 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
         int number = QInputDialog::getInt(this, dlgTitle, txtLabel, 0, 0, 255, 1, &ok);
         if (ok)
         {
-            openvioList.at(ui->lv_openvio->indexAt(pos).row())->setNumber(number);
+            vio->setNumber(number);
         }
     }
     else if (rightClickItem && rightClickItem->text().contains("Upgrade Firmware"))
@@ -168,14 +167,14 @@ FormCamWindow::~FormCamWindow()
 
 void FormCamWindow::on_pb_start_clicked()
 {
-    ctrlProcess->setVio(qwinusb->openvioList, NULL);
-    qwinusb->visionProcess->init(qwinusb->openvioList->size());
+    ctrlProcess->setVio(&qwinusb->vioMap, NULL);
+    qwinusb->visionProcess->init(qwinusb->vioMap.size());
     emit ctrlMultemCamStartSignal();
 }
 
 void FormCamWindow::on_pb_stop_clicked()
 {
-    ctrlProcess->setVio(qwinusb->openvioList, NULL);
+    ctrlProcess->setVio(&qwinusb->vioMap, NULL);
     emit ctrlMultemCamStopSignal();
 }
 
@@ -213,7 +212,7 @@ static bool isDirExist(QString fullPath)
 
 void FormCamWindow::on_actionConfig_triggered()
 {
-    formCamConfig->setQData(qwinusb->openvioList, NULL);
+    formCamConfig->setQData(&qwinusb->vioMap, NULL);
     if (formCamConfig->isVisible() == false)
     {
         formCamConfig->show();
@@ -225,7 +224,7 @@ void FormCamWindow::on_actionUpgrade_triggered()
 
     if (!muItemCtrl->muItemCtrlThread->isRunning())
     {
-        muItemCtrl->setCtrl(CTRL_TYPE_UPGRADE, qwinusb->openvioList);
+        muItemCtrl->setCtrl(CTRL_TYPE_UPGRADE, &qwinusb->vioMap);
         muItemCtrl->start();
     }
 }
@@ -243,7 +242,7 @@ void FormCamWindow::on_pb_capture_clicked()
             return;
         }
 
-        if (openvioList.size() > 0)
+        if (qwinusb->vioMap.size() > 0)
         {
             QDateTime time = QDateTime::currentDateTime();
             QString current_date = time.toString("yyyy-MM-dd-hh-mm-ss-zzz");
@@ -251,9 +250,10 @@ void FormCamWindow::on_pb_capture_clicked()
             isDirExistOrCreat(savePath);
         }
 
-        for (int i = 0; i < openvioList.length(); i++)
+        for (QMap<uint8_t, OPENVIO *>::Iterator it = qwinusb->vioMap.begin();
+             it != qwinusb->vioMap.end(); it++)
         {
-            OPENVIO *vio = openvioList.at(i);
+            OPENVIO *vio = it.value();
             if (vio->dev_handle != NULL)
             {
                 if (vio->number == -1)
@@ -282,13 +282,28 @@ void FormCamWindow::vioItemSelected(const QModelIndex &index)
 {
 }
 
+OPENVIO *FormCamWindow::getIndexVio(const QModelIndex &index)
+{
+    OPENVIO *vio = nullptr;
+    for (QMap<uint8_t, OPENVIO *>::Iterator it = qwinusb->vioMap.begin();
+         it != qwinusb->vioMap.end(); it++)
+    {
+        if (it.value()->getRow() == index.row())
+        {
+            vio = it.value();
+        }
+    }
+
+    return vio;
+}
+
 void FormCamWindow::doubleClickedSlot(const QModelIndex &index)
 {
-    OPENVIO *vio = openvioList.at(index.row());
+    OPENVIO *vio = getIndexVio(index);
 
     if (vio->type == TYPE_OPENVIO)
     {
-        if (vio->formVioWindow == NULL)
+        if (vio->formVioWindow == nullptr)
         {
             vio->formVioWindow = new FormVioWindow(ctrlProcess);
             vio->formVioWindow->setQData(vio);
@@ -329,9 +344,11 @@ void FormCamWindow::onTimeOut()
     // ui->lb_imu_hz->setText(QString::number(qwinusb->imu_hz)+"Hz");
     // qwinusb->imu_hz = 0;
     recv_count_1s = 0;
-    for (int i = 0; i < openvioList.length(); i++)
+
+    for (QMap<uint8_t, OPENVIO *>::Iterator it = qwinusb->vioMap.begin();
+         it != qwinusb->vioMap.end(); it++)
     {
-        OPENVIO *vio = openvioList.at(i);
+        OPENVIO *vio = it.value();
         QString speedStr;
         recv_count_1s += vio->recv_count_1s;
         speedStr += getSpeed(vio->recv_count_1s);

@@ -1,9 +1,11 @@
 #include "multipleViewTriangulation.h"
 #include <iostream>
 
-struct VISION_PARAM vision_param = {
-    .CamNum = 0,
-};
+// struct VISION_PARAM vision_param = {
+//     .CamNum = 0,
+// };
+
+struct VISION_PARAM vision_param;
 
 MultipleViewTriangulation::MultipleViewTriangulation()
 {

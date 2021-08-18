@@ -58,18 +58,18 @@ FormCamConfig::FormCamConfig(CtrlProcess *ctrlProcess,QWidget *parent) : QWidget
     
 }
 
-void FormCamConfig::setQData(QList<OPENVIO *> *vioList, OPENVIO *vio)
+void FormCamConfig::setQData(QMap<uint8_t, OPENVIO*> *vioMap, OPENVIO *vio)
 {
     OPENVIO *configvio = NULL;
-    this->vioList = vioList;
+    this->vioMap = vioMap;
     this->vio = vio;
 
-    if (vioList != NULL)
+    if (vioMap != NULL)
     {
-        this->setWindowTitle("camera config select " + QString::number(vioList->size()));
-        if(vioList->size() != 0)
+        this->setWindowTitle("camera config select " + QString::number(vioMap->size()));
+        if(vioMap->size() != 0)
         {
-            configvio = vioList->at(0);
+            configvio = vioMap->values().at(0);
         }
     }else if (vio != NULL)
     {
@@ -77,7 +77,7 @@ void FormCamConfig::setQData(QList<OPENVIO *> *vioList, OPENVIO *vio)
         configvio = vio;
     }
 
-    ctrlProcess->setVio(vioList,vio);
+    ctrlProcess->setVio(vioMap,vio);
 
     if(configvio != NULL)
     {
@@ -111,13 +111,13 @@ void FormCamConfig::on_pb_exit_clicked()
 
 void FormCamConfig::on_pb_cam_start_clicked()
 {
-    ctrlProcess->setVio(vioList,vio);
+    ctrlProcess->setVio(vioMap,vio);
     emit ctrlCamStatusSignal(1);
 }
 
 void FormCamConfig::on_pb_cam_stop_clicked()
 {
-    ctrlProcess->setVio(vioList,vio);
+    ctrlProcess->setVio(vioMap,vio);
     emit ctrlCamStatusSignal(0);
 }
 
@@ -132,26 +132,26 @@ void FormCamConfig::on_pb_set_config_exposure_clicked()
     {
         exposure_value = -exposure_value;
     }
-    ctrlProcess->setVio(vioList,vio);
+    ctrlProcess->setVio(vioMap,vio);
     emit setExposureSignal(exposure_value);
 }
 
 void FormCamConfig::on_pb_sync_clicked()
 {
-    ctrlProcess->setVio(vioList,vio);
+    ctrlProcess->setVio(vioMap,vio);
     emit syncSignal();
 }
 
 void FormCamConfig::on_pb_set_config_fps_clicked()
 {
     uint8_t fps = ui->le_fps->text().toInt();
-    ctrlProcess->setVio(vioList,vio);
+    ctrlProcess->setVio(vioMap,vio);
     emit ctrlCamFpsSignal(fps);
 }
 
 void FormCamConfig::on_pb_set_config_sync_mode_clicked()
 {
-    ctrlProcess->setVio(vioList,vio);
+    ctrlProcess->setVio(vioMap,vio);
     if (ui->cb_syncmode->checkState() == Qt::CheckState::Checked)
     {
         emit ctrlCamSyncModeSignal(1);
@@ -162,20 +162,20 @@ void FormCamConfig::on_pb_set_config_sync_mode_clicked()
 
 void FormCamConfig::on_pb_set_config_sync_start_clicked()
 {
-    ctrlProcess->setVio(vioList,vio);
+    ctrlProcess->setVio(vioMap,vio);
     emit ctrlCamSyncStatusSignal(1);
 }
 
 void FormCamConfig::on_pb_set_config_sync_stop_clicked()
 {
-    ctrlProcess->setVio(vioList,vio);
+    ctrlProcess->setVio(vioMap,vio);
     emit ctrlCamSyncStatusSignal(0);
 }
 
 void FormCamConfig::on_pb_set_config_pwm_clicked()
 {
     uint8_t pwm = ui->hs_pwm->value();
-    ctrlProcess->setVio(vioList,vio);
+    ctrlProcess->setVio(vioMap,vio);
     emit ctrlInfraredPwmSignal(pwm);
 }
 

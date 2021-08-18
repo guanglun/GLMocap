@@ -64,6 +64,9 @@
         "qthread": "cpp",
         "algorithm": "cpp",
         "qmetatype": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "xhash": "cpp",
+        "xtree": "cpp",
+        "xutility": "cpp"
     }
 }

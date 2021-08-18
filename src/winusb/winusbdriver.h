@@ -85,7 +85,8 @@ public:
     unsigned char cam_id;
     pixformat_t pixformat;
     unsigned int recv_count_1s = 0,frame_fps = 0,imu_hz = 0;
-    QList<OPENVIO*> *openvioList;
+    QMap<uint8_t, OPENVIO*> vioMap; 
+    QMap<uint8_t, OPENVIO*>::Iterator it;
 
     libusb_device **list;
 
@@ -99,7 +100,6 @@ public:
     void scan(void);
     void autoScan();
     void setModule(QStandardItemModel *pModelOpenvio);
-    void setOpenvioList(QList<OPENVIO*> *openvioList);
 signals:
     void camSignals(int index);
     void imuSignals(int index);

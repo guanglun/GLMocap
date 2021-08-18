@@ -36,14 +36,15 @@ public:
 
     MuItemCtrlThread *muItemCtrlThread;
     OPENVIO *vio;
-    QList<OPENVIO*> *vioList;
+    
+    QMap<uint8_t, OPENVIO*> *vioMap; 
     enum CTRL_TYPE type;
     FormCamWindow *formCamWindow;
     QString binPath;
     FirmwareUpgrade *firmwareUpgrade;
 
     MuItemCtrl(FormCamWindow *formCamWindow);
-    void setCtrl(enum CTRL_TYPE type,QList<OPENVIO*> *vioList);
+    void setCtrl(enum CTRL_TYPE type,QMap<uint8_t, OPENVIO*> *vioMap);
     void start();
 signals:
 

@@ -18,7 +18,7 @@ class MuItemCtrlThread : public QThread
 private:
     QList<QString> idlist;
     MuItemCtrl *muItemCtrl;
-    QList<OPENVIO*> *vioList;
+
 public:
     MuItemCtrlThread(MuItemCtrl *muItemCtrl);
     void run();

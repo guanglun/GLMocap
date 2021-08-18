@@ -22,7 +22,7 @@ WinUSBDriver::WinUSBDriver()
 
     qRegisterMetaType<CAMERA_RESULT>("CAMERA_RESULT");
     visionProcess = new VisionProcess(this);
-    visionProcess->moveToThread(&visionProcessThread); 
+    visionProcess->moveToThread(&visionProcessThread);
     visionProcessThread.start();
 
     timer = new QTimer(this);
@@ -32,17 +32,11 @@ WinUSBDriver::WinUSBDriver()
 
 WinUSBDriver::~WinUSBDriver()
 {
-
 }
 
 void WinUSBDriver::setModule(QStandardItemModel *pModelOpenvio)
 {
     this->pModelOpenvio = pModelOpenvio;
-}
-
-void WinUSBDriver::setOpenvioList(QList<OPENVIO *> *openvioList)
-{
-    this->openvioList = openvioList;
 }
 
 void WinUSBDriver::open(int vid, int pid)
@@ -75,42 +69,34 @@ void WinUSBDriver::autoScan(void)
     libusb_device_handle *handle = NULL;
     int config = 0;
     int ret;
-    int ii, i;
+    int i;
 
     int status;
 
-    ssize_t num_devs, j, k;
-    int size = openvioList->size();
-
+    ssize_t num_devs;
     num_devs = libusb_get_device_list(m_libusb_context, &list);
 
-    for (i = 0; i < size; i++)
+    it = vioMap.begin();
+    while (it != vioMap.end())
     {
-
-        for (ii = 0; ii < num_devs; ii++)
+        for (i = 0; i < num_devs; i++)
         {
-            device = list[ii];
-
-            if (openvioList->at(i)->devAddr == libusb_get_device_address(device))
+            if (it.key() == libusb_get_device_address(list[i]))
             {
-                //openvioList->at(i)->dev = device;
                 break;
             }
         }
-
-        if (ii >= num_devs)
+        if (i >= num_devs)
         {
-            DBG("remove %s %s %d", openvioList->at(i)->productStr, openvioList->at(i)->idShort, openvioList->at(i)->devAddr);
-            openvioList->at(i)->removeItem();
-            openvioList->removeAt(i);
-            i--;
-            size--;
-            DBG("remove success");
+            DBG("remove %s %s %d", it.value()->productStr, it.value()->idShort, it.value()->devAddr);
+            it.value()->removeItem();
+            it = vioMap.erase(it);
+        }
+        else
+        {
+            it++;
         }
     }
-
-    //openvioList->clear();
-    //pModelOpenvio->clear();
 
     for (i = 0; i < num_devs; ++i)
     {
@@ -131,16 +117,7 @@ void WinUSBDriver::autoScan(void)
 
         if (type != TYPE_NULL)
         {
-            size = openvioList->size();
-            for (ii = 0; ii < size; ii++)
-            {
-                if (openvioList->at(ii)->devAddr == libusb_get_device_address(device))
-                {
-                    break;
-                }
-            }
-
-            if (ii >= size)
+            if (vioMap[libusb_get_device_address(device)] == nullptr)
             {
                 OPENVIO *vio = new OPENVIO(device);
                 bool isNew = false;
@@ -151,7 +128,7 @@ void WinUSBDriver::autoScan(void)
 
                 //DBG("new addr : %d ",vio->devAddr);
                 ret = vio->open();
-                if(ret < 0)
+                if (ret < 0)
                 {
                     delete vio;
                     break;
@@ -180,27 +157,31 @@ void WinUSBDriver::autoScan(void)
                 {
                     if (vio->getVersion() != -1)
                     {
-                        DBG("found %s %s %d v%d.%d.%d", vio->productStr, vio->idShort, vio->devAddr,vio->version[0],vio->version[1],vio->version[2]);
+                        DBG("found %s %s %d v%d.%d.%d", vio->productStr, vio->idShort, vio->devAddr, vio->version[0], vio->version[1], vio->version[2]);
 
-                        if(vio->type == TYPE_OPENVIO)
+                        if (vio->type == TYPE_OPENVIO)
                         {
-                            if(vio->getCameraStatus() == 0)
+                            if (vio->getCameraStatus() == 0)
                             {
                                 connect(vio->camProcess, SIGNAL(positionSignals(CAMERA_RESULT)), visionProcess, SLOT(positionSlot(CAMERA_RESULT)));
-                                openvioList->append(vio);
+                                vioMap[vio->devAddr] = vio;
                                 vio->setItem(pModelOpenvio);
                                 vio->ctrlCamStatus(0);
                                 vio->camRecvStart();
                                 isNew = true;
                             }
-                        }else if(vio->type == TYPE_BOOTLOADER)
+                        }
+                        else if (vio->type == TYPE_BOOTLOADER)
                         {
-                            openvioList->append(vio);
+                            //openvioList->append(vio);
+                            vioMap[vio->devAddr] = vio;
                             vio->setItem(pModelOpenvio);
-                            
+
                             isNew = true;
                         }
-                    }else{
+                    }
+                    else
+                    {
                         vio->close();
                     }
                 }
@@ -210,14 +191,13 @@ void WinUSBDriver::autoScan(void)
                     delete vio;
                 }
 
-                if(isNew)
+                if (isNew)
                 {
                     emit newSignal(vio);
                 }
             }
         }
     }
-
     //DBG("all found openvio : %d", (int)openvioList->length());
 
     //libusb_free_device_list(list, 1);
@@ -237,4 +217,5 @@ void WinUSBDriver::send(QByteArray byte)
 int WinUSBDriver::close(void)
 {
     //emit closeSignals();
+    return 0;
 }

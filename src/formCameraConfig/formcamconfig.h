@@ -25,9 +25,9 @@ public:
 
     explicit FormCamConfig(CtrlProcess *ctrlProcess,QWidget *parent = 0);
     ~FormCamConfig();
-    QList<OPENVIO *> *vioList;
+    QMap<uint8_t, OPENVIO*> *vioMap; 
     OPENVIO *vio;
-    void setQData(QList<OPENVIO *> *vioList = NULL,OPENVIO *vio = NULL);
+    void setQData(QMap<uint8_t, OPENVIO*> *vioMap = NULL,OPENVIO *vio = NULL);
 private slots:
     void on_pb_set_config_clicked();
     void on_pb_exit_clicked();
