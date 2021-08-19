@@ -63,15 +63,11 @@ void WinUSBDriver::autoScan(void)
 {
     //DBG("start scan");
 
-    struct libusb_device_descriptor desc;
-    struct libusb_config_descriptor *conf;
     struct libusb_device *device;
     libusb_device_handle *handle = NULL;
     int config = 0;
     int ret;
     int i;
-
-    int status;
 
     ssize_t num_devs;
     num_devs = libusb_get_device_list(m_libusb_context, &list);

@@ -1,4 +1,4 @@
-#include "camview.h"
+﻿#include "camview.h"
 #include "gldrow.h"
 #include "workspace.h"
 #include <QtMath>

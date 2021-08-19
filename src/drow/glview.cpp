@@ -1,4 +1,4 @@
-#include "glview.h"
+﻿#include "glview.h"
 #include "gldrow.h"
 #include "workspace.h"
 #include <QtMath>

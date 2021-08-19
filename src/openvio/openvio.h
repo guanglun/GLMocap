@@ -34,8 +34,8 @@ class CamProcess;
 #define REQUEST_SET_REBOOT 					0x01
 
 //IN
-#define REQUEST_GET_CAMERA_STATUS 	0x10
-#define REQUEST_GET_VERSION 		0x00
+#define REQUEST_GET_CAMERA_STATUS 	        0x10
+#define REQUEST_GET_VERSION 		        0x00
 
 #define REQUEST_CAMERA_SET_FRAME_SIZE_NUM   0xA2
 #define REQUEST_CAMERA_SET_EXPOSURE         0xA3
@@ -44,8 +44,8 @@ class CamProcess;
 #define REQUEST_CAMERA_SET_FPS              0xA6
 #define REQUEST_SET_INFRARED_PWM            0xA7
 
-#define REQUEST_IMU_START 0xB0
-#define REQUEST_IMU_STOP 0xB1
+#define REQUEST_IMU_START                   0xB0
+#define REQUEST_IMU_STOP                    0xB1
 
 class OPENVIO : public QObject
 {

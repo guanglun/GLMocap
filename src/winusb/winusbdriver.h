@@ -1,4 +1,4 @@
-#ifndef WINUSBDRIVER_H
+﻿#ifndef WINUSBDRIVER_H
 #define WINUSBDRIVER_H
 
 #include "workspace.h"

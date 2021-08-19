@@ -1,4 +1,4 @@
-#include "gldrow.h"
+﻿#include "gldrow.h"
 
 GLDrow::GLDrow()
 {

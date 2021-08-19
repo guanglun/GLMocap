@@ -1,4 +1,4 @@
-#include "easytool.h"
+﻿#include "easytool.h"
 
 EasyTool::EasyTool()
 {

@@ -1,4 +1,4 @@
-#ifndef FIRMWAREUPGRADE_H
+﻿#ifndef FIRMWAREUPGRADE_H
 #define FIRMWAREUPGRADE_H
 
 #include "workspace.h"

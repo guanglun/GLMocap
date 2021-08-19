@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Public libusb header file
  * Copyright © 2001 Johannes Erdfelt <johannes@erdfelt.com>
  * Copyright © 2007-2008 Daniel Drake <dsd@gentoo.org>

@@ -6,6 +6,8 @@ find_package(Qt5 COMPONENTS Core Widgets Gui OpenGL REQUIRED)
 find_package(OpenCV 4.5.3 REQUIRED)
 find_package(OpenGL REQUIRED)
 
+add_compile_options(/wd4200 /wd4267 /wd4102 /wd4309 /wd4305)
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC OFF)
 set(CMAKE_AUTOMOC ON)

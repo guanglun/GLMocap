@@ -95,7 +95,6 @@ void OPENVIO::CamRecv(void)
     int recv_head_status = 0;
     int findRet = 0;
     FindStr findStr;
-    uint8_t head_tmp[1024];
     findStr.config((unsigned char *)"CAMERA", 6);
     while (isCamRecv)
     {

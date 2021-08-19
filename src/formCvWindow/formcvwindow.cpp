@@ -1,4 +1,4 @@
-#include "formcvwindow.h"
+﻿#include "formcvwindow.h"
 #include "ui_formcvwindow.h"
 
 #include <opencv2/opencv.hpp>
@@ -68,7 +68,7 @@ void FormCvWindow::imageSlot(QImage qImage,int flag)
 	}
 
     cv::cvtColor(imageContours, image, cv::COLOR_BGR2RGB);
-    QImage qImg = QImage((const unsigned char *)(image.data), image.cols, image.rows, image.step, QImage::Format_RGB888);
+    QImage qImg = QImage((const unsigned char *)(image.data), image.cols, image.rows, image.step,QImage::Format_RGB888);
     ui->lb_img->setPixmap(QPixmap::fromImage(qImg));
     ui->lb_img->setScaledContents(true);
 

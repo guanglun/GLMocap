@@ -1,4 +1,4 @@
-#ifndef GLDROW_H
+﻿#ifndef GLDROW_H
 #define GLDROW_H
 
 #include <QOpenGLWidget>

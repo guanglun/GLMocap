@@ -1,4 +1,4 @@
-#include <stdint.h>
+﻿#include <stdint.h>
 #include "imu.h"
 #include <QtMath>
 #include "workspace.h"
@@ -227,8 +227,6 @@ void IMUSO3Thread(T_int16_xyz *gyri, T_int16_xyz *acci, T_int16_xyz *magi, T_flo
     //! Time constant
     float dt = 0.01f;		//s
     static uint32_t tPrev=0,startTime=0;	//us
-    uint32_t now;
-    uint8_t i;
 
     /* output euler angles */
     float euler[3] = {0.0f, 0.0f, 0.0f};	//rad
