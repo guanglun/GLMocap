@@ -59,6 +59,22 @@ void WinUSBDriver::onTimeOut()
     autoScan();
 }
 
+void WinUSBDriver::closeDevice(void)
+{
+    DBG("====>>> %d",vioMap.size());
+
+    it = vioMap.begin();
+    while (it != vioMap.end())
+    {
+        if(it.value() != nullptr)
+        {
+            DBG("remove %s %s %d", it.value()->productStr, it.value()->idShort, it.value()->devAddr);
+            it.value()->removeReady();
+            it = vioMap.erase(it);
+        }
+    }
+}
+
 void WinUSBDriver::autoScan(void)
 {
     //DBG("start scan");
@@ -97,7 +113,6 @@ void WinUSBDriver::autoScan(void)
 
     for (i = 0; i < num_devs; ++i)
     {
-
         device = list[i];
         struct libusb_device_descriptor desc;
         libusb_get_device_descriptor(device, &desc);
@@ -114,7 +129,7 @@ void WinUSBDriver::autoScan(void)
 
         if (type != TYPE_NULL)
         {
-            if (vioMap[libusb_get_device_address(device)] == nullptr)
+            if (!vioMap.contains(libusb_get_device_address(device)))
             {
                 OPENVIO *vio = new OPENVIO(device);
                 bool isNew = false;
@@ -128,7 +143,7 @@ void WinUSBDriver::autoScan(void)
                 if (ret < 0)
                 {
                     delete vio;
-                    break;
+                    continue;
                 }
 
                 ret = libusb_get_string_descriptor_ascii(vio->dev_handle,
@@ -153,8 +168,9 @@ void WinUSBDriver::autoScan(void)
                     DBG("get product success : %s", vio->productStr);
                 }
 
-                if (QString(vio->productStr).length() >= 7 &&
-                    QString(vio->idStr).length() == 24)
+                if ((   QString(vio->productStr).length() == 7 ||
+                        QString(vio->productStr).length() == 18) &&
+                        QString(vio->idStr).length() == 24)
                 {
                     if (vio->getVersion() != -1)
                     {
@@ -165,31 +181,41 @@ void WinUSBDriver::autoScan(void)
                             if (vio->getCameraStatus() == 0)
                             {
                                 connect(vio->camProcess, SIGNAL(positionSignals(CAMERA_RESULT)), visionProcess, SLOT(positionSlot(CAMERA_RESULT)));
-                                vioMap[vio->devAddr] = vio;
+
+                                DBG("===>>> add vio %d",vio->devAddr);
+
+                                vioMap.insert(vio->devAddr,vio);
                                 vio->setItem(pModelOpenvio);
                                 vio->ctrlCamStatus(0);
                                 vio->camRecvStart();
                                 isNew = true;
+                            }else{
+                                vio->close();
+                                delete vio;
+                                continue;
                             }
                         }
                         else if (vio->type == TYPE_BOOTLOADER)
                         {
-                            //openvioList->append(vio);
-                            vioMap[vio->devAddr] = vio;
-                            vio->setItem(pModelOpenvio);
+                            DBG("===>>> add bootloader vio %d",vio->devAddr);
 
+                            vioMap.insert(vio->devAddr,vio);
+                            vio->setItem(pModelOpenvio);
                             isNew = true;
                         }
                     }
                     else
                     {
                         vio->close();
+                        delete vio;
+                        continue;
                     }
                 }
                 else
                 {
                     vio->close();
                     delete vio;
+                    continue;
                 }
 
                 if (isNew)
@@ -199,6 +225,7 @@ void WinUSBDriver::autoScan(void)
             }
         }
     }
+
     //DBG("all found openvio : %d", (int)openvioList->length());
 
     //libusb_free_device_list(list, 1);

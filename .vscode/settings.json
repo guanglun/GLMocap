@@ -67,6 +67,7 @@
         "random": "cpp",
         "xhash": "cpp",
         "xtree": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "xstring": "cpp"
     }
 }

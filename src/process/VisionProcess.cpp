@@ -15,10 +15,10 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
 
     camResult[result.camIndex] = result;
 
-    mlog->show("index: " + QString::number(result.camIndex) +
-               " ptnum: " + QString::number(result.pointNum) +
-               " time: " + QString::number(result.time) +
-               " diff: " + QString::number(result.time - lastTime[result.camIndex]));
+    // mlog->show("index: " + QString::number(result.camIndex) +
+    //            " ptnum: " + QString::number(result.pointNum) +
+    //            " time: " + QString::number(result.time) +
+    //            " diff: " + QString::number(result.time - lastTime[result.camIndex]));
     lastTime[result.camIndex] = result.time;
 
     if (camNum < 2)

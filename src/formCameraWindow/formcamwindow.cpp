@@ -160,8 +160,6 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
 
 FormCamWindow::~FormCamWindow()
 {
-    ctrlProcessThread.quit();
-    ctrlProcessThread.wait();
     delete ui;
 }
 
@@ -180,7 +178,22 @@ void FormCamWindow::on_pb_stop_clicked()
 
 void FormCamWindow::closeEvent(QCloseEvent *event)
 {
-    fLogWindow.close();
+    
+    qwinusb->timer->stop();
+
+    ctrlProcessThread.quit();
+    ctrlProcessThread.wait();
+
+    if(f3DViewWindow.isEnabled())
+        f3DViewWindow.close();
+    if(fVisionWindow.isEnabled())
+        fVisionWindow.close();        
+    if(fLogWindow.isEnabled())
+        fLogWindow.close();    
+    if(formCamConfig->isEnabled())
+        formCamConfig->close();   
+    
+    qwinusb->closeDevice();
 }
 
 static bool isDirExistOrCreat(QString fullPath)
@@ -372,7 +385,7 @@ void FormCamWindow::onTimeOut()
 
 void FormCamWindow::on_action_position_triggered()
 {
-    if (!fVisionWindow.isActiveWindow())
+    if (!fVisionWindow.isVisible())
     {
         connect(&qwinusb->visionProcess->multipleViewTriangulation, SIGNAL(onXYZSignals(double, double, double)), &fVisionWindow, SLOT(onXYZSlot(double, double, double)));
         fVisionWindow.show();
@@ -381,7 +394,7 @@ void FormCamWindow::on_action_position_triggered()
 
 void FormCamWindow::on_action3d_view_triggered()
 {
-    if (!f3DViewWindow.isActiveWindow())
+    if (!f3DViewWindow.isVisible())
     {
         connect(&qwinusb->visionProcess->multipleViewTriangulation, SIGNAL(onXYZSignals(double, double, double)), &f3DViewWindow, SLOT(onXYZSlot(double, double, double)));
         f3DViewWindow.show();
@@ -390,9 +403,8 @@ void FormCamWindow::on_action3d_view_triggered()
 
 void FormCamWindow::on_actionLog_view_triggered()
 {
-    if (!fLogWindow.isActiveWindow())
+    if (!fLogWindow.isVisible())
     {
-
         fLogWindow.show();
     }
 }

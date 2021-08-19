@@ -75,10 +75,11 @@ private:
     libusb_context* m_libusb_context;
 
     enum SENSOR_STATUS camStatus,imuStatus;
-    QTimer *timer;
+    
 
     QThread visionProcessThread;
 public:
+    QTimer *timer;
     VisionProcess *visionProcess;
     QStandardItemModel *pModelOpenvio;
     Image img;
@@ -100,6 +101,7 @@ public:
     void scan(void);
     void autoScan();
     void setModule(QStandardItemModel *pModelOpenvio);
+    void closeDevice(void);
 signals:
     void camSignals(int index);
     void imuSignals(int index);
