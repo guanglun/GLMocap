@@ -61,8 +61,7 @@ int OPENVIO::open(void)
     {
         //DBG("claim interface success");
     }
-
-    DBG("open %s success", idShort);
+    DBG("open success");
 
     return 0;
 
@@ -82,9 +81,19 @@ int OPENVIO::close(void)
         libusb_release_interface(dev_handle, 0);
         libusb_close(dev_handle);
     }
-    DBG("close %s", idShort);
+    DBG("close");
     dev_handle = NULL;
     return 0;
+}
+
+void OPENVIO::removeReady(void)
+{
+    if(formVioWindow->isActiveWindow() == true)
+    {
+        formVioWindow->close();
+    }
+    close();
+    removeItem();
 }
 
 void OPENVIO::CamRecv(void)
@@ -369,19 +378,18 @@ int OPENVIO::sendCtrl(char request, uint8_t type, unsigned char *buffer, uint16_
 
     if (dev_handle != NULL)
     {
-        DBG("sendCtrl Start");
+        //DBG("sendCtrl Start");
         ret = libusb_control_transfer(dev_handle, LIBUSB_REQUEST_TYPE_VENDOR + type, request, 0, 0, buffer, len, 1);
-        DBG("sendCtrl End");
+        //DBG("sendCtrl End");
 
         if (ret < 0)
         {
-            DBG("sendCtrl fail ret:%d", ret);
+            DBG("sendCtrl %02X fail ret:%d", (uint8_t)request , ret);
             return -1;
         }
         else
         {
-            DBG("sendCtrl success. ret:%d", ret);
-
+            DBG("sendCtrl %02X success. ret:%d", (uint8_t)request , ret);
             return 0;
         }
     }

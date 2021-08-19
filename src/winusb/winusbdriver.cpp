@@ -85,7 +85,8 @@ void WinUSBDriver::autoScan(void)
         if (i >= num_devs)
         {
             DBG("remove %s %s %d", it.value()->productStr, it.value()->idShort, it.value()->devAddr);
-            it.value()->removeItem();
+
+            it.value()->removeReady();
             it = vioMap.erase(it);
         }
         else
@@ -136,7 +137,9 @@ void WinUSBDriver::autoScan(void)
                                                          sizeof(vio->idStr));
                 if (ret < 0)
                 {
-                    DBG("get descriptor fail %d", ret);
+                    DBG("get iSerialNumber fail %d", ret);
+                }else{
+                    DBG("get id success : %s", vio->idStr);
                 }
 
                 ret = libusb_get_string_descriptor_ascii(vio->dev_handle,
@@ -145,7 +148,9 @@ void WinUSBDriver::autoScan(void)
                                                          sizeof(vio->productStr));
                 if (ret < 0)
                 {
-                    DBG("get descriptor fail %d", ret);
+                    DBG("get iProduct fail %d", ret);
+                }else{
+                    DBG("get product success : %s", vio->productStr);
                 }
 
                 if (QString(vio->productStr).length() >= 7 &&

@@ -105,6 +105,7 @@ public:
     int open(void);
     int close(void);
     
+    void removeReady(void);
     int getRow(void);
     void setItem(QStandardItemModel *pModelOpenvio);
     void setStatus(QString status);
