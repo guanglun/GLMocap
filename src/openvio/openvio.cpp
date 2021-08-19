@@ -379,7 +379,7 @@ int OPENVIO::sendCtrl(char request, uint8_t type, unsigned char *buffer, uint16_
     if (dev_handle != NULL)
     {
         //DBG("sendCtrl Start");
-        ret = libusb_control_transfer(dev_handle, LIBUSB_REQUEST_TYPE_VENDOR + type, request, 0, 0, buffer, len, 1000);
+        ret = libusb_control_transfer(dev_handle, LIBUSB_REQUEST_TYPE_VENDOR + type, request, 0, 0, buffer, len, 50000);
         //DBG("sendCtrl End");
 
         if (ret < 0)

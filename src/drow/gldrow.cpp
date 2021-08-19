@@ -107,7 +107,7 @@ void GLDrow::DrowCam(float size)
     // glRotatef(-90, 0, 1, 0);
 
     glColor3f(1.0, 0.0, 0.0);
-    DrowCube();
+    //DrowCube();
 
     glBegin(GL_LINES);
     glVertex3f(size/2, size/2, size/2);

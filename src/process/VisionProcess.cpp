@@ -12,6 +12,7 @@ void VisionProcess::init(int camNum)
 void VisionProcess::positionSlot(CAMERA_RESULT result)
 {
     bool check = true;
+    int foundNum = 0;
 
     camResult[result.camIndex] = result;
 
@@ -35,7 +36,7 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
 
     if (check == true)
     {
-        mlog->show("====>>>" + QString::number(camResult[0].time) + " " + QString::number(camResult[0].time - lastAllTime));
+        mlog->show("===>>>" + QString::number(camResult[0].time) + " " + QString::number(camResult[0].time - lastAllTime));
         lastAllTime = camResult[0].time;
 
         if (isCapImage == true)
@@ -54,25 +55,33 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
         else
         {
             count++;
-            for (int i = 0; i < camNum; i++)
-            {
-                if (camResult[i].pointNum <= 0)
-                {
-                    return;
-                }
-            }
+            // for (int i = 0; i < camNum; i++)
+            // {
+            //     if (camResult[i].pointNum <= 0)
+            //     {
+            //         return;
+            //     }
+            // }
 
             vision_param.CamNum = camNum;
             vision_param.ptNum = 1;
 
             for (int i = 0; i < camNum; i++)
             {
-                vision_param.idx.row(0)(i) = 1;
-                vision_param.xy[0].col(i)(0) = camResult[i].x[0];
-                vision_param.xy[0].col(i)(1) = camResult[i].y[0];
-            }
+                if(camResult[i].pointNum <= 0)
+                {
+                    vision_param.idx.row(0)(i) = 0;
+                }else{
+                    foundNum++;
+                    vision_param.idx.row(0)(i) = 1;
+                    vision_param.xy[0].col(i)(0) = camResult[i].x[0];
+                    vision_param.xy[0].col(i)(1) = camResult[i].y[0];
+                }
 
-            multipleViewTriangulation.triangulation();
+            }
+            
+            if(foundNum >= 3)
+                multipleViewTriangulation.triangulation();
         }
     }
 }

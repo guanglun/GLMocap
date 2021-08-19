@@ -205,7 +205,7 @@ static bool isDirExistOrCreat(QString fullPath)
     }
     else
     {
-        bool ok = dir.mkdir(fullPath); //只创建一级子目录，即必须保证上级目录存在
+        bool ok = dir.mkdir(fullPath);
         return ok;
     }
 }

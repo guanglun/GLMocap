@@ -92,7 +92,7 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
 {
     Mat image;
     Mat sourceImg = cv::Mat(qImage.height(), qImage.width(), CV_8UC1, qImage.bits());
-    threshold(sourceImg, image, 200, 255.0, THRESH_BINARY);
+    threshold(sourceImg, image, 150, 255.0, THRESH_BINARY);
 
     vector<vector<Point>> contours;
     vector<Vec4i> hierarchy;
