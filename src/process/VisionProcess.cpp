@@ -15,11 +15,11 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
 
     camResult[result.camIndex] = result;
 
-    // mlog->show("index: " + QString::number(result.camIndex) +
-    //            " ptnum: " + QString::number(result.pointNum) +
-    //            " time: " + QString::number(result.time) +
-    //            " diff: " + QString::number(result.time - lastTime[result.camIndex]));
-    //lastTime[result.camIndex] = result.time;
+    mlog->show("index: " + QString::number(result.camIndex) +
+               " ptnum: " + QString::number(result.pointNum) +
+               " time: " + QString::number(result.time) +
+               " diff: " + QString::number(result.time - lastTime[result.camIndex]));
+    lastTime[result.camIndex] = result.time;
 
     if (camNum < 2)
         return;
@@ -35,8 +35,8 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
 
     if (check == true)
     {
-        mlog->show("====>>>" + QString::number(camResult[0].time) + " " + QString::number(camResult[0].time - lastTime[0]));
-        lastTime[0] = camResult[0].time;
+        mlog->show("====>>>" + QString::number(camResult[0].time) + " " + QString::number(camResult[0].time - lastAllTime));
+        lastAllTime = camResult[0].time;
 
         if (isCapImage == true)
         {

@@ -35,7 +35,7 @@ public:
     
     CAMERA_RESULT camResult[CAM_NUM_MAX];
 
-    qint64 lastTime[CAM_NUM_MAX];
+    qint64 lastTime[CAM_NUM_MAX],lastAllTime;
     qint64 saveLastTime = 0;
 
     MultipleViewTriangulation multipleViewTriangulation;

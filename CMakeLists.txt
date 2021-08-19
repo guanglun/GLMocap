@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 3.5)
 
 project(MultiCam LANGUAGES C CXX)
 
-find_package(Qt5 COMPONENTS Core Widgets Gui REQUIRED)
+find_package(Qt5 COMPONENTS Core Widgets Gui OpenGL REQUIRED)
 find_package(OpenCV 4.5.3 REQUIRED)
+find_package(OpenGL REQUIRED)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC OFF)
@@ -93,23 +94,25 @@ include_directories(
                     src/vision
                     src/openvio
                     lib/eigen-3.2.10
-                    lib/glut
                     lib/libusb
                     ${OpenCV_INCLUDE_DIRS}
 )
 
 link_directories(
                     lib/eigen-3.2.10
-                    lib/glut
+                    lib/opencv
                     )
 
+                    
 set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO /NODEFAULTLIB:${CMAKE_SOURCE_DIR}/lib/usb/libusb-1.0.lib")
+
 target_link_libraries(MultiCam 
                         Qt5::Widgets
                         Qt5::Core
                         Qt5::Gui
-                        ${CMAKE_SOURCE_DIR}/lib/libusb/win32/libusb-1.0.lib
-                        ${CMAKE_SOURCE_DIR}/lib/glut/glut32.lib
+                        Qt5::OpenGL
+                        ${OPENGL_LIBRARIES}
+                        ${CMAKE_SOURCE_DIR}/lib/libusb/libusb-1.0.lib
                         ${OpenCV_LIBS}
                         
 )

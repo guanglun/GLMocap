@@ -4,7 +4,8 @@
 
 #include <QObject>
 #include <QDebug>
-#include "ui_mainwindow.h"
+#include <QLabel>
+#include "ui_formcamwindow.h"
 
 extern QLabel *status_msg;
 

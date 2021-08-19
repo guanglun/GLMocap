@@ -1,27 +1,15 @@
 #ifndef CAMVIEW_H
 #define CAMVIEW_H
 
-
+#include <QGLWidget>
 #include <QOpenGLWidget>
 #include <QOpenGLBuffer>
 #include <QOpenGLFunctions>
 #include <QOpenGLTexture>
 #include <QOpenGLShaderProgram>
 
-#ifdef __linux__
-#include <GL/glut.h>
-#elif _WIN32
-#include <windows.h>
-#include <glut.h>
-#include <gl/glu.h>
-#else
-
-#endif
-
-
-
-#include<QMouseEvent>
-#include<QWheelEvent>
+#include <QMouseEvent>
+#include <QWheelEvent>
 
 
 

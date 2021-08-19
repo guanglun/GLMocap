@@ -348,17 +348,22 @@ void FormCamWindow::onTimeOut()
     for (QMap<uint8_t, OPENVIO *>::Iterator it = qwinusb->vioMap.begin();
          it != qwinusb->vioMap.end(); it++)
     {
-        OPENVIO *vio = it.value();
-        QString speedStr;
-        recv_count_1s += vio->recv_count_1s;
-        speedStr += getSpeed(vio->recv_count_1s);
-        speedStr += " ";
-        speedStr += QString::number(vio->frame_fps);
-        speedStr += "fps";
-        vio->frame_fps = 0;
 
-        vio->recv_count_1s = 0;
-        vio->setSpeed(speedStr);
+            OPENVIO *vio = it.value();
+                if(vio != nullptr)
+        {
+            QString speedStr;
+            recv_count_1s += vio->recv_count_1s;
+            speedStr += getSpeed(vio->recv_count_1s);
+            speedStr += " ";
+            speedStr += QString::number(vio->frame_fps);
+            speedStr += "fps";
+            vio->frame_fps = 0;
+
+            vio->recv_count_1s = 0;
+            vio->setSpeed(speedStr);
+        }
+
     }
 
     status_speed->setText(getSpeed(recv_count_1s) + " " + QString::number(qwinusb->visionProcess->count) + "position/s");

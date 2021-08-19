@@ -68,7 +68,7 @@ void CamView::paintGL()
     
     glTranslatef(px,py,pz);
     glColor3f(1.0, 0.0, 0.0);
-    glutSolidSphere( 0.2, 60, 60 );
+    //glutSolidSphere( 0.2, 60, 60 );
 
     glPopMatrix();
     

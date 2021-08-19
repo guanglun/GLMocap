@@ -1,12 +1,12 @@
 {
     "configurations": [
         {
-            "name": "Win32",
+            "name": "Win64",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${env:QT_PATH}/5.6.3/mingw49_32/include",
-                "${env:QT_PATH}/5.6.3/mingw49_32/include/QtCore",
-                "${env:QT_PATH}/5.6.3/mingw49_32/include/QtWidgets"
+                "${env:QT_PATH}/5.12.11/msvc2017_64/include",
+                "${env:QT_PATH}/48.Qt5.12.11/5.12.11/msvc2017_64/include/QtCore",
+                "${env:QT_PATH}/48.Qt5.12.11/5.12.11/msvc2017_64/include/QtWidgets"
             ],
             "defines": [
                 "_DEBUG",
@@ -14,10 +14,10 @@
                 "_UNICODE"
             ],
             "windowsSdkVersion": "10.0.17134.0",
-            "compilerPath": "${env:QT_PATH}/Tools/mingw492_32/bin/g++.exe",
+            "compilerPath": "D:/0.software/49.VS2017/VC/Tools/MSVC/14.16.27023/bin/Hostx64/x64/cl.exe",
             "cStandard": "c11",
-            "cppStandard": "c++11",
-            "intelliSenseMode": "gcc-x86",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "msvc-x64",
             "configurationProvider": "ms-vscode.cmake-tools"
         }
     ],
