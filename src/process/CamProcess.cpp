@@ -8,6 +8,7 @@ using namespace std;
 CamProcess::CamProcess(OPENVIO *vio, QObject *parent)
 {
     this->vio = vio;
+    this->hPoint = new QHash<POINT_STATE, GLPoint *>();
 }
 
 void CamProcess::setShowFlag(Qt::CheckState flag)
@@ -92,7 +93,12 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
 {
     Mat image;
     Mat sourceImg = cv::Mat(qImage.height(), qImage.width(), CV_8UC1, qImage.bits());
+
+    qint64 t1 = QDateTime::currentDateTime().toMSecsSinceEpoch();
     threshold(sourceImg, image, 150, 255.0, THRESH_BINARY);
+    qint64 t2 = QDateTime::currentDateTime().toMSecsSinceEpoch();
+
+    DBG("diff %d",t2-t1);
 
     vector<vector<Point>> contours;
     vector<Vec4i> hierarchy;
@@ -105,12 +111,13 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
     vector<Point2f> centers(contours.size()); //圆心
     vector<float> radius(contours.size());    //半径
 
-    CAMERA_RESULT result;
+    
     result.camIndex = vio->number;
     result.pointNum = (int)0;
     result.time = time.toMSecsSinceEpoch();
     result.path = vio->saveImagePath;
     result.image = qImage;
+    result.hPoint = hPoint;
 
     if (contours.size() >= 36)
     {

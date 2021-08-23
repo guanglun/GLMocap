@@ -10,8 +10,11 @@
 #include <QTimer>
 #include <QMetaType>
 #include <QImage>
+#include <QHash>
 
+#include "GLPoint.h"
 #include "multipleViewTriangulation.h"
+
 
 typedef struct CAMERA_RESULT{
     int camIndex;
@@ -21,6 +24,7 @@ typedef struct CAMERA_RESULT{
     QImage image;
     double x[PT_NUM_MAX];
     double y[PT_NUM_MAX];
+    QHash<POINT_STATE, GLPoint *> *hPoint; 
 }CAMERA_RESULT;
 
 class VisionProcess:public QObject        

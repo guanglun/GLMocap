@@ -48,6 +48,8 @@ add_executable(MultiCam
     src/process/CamProcess.cpp
     src/process/VisionProcess.cpp
 
+    src/vision/GLPoint.cpp
+
     src/main.cpp
     src/openvio/openvio.cpp
     src/winusb/winusbdriver.cpp
