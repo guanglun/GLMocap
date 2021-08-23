@@ -211,3 +211,29 @@ void FormVioWindow::onTimeOut()
     speedStr += "fps";
     ui->lb_fps->setText(speedStr);
 }
+
+void FormVioWindow::on_pb_previous_clicked()
+{
+    QImage myImage;
+    vio->camProcess->index--;
+    if(vio->camProcess->index < 0)
+    {
+        vio->camProcess->index = IMG_FRAME_SIZE_MAX - 1;
+    }
+    
+    myImage = QImage(vio->img.img[vio->camProcess->index], vio->img.width, vio->img.high, QImage::Format_Grayscale8);
+    ui->lb_img->setPixmap(QPixmap::fromImage(myImage));
+}
+
+void FormVioWindow::on_pb_next_clicked()
+{
+    QImage myImage;
+    vio->camProcess->index++;
+    if(vio->camProcess->index >= IMG_FRAME_SIZE_MAX)
+    {
+        vio->camProcess->index = 0;
+    }
+    
+    myImage = QImage(vio->img.img[vio->camProcess->index], vio->img.width, vio->img.high, QImage::Format_Grayscale8);
+    ui->lb_img->setPixmap(QPixmap::fromImage(myImage));    
+}

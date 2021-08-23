@@ -55,7 +55,7 @@ void CamProcess::camSlot(int index)
     // t2_old = t2;
 
     // d_time = timer*0.00001;
-
+    this->index = index;
     if (vio->cam_id == MT9V034_ID)
     {
         if (vio->pixformat == PIXFORMAT_GRAYSCALE)
@@ -91,14 +91,15 @@ void CamProcess::camSlot(int index)
 
 void CamProcess::cvProcess(QImage qImage, QDateTime time)
 {
+    // qint64 t1,t2;
+    // t1 = QDateTime::currentDateTime().toMSecsSinceEpoch();
+
     Mat image;
     Mat sourceImg = cv::Mat(qImage.height(), qImage.width(), CV_8UC1, qImage.bits());
 
-    qint64 t1 = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    
     threshold(sourceImg, image, 150, 255.0, THRESH_BINARY);
-    qint64 t2 = QDateTime::currentDateTime().toMSecsSinceEpoch();
 
-    DBG("diff %d",t2-t1);
 
     vector<vector<Point>> contours;
     vector<Vec4i> hierarchy;
@@ -171,4 +172,7 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
 
     else if (showFlag == Qt::CheckState::Checked)
         emit visionImageSignals(QPixmap::fromImage(qImg));
+
+    // t2 = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    // mlog->show(QString::number(vio->number) + " diff " + QString::number(t2-time.toMSecsSinceEpoch()));        
 }

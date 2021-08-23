@@ -25,11 +25,14 @@ class CamProcess:public QObject
 {
     Q_OBJECT
 private:
+    
+    
     OPENVIO *vio = NULL;    
     Qt::CheckState showFlag = Qt::CheckState::Unchecked;
     QHash<POINT_STATE, GLPoint *> *hPoint;
     CAMERA_RESULT result;
 public:
+    int index;
     CamProcess(OPENVIO *vio,QObject* parent = nullptr);
     void cvProcess(QImage qImage,QDateTime time);
     void setShowFlag(Qt::CheckState flag);

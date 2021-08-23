@@ -41,9 +41,9 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
 
         if (isCapImage == true)
         {
-            if (camResult[0].time - saveLastTime >= 500)
+            //if (camResult[0].time - saveLastTime >= 500)
             {
-                for (int i = 0; i < camNum; i++)
+                for (int i = 0; i < 1; i++)
                 {
                     QString filePath = camResult[i].path + "/" + QString::number(camResult[0].time) + ".png";
                     //mlog->show("save "+filePath);
@@ -68,20 +68,31 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
 
             for (int i = 0; i < camNum; i++)
             {
-                if(camResult[i].pointNum <= 0)
+                if (camResult[i].pointNum <= 0)
                 {
                     vision_param.idx.row(0)(i) = 0;
-                }else{
+                }
+                else
+                {
                     foundNum++;
                     vision_param.idx.row(0)(i) = 1;
                     vision_param.xy[0].col(i)(0) = camResult[i].x[0];
                     vision_param.xy[0].col(i)(1) = camResult[i].y[0];
                 }
-
             }
-            
-            if(foundNum >= 3)
+
+            qint64 t1, t2;
+            t1 = QDateTime::currentDateTime().toMSecsSinceEpoch();
+
+            for(int ii=0;ii<10000;ii++)
+            {
+            if (foundNum >= 3)
                 multipleViewTriangulation.triangulation();
+            }
+
+
+            t2 = QDateTime::currentDateTime().toMSecsSinceEpoch();
+            mlog->show(" diff " + QString::number(t2 - t1));
         }
     }
 }

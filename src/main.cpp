@@ -15,15 +15,17 @@ int main(int argc, char *argv[])
     FormCamWindow fCamWindow;
     fCamWindow.show();
 
-    // Mat image = imread("D:\\3.code\\MatlabLIB\\image5\\camera1\\camera1_0.png", IMREAD_GRAYSCALE);
+    // Mat image = imread("F:\\windows\\Desktop\\CODE\\MatlabLIB\\image6\\camera0\\camera0_0.png", IMREAD_GRAYSCALE);
     // Mat temp;
-    // QDateTime t1,t2;
-    // t1 = QDateTime::currentDateTime();
-    // threshold(image, image, 150, 255.0, THRESH_BINARY);
+    // qint64 t1,t2;
+    // while(1)
+    // {
+    // t1 = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    // threshold(temp, image, 150, 255.0, THRESH_BINARY);
     // //QThread::msleep(100);
-    // t2 = QDateTime::currentDateTime();
+    // t2 = QDateTime::currentDateTime().toMSecsSinceEpoch();
 
-    // qDebug().noquote() << QString::number(t2.toMSecsSinceEpoch()-t1.toMSecsSinceEpoch());
-
+    // qDebug().noquote() << QString::number(t2-t1);
+    // }
     return a.exec();
 }

@@ -101,6 +101,20 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="pb_previous">
+       <property name="text">
+        <string>previous</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pb_next">
+       <property name="text">
+        <string>next</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="pb_vision">
        <property name="text">
         <string>vision</string>

@@ -46,7 +46,8 @@ private slots:
     void on_pb_vision_clicked();
     void on_pb_cam_clicked();
     void on_pb_sync_clicked();
-
+    void on_pb_previous_clicked();
+    void on_pb_next_clicked();
     void visionImageSlot(QPixmap qImage);  
     void getCameraStatusSlot(void); 
 

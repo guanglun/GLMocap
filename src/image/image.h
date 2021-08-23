@@ -7,7 +7,7 @@
 #define IMG_MAX_WIDTH   752
 #define IMG_MAX_HIGH    480
 
-#define IMG_FRAME_SIZE_MAX 30
+#define IMG_FRAME_SIZE_MAX (40*10)
 #define IMU_FRAME_SIZE_MAX 100
 
 #define IMU_PACKAGE_SIZE 24
