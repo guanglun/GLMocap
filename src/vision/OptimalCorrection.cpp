@@ -8,7 +8,7 @@ MultipleViewTriangulation::optimal_correction_all(
     int CamNumAll,
     MatrixXd Xk0[],
     MatrixXd Xkc0[],
-    MatrixXi& idx,
+    Matrix<double,PT_NUM_MAX,CAM_NUM_MAX>& idx,
     double reperr[],
     int PtNum,
     int Max_Iter,
@@ -75,6 +75,8 @@ MultipleViewTriangulation::optimal_correction_all(
             // correction
             flag = optimal_correction(tfT, CamNum, xk, xkc, reperr,
                                       Max_Iter, Conv_EPS);
+
+            mlog->show(">>>>>>> " + QString::number(CamNum) + " " + QString::number(flag) + " " + QString::number(reperr[0]));
 
             if (flag) // success
             {

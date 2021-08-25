@@ -107,14 +107,7 @@ void OPENVIO::CamRecv(void)
     findStr.config((unsigned char *)"CAMERA", 6);
     while (isCamRecv)
     {
-        try
-        {
-            ret = libusb_bulk_transfer(dev_handle, CAM_EPADDR, (unsigned char *)(img.img[img_index] + recv_index), 512 * 1024, &camRecvLen, 1000);
-        }
-        catch (...)
-        {
-            break;
-        }
+        ret = libusb_bulk_transfer(dev_handle, CAM_EPADDR, (unsigned char *)(img.img[img_index] + recv_index), 512 * 1024, &camRecvLen, 1000);
 
         if (ret < 0)
         {

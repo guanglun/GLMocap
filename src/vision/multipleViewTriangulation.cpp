@@ -196,6 +196,15 @@ void MultipleViewTriangulation::positionSlot(int camIndex, double x,double y)
 
 void MultipleViewTriangulation::triangulation(void)
 {
+    double rerr[vision_param.ptNum];
+
+    optimal_correction_all(vision_param.P,
+                            vision_param.CamNum,
+                            vision_param.xy,
+                            vision_param.xy,
+                            vision_param.idx,
+                            rerr,vision_param.ptNum);
+
     triangulation_all(vision_param.P,vision_param.CamNum,vision_param.xy,Xr,vision_param.ptNum,vision_param.idx);
     emit onXYZSignals(Xr[0](0,0),Xr[0](1,0),Xr[0](2,0));
 }

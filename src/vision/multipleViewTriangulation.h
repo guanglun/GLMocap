@@ -86,12 +86,12 @@ public:
         int CamNumAll,
         MatrixXd Xk0[],
         MatrixXd Xkc0[],
-        MatrixXi &idx,
+        Matrix<double, PT_NUM_MAX, CAM_NUM_MAX> &idx,
         double reperr[],
         int PtNum,
-        int Max_Iter,
-        double Conv_EPS,
-        double f0);
+        int Max_Iter = Max_Iteration,
+        double Conv_EPS = Convergence_EPS,
+        double f0 = Default_f0);
 
     bool optimal_correction(
         const Matrix3d tfT[][3],
