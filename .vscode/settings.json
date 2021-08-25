@@ -70,6 +70,7 @@
         "xutility": "cpp",
         "xstring": "cpp",
         "thread": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "multipleviewtriangulation.h": "c"
     }
 }

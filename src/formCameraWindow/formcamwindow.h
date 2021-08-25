@@ -11,7 +11,7 @@
 
 #include "openvio.h"
 
-#include "multipleViewTriangulation.h"
+#include "MultipleViewTriangulation.h"
 
 #include "MuItemCam.h"
 #include "winusbdriver.h"

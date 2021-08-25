@@ -5,7 +5,9 @@
 extern "C" {
 #endif
 
+#include <stdio.h>
 #include <memory.h>
+
 
 #define LOCAL_ID     0x01
 #define TARGET_ID    0x02

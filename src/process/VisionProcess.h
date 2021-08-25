@@ -13,7 +13,7 @@
 #include <QHash>
 
 #include "GLPoint.h"
-#include "multipleViewTriangulation.h"
+#include "MultipleViewTriangulation.h"
 
 
 typedef struct CAMERA_RESULT{

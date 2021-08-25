@@ -1,5 +1,5 @@
 #include "setting.h"
-#include "multipleViewTriangulation.h"
+#include "MultipleViewTriangulation.h"
 #include <iostream>
 
 Setting::Setting()

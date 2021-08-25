@@ -6,7 +6,9 @@ find_package(Qt5 COMPONENTS Core Widgets Gui OpenGL REQUIRED)
 find_package(OpenCV 4.5.3 REQUIRED)
 find_package(OpenGL REQUIRED)
 
+if (MSVC)
 add_compile_options(/wd4200 /wd4267 /wd4102 /wd4309 /wd4305)
+endif()
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC OFF)
@@ -38,7 +40,9 @@ add_executable(MultiCam
     src/form3DViewWindow/form3dviewwindow.cpp
     src/formlogWindow/formlogwindow.cpp
     src/formCvWindow/formcvwindow.cpp
-    src/vision/multipleViewTriangulation.cpp
+    src/vision/MultipleViewTriangulation.cpp
+    src/vision/MultipleViewTriangulationCommon.cpp
+    src/vision/OptimalCorrection.cpp
     src/firmwareUpgrade/firmwareUpgrade.cpp
     src/firmwareUpgrade/upgradeRecvThread.cpp
     src/firmwareUpgrade/upgradeThread.cpp
@@ -98,7 +102,7 @@ include_directories(
                     src/vision
                     src/openvio
                     lib/eigen-3.2.10
-                    lib/libusb
+                    lib/libusb/include/libusb-1.0
                     ${OpenCV_INCLUDE_DIRS}
 )
 
@@ -107,8 +111,10 @@ link_directories(
                     lib/opencv
                     )
 
-                    
-set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO /NODEFAULTLIB:${CMAKE_SOURCE_DIR}/lib/usb/libusb-1.0.lib")
+if (MSVC)
+    set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO /NODEFAULTLIB:${CMAKE_SOURCE_DIR}/lib/usb/libusb-1.0.lib")
+endif()           
+
 
 target_link_libraries(MultiCam 
                         Qt5::Widgets
@@ -116,7 +122,7 @@ target_link_libraries(MultiCam
                         Qt5::Gui
                         Qt5::OpenGL
                         ${OPENGL_LIBRARIES}
-                        ${CMAKE_SOURCE_DIR}/lib/libusb/libusb-1.0.lib
+                        ${CMAKE_SOURCE_DIR}/lib/libusb/MinGW32/dll/libusb-1.0.dll.a
                         ${OpenCV_LIBS}
                         
 )

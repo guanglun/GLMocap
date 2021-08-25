@@ -6,7 +6,7 @@
 #include <Eigen/Geometry>
 #include <Eigen/Core>
 #include <Eigen/Dense> 
-#include "multipleViewTriangulation.h"
+#include "MultipleViewTriangulation.h"
 #include <iostream>
 
 using namespace Eigen;

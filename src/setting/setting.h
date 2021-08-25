@@ -13,7 +13,7 @@
 
 #include "imu.h"
 
-
+#define sscanf_s sscanf
 class Setting : public QObject
 {
     Q_OBJECT

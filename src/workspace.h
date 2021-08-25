@@ -6,35 +6,42 @@
 #include "setting.h"
 #include "log.h"
 
+#ifdef MSVC
+    #define QLOG(fmt,...) do{\
+        char temp[4096];\
+        sprintf_s(temp,fmt, ##__VA_ARGS__);\
+        mlog->show(temp);\
+    }while(0)
 
-#define QLOG(fmt,...) do{\
-    char temp[4096];\
-    sprintf_s(temp,fmt, ##__VA_ARGS__);\
+    #define ERR(fmt, ...)      
+    #define WARNING(fmt, ...)  
+    #define DBG(fmt,...)      QLOG(fmt, __VA_ARGS__)
+#endif
+
+//#ifdef __MINGW32__
+#ifdef __GNUC__
+
+#define QDBG(tag, args...) do{\
+    char temp[4096] = tag;\
+    sprintf(temp + 7, ##args);\
     mlog->show(temp);\
 }while(0)
 
-// #define QDBG(tag, args...) do{\
-//     char temp[4096] = tag;\
-//     sprintf(temp + 7, ##args);\
-//     mlog->show(temp);\
-//     qDebug()<<temp;\
-// }while(0)
+#define QLOG(args...) do{\
+    char temp[4096];\
+    sprintf(temp, ##args);\
+    mlog->show(temp);\
+}while(0)
 
-// #define QLOG(args...) do{\
-//     char temp[4096];\
-//     sprintf(temp, ##args);\
-//     mlog->show(temp);\
-// }while(0)
+#define ERR(args...)      QDBG("ERROR   ", ##args)
+#define WARNING(args...)  QDBG("WARNING ", ##args)
+#define DBG(args...)      QLOG(args)
 
-// #define ERR(args...)      QDBG("ERROR   ", ##args)
-// #define WARNING(args...)  QDBG("WARNING ", ##args)
-// #define DBG(args...)      QLOG(args)
+#endif
 
 // #define errprintf(fmt, ...){fprintf(stderr, __FUNCTION__ fmt, __VAR_ARGS__); }
 
-#define ERR(fmt, ...)      
-#define WARNING(fmt, ...)  
-#define DBG(fmt,...)      QLOG(fmt, __VA_ARGS__)
+
 
 //#define DBG(args...)      QDBG("DEBUG   ", ##args)
 
