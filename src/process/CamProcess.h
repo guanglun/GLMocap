@@ -35,6 +35,9 @@ private:
     QHash<POINT_STATE, GLPoint *> *hPoint;
     vector<GLPoint *> vPoint;
     CAMERA_RESULT result;
+
+    void match(vector<Point2f> centers);
+
 public:
     int index;
     CamProcess(OPENVIO *vio,QObject* parent = nullptr);

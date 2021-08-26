@@ -29,7 +29,7 @@ typedef DiagonalMatrix<double, 9> DiagMatrix9d;
 
 // constants for defualt values
 #define Default_f0 (1.0)
-#define Max_Iteration (100)
+#define Max_Iteration (7)
 #define Convergence_EPS (1e-12)
 #define Large_Number (1e99)
 

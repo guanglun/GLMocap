@@ -1,4 +1,5 @@
 #include "VisionProcess.h"
+#include "CameraPointMap.h"
 
 VisionProcess::VisionProcess(QObject *parent)
 {
@@ -12,21 +13,37 @@ void VisionProcess::init(int camNum)
 
 void VisionProcess::matchPoint(void)
 {
+    for(int i=0;i<camNum-1;i++)
+    {
+        if(camResult[i].vPoint.size() != camResult[i+1].vPoint.size())
+        {
+            DBG("Error Return");
+            return;
+        }
+    }
     pintNum = camResult[0].vPoint.size();
-
-    MatrixXd xy[pintNum];
-    MatrixXd xyc[pintNum];
-    double rerr[pintNum];
-    MatrixXi idx(pintNum, camNum);
+    //DBG("pintNum: %d",pintNum);
     
+    CameraPointMap cpMap;
+    MatrixXi map = cpMap.getPointMap(camNum,pintNum);
+    //std::cout << map << std::endl;
 
-    for (int pm = 0; pm < pintNum; pm++)
+    MatrixXd xy[map.rows()];
+    MatrixXd xyc[map.rows()];
+    double rerr[map.rows()];
+
+    MatrixXi idx(map.rows(), camNum);
+
+    for (int i = 0; i < map.rows(); i++)
     {
         for (int cm = 0; cm < camNum; cm++)
         {
-            xy[pm].col(cm)(0) = camResult[cm].vPoint[pm]->x;
-            xy[pm].col(cm)(1) = camResult[cm].vPoint[pm]->y;
-            idx.row(pm)(cm) = 1;
+            
+            xy[i].resize(2,camNum);
+            xyc[i].resize(2,camNum);
+            xy[i].col(cm)(0) = camResult[cm].vPoint[map.row(i)(cm)]->x;
+            xy[i].col(cm)(1) = camResult[cm].vPoint[map.row(i)(cm)]->y;
+            idx.row(i)(cm) = 1;
         }
     }
 
@@ -35,24 +52,13 @@ void VisionProcess::matchPoint(void)
                                                      xy,
                                                      xyc,
                                                      idx,
-                                                     rerr, vision_param.ptNum);
-}
+                                                     rerr, map.rows());
 
-void VisionProcess::forloop(int pm,int cm)
-{
-    // xy[pm].col(cm)(0) = camResult[cm].vPoint[pm]->x;
-    // xy[pm].col(cm)(1) = camResult[cm].vPoint[pm]->y;
-    // idx.row(pm)(cm) = 1;
-
-    // cm++;
-    // if(cm < camNum)
-    // {
-    //     for(int ppm =0;ppm<pintNum;ppm++)
-    //     {
-    //         forloop(ppm,cm);
-    //     }
-    // }
-        
+    for (int i = 0; i < map.rows(); i++)
+    {
+        std::cout << map.row(i) << " ";
+        mlog->show(QString::number(rerr[i]));
+    }
 }
 
 void VisionProcess::positionSlot(CAMERA_RESULT result)
@@ -109,36 +115,37 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
             //     }
             // }
 
-            vision_param.CamNum = camNum;
-            vision_param.ptNum = 1;
+            // vision_param.CamNum = camNum;
+            // vision_param.ptNum = 1;
 
-            for (int i = 0; i < camNum; i++)
-            {
-                if (camResult[i].pointNum <= 0)
-                {
-                    vision_param.idx.row(0)(i) = 0;
-                }
-                else
-                {
-                    foundNum++;
-                    vision_param.idx.row(0)(i) = 1;
-                    vision_param.xy[0].col(i)(0) = camResult[i].x[0];
-                    vision_param.xy[0].col(i)(1) = camResult[i].y[0];
-                }
-            }
+            // for (int i = 0; i < camNum; i++)
+            // {
+            //     if (camResult[i].pointNum <= 0)
+            //     {
+            //         vision_param.idx.row(0)(i) = 0;
+            //     }
+            //     else
+            //     {
+            //         foundNum++;
+            //         vision_param.idx.row(0)(i) = 1;
+            //         vision_param.xy[0].col(i)(0) = camResult[i].x[0];
+            //         vision_param.xy[0].col(i)(1) = camResult[i].y[0];
+            //     }
+            // }
 
             //vision_param.xy[0].col(0)(0) = 10;
 
-            // qint64 t1, t2;
-            // t1 = QDateTime::currentDateTime().toMSecsSinceEpoch();
+            qint64 t1, t2;
+            t1 = QDateTime::currentDateTime().toMSecsSinceEpoch();
 
-            if (foundNum >= 3)
-            {
-                multipleViewTriangulation.triangulation();
-            }
+            matchPoint();
+            // if (foundNum >= 3)
+            // {
+            //     multipleViewTriangulation.triangulation();
+            // }
 
-            // t2 = QDateTime::currentDateTime().toMSecsSinceEpoch();
-            // mlog->show(" diff " + QString::number(t2 - t1));
+            t2 = QDateTime::currentDateTime().toMSecsSinceEpoch();
+            mlog->show(" diff " + QString::number(t2 - t1));
         }
     }
 }

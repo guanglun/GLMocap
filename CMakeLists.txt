@@ -43,6 +43,7 @@ add_executable(MultiCam
     src/vision/MultipleViewTriangulation.cpp
     src/vision/MultipleViewTriangulationCommon.cpp
     src/vision/OptimalCorrection.cpp
+    src/vision/CameraPointMap.cpp
     src/firmwareUpgrade/firmwareUpgrade.cpp
     src/firmwareUpgrade/upgradeRecvThread.cpp
     src/firmwareUpgrade/upgradeThread.cpp

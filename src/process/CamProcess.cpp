@@ -1,9 +1,5 @@
 ﻿#include "CamProcess.h"
 
-
-
-
-
 CamProcess::CamProcess(OPENVIO *vio, QObject *parent)
 {
     this->vio = vio;
@@ -13,6 +9,44 @@ CamProcess::CamProcess(OPENVIO *vio, QObject *parent)
 void CamProcess::setShowFlag(Qt::CheckState flag)
 {
     showFlag = flag;
+}
+
+double distance(Point2f p1, Point2f p2)
+{
+    return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
+}
+
+void CamProcess::match(vector<Point2f> centers)
+{
+
+    if (vPoint.size() == 0)
+    {
+        //vPoint.clear();
+        for (int i = 0; i < centers.size(); i++)
+        {
+            vPoint.push_back(new GLPoint(POINT_STATE_NEW_FOUND, vio->number, centers[i].x, centers[i].y));
+        }
+    }
+    else if (vPoint.size() > 0 && centers.size() > 0)
+    {
+        for (int i = 0; i < vPoint.size(); i++)
+        {
+            int minIndex = 0;
+            double min = 9999999, minTmp;
+            for (int cm = 0; cm < centers.size(); cm++)
+            {
+                minTmp = distance(Point2f(vPoint[i]->x, vPoint[i]->y), centers[cm]);
+                if (minTmp < min)
+                {
+                    min = minTmp;
+                    minIndex = cm;
+                }
+            }
+
+            vPoint[i]->x = centers[minIndex].x;
+            vPoint[i]->y = centers[minIndex].y;
+        }
+    }
 }
 
 void CamProcess::camSlot(int index)
@@ -115,7 +149,6 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
     result.path = vio->saveImagePath;
     result.image = qImage;
     result.hPoint = hPoint;
-    
 
     if (contours.size() >= 36)
     {
@@ -143,23 +176,22 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
         minEnclosingCircle(contours[i], centers[i], radius[i]);
         circle(imageContours, centers[i], radius[i], Scalar(255), 1);
 
-        if (showFlag == Qt::CheckState::PartiallyChecked)
-        {
-            drawMarker(sourceImg, centers[i], Scalar(255, 0, 0), MarkerTypes::MARKER_CROSS, 20, 1, 8);
-        }
-
         if (i < PT_NUM_MAX)
         {
+
             result.x[i] = centers[i].x;
             result.y[i] = centers[i].y;
         }
     }
 
-    if(vPoint.size() == 0)
+    match(centers);
+
+    if (showFlag == Qt::CheckState::PartiallyChecked)
     {
-        for (int i = 0; i < centers.size(); i++)
+        for (int i = 0; i < vPoint.size(); i++)
         {
-            vPoint.push_back(new GLPoint(POINT_STATE_NEW_FOUND,vio->number,centers[i].x,centers[i].y));
+            putText(sourceImg, std::to_string(i), Point(vPoint[i]->x, vPoint[i]->y - 15), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255, 0, 0), 2);
+            drawMarker(sourceImg, Point2f(vPoint[i]->x, vPoint[i]->y), Scalar(255, 0, 0), MarkerTypes::MARKER_CROSS, 20, 1, 8);
         }
     }
 
@@ -180,5 +212,5 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
         emit visionImageSignals(QPixmap::fromImage(qImg));
 
     // t2 = QDateTime::currentDateTime().toMSecsSinceEpoch();
-    // mlog->show(QString::number(vio->number) + " diff " + QString::number(t2-time.toMSecsSinceEpoch()));        
+    // mlog->show(QString::number(vio->number) + " diff " + QString::number(t2-time.toMSecsSinceEpoch()));
 }

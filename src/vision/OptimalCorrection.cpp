@@ -73,10 +73,10 @@ MultipleViewTriangulation::optimal_correction_all(
                 make_trifocal_tensor(&(Prj[cnum]), &(tfT[cnum][0]));
 
             // correction
-            flag = optimal_correction(tfT, CamNum, xk, xkc, reperr,
+            flag = optimal_correction(tfT, CamNum, xk, xkc, reperr+pnum,
                                       Max_Iter, Conv_EPS);
 
-            mlog->show(">>>>>>> " + QString::number(CamNum) + " " + QString::number(flag) + " " + QString::number(reperr[0]));
+            //mlog->show(">>>>>>> " + QString::number(CamNum) + " " + QString::number(flag) + " " + QString::number(reperr[pnum]));
 
             if (flag) // success
             {
@@ -95,7 +95,8 @@ MultipleViewTriangulation::optimal_correction_all(
             }
             else // failed
             {
-				std::fprintf( stderr, "\n\nIndividual call to optimal_correction FAILED.\n\n" );
+                reperr[pnum] = -1;
+				//std::fprintf( stderr, "\n\nIndividual call to optimal_correction FAILED.\n\n" );
                 for (int cnum = 0; cnum < CamNum; cnum++)
                     Xkc0[pnum].col(cnum) = ZeroVec2;
             }

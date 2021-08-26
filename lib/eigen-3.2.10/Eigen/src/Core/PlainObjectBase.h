@@ -132,7 +132,7 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
     Base& base() { return *static_cast<Base*>(this); }
     const Base& base() const { return *static_cast<const Base*>(this); }
 
-    EIGEN_STRONG_INLINE Index rows() const { return m_storage.rows(); }
+    EIGEN_STRONG_INLINE Index  rows() const { return m_storage.rows(); }
     EIGEN_STRONG_INLINE Index cols() const { return m_storage.cols(); }
 
     EIGEN_STRONG_INLINE const Scalar& coeff(Index rowId, Index colId) const
