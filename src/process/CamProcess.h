@@ -19,7 +19,10 @@
 class OPENVIO;
 #include "openvio.h"
 
+#include <opencv2/opencv.hpp>
 
+using namespace cv;
+using namespace std;
 
 class CamProcess:public QObject        
 {
@@ -30,6 +33,7 @@ private:
     OPENVIO *vio = NULL;    
     Qt::CheckState showFlag = Qt::CheckState::Unchecked;
     QHash<POINT_STATE, GLPoint *> *hPoint;
+    vector<GLPoint *> vPoint;
     CAMERA_RESULT result;
 public:
     int index;

@@ -73,6 +73,7 @@ MultipleViewTriangulation::MultipleViewTriangulation()
     // float sum = sqrt(pow(Xr[0](0,0)-Xr[1](0,0),2)+pow(Xr[0](1,0)-Xr[1](1,0),2)+pow(Xr[0](2,0)-Xr[1](2,0),2));
 
     // std::cout << "sum\n" << sum << std::endl;
+    vision_param.idx.resize(PT_NUM_MAX,CAM_NUM_MAX);
 }
 
 Vector3d
@@ -121,7 +122,7 @@ MultipleViewTriangulation::triangulation_all(
     MatrixXd x[],
     Vector3d Xr[],
     int PtNum,
-    Matrix<double,PT_NUM_MAX,CAM_NUM_MAX>& idx,
+    MatrixXi& idx,
     double f0)
 {
     int CamNum;

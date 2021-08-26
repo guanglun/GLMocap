@@ -15,6 +15,7 @@
 #include "GLPoint.h"
 #include "MultipleViewTriangulation.h"
 
+using namespace std;
 
 typedef struct CAMERA_RESULT{
     int camIndex;
@@ -25,6 +26,7 @@ typedef struct CAMERA_RESULT{
     double x[PT_NUM_MAX];
     double y[PT_NUM_MAX];
     QHash<POINT_STATE, GLPoint *> *hPoint; 
+    vector<GLPoint *> vPoint;
 }CAMERA_RESULT;
 
 class VisionProcess:public QObject        
@@ -32,7 +34,9 @@ class VisionProcess:public QObject
     Q_OBJECT
 private:
     int camNum = 0;
-    
+    int pintNum = 0;
+    void matchPoint(void);
+    void forloop(int pm,int cm);
 public:
     int count = 0;
     bool isCapImage = false;

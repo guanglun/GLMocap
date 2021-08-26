@@ -205,6 +205,6 @@ bool Setting::loadVisionParam(QString path)
     }
 
     vision_param.xy[0].resize(2,vision_param.CamNum);
-
+    vision_param.idx.resize(PT_NUM_MAX,CAM_NUM_MAX);
     return true;
 }

@@ -7,6 +7,52 @@ VisionProcess::VisionProcess(QObject *parent)
 void VisionProcess::init(int camNum)
 {
     this->camNum = camNum;
+    
+}
+
+void VisionProcess::matchPoint(void)
+{
+    pintNum = camResult[0].vPoint.size();
+
+    MatrixXd xy[pintNum];
+    MatrixXd xyc[pintNum];
+    double rerr[pintNum];
+    MatrixXi idx(pintNum, camNum);
+    
+
+    for (int pm = 0; pm < pintNum; pm++)
+    {
+        for (int cm = 0; cm < camNum; cm++)
+        {
+            xy[pm].col(cm)(0) = camResult[cm].vPoint[pm]->x;
+            xy[pm].col(cm)(1) = camResult[cm].vPoint[pm]->y;
+            idx.row(pm)(cm) = 1;
+        }
+    }
+
+    multipleViewTriangulation.optimal_correction_all(vision_param.P,
+                                                     camNum,
+                                                     xy,
+                                                     xyc,
+                                                     idx,
+                                                     rerr, vision_param.ptNum);
+}
+
+void VisionProcess::forloop(int pm,int cm)
+{
+    // xy[pm].col(cm)(0) = camResult[cm].vPoint[pm]->x;
+    // xy[pm].col(cm)(1) = camResult[cm].vPoint[pm]->y;
+    // idx.row(pm)(cm) = 1;
+
+    // cm++;
+    // if(cm < camNum)
+    // {
+    //     for(int ppm =0;ppm<pintNum;ppm++)
+    //     {
+    //         forloop(ppm,cm);
+    //     }
+    // }
+        
 }
 
 void VisionProcess::positionSlot(CAMERA_RESULT result)
@@ -90,7 +136,6 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
             {
                 multipleViewTriangulation.triangulation();
             }
-
 
             // t2 = QDateTime::currentDateTime().toMSecsSinceEpoch();
             // mlog->show(" diff " + QString::number(t2 - t1));

@@ -71,6 +71,8 @@
         "xstring": "cpp",
         "thread": "cpp",
         "variant": "cpp",
-        "multipleviewtriangulation.h": "c"
+        "multipleviewtriangulation.h": "c",
+        "condition_variable": "cpp",
+        "future": "cpp"
     }
 }

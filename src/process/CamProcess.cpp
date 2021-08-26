@@ -1,9 +1,8 @@
 ﻿#include "CamProcess.h"
 
-#include <opencv2/opencv.hpp>
 
-using namespace cv;
-using namespace std;
+
+
 
 CamProcess::CamProcess(OPENVIO *vio, QObject *parent)
 {
@@ -97,9 +96,7 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
     Mat image;
     Mat sourceImg = cv::Mat(qImage.height(), qImage.width(), CV_8UC1, qImage.bits());
 
-    
     threshold(sourceImg, image, 150, 255.0, THRESH_BINARY);
-
 
     vector<vector<Point>> contours;
     vector<Vec4i> hierarchy;
@@ -112,13 +109,13 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
     vector<Point2f> centers(contours.size()); //圆心
     vector<float> radius(contours.size());    //半径
 
-    
     result.camIndex = vio->number;
     result.pointNum = (int)0;
     result.time = time.toMSecsSinceEpoch();
     result.path = vio->saveImagePath;
     result.image = qImage;
     result.hPoint = hPoint;
+    
 
     if (contours.size() >= 36)
     {
@@ -158,6 +155,15 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
         }
     }
 
+    if(vPoint.size() == 0)
+    {
+        for (int i = 0; i < centers.size(); i++)
+        {
+            vPoint.push_back(new GLPoint(POINT_STATE_NEW_FOUND,vio->number,centers[i].x,centers[i].y));
+        }
+    }
+
+    result.vPoint = vPoint;
     emit positionSignals(result);
 
     cv::cvtColor(imageContours, image, cv::COLOR_BGR2RGB);

@@ -21,6 +21,13 @@ public:
     int y=-1;
 
     GLPoint();
+    GLPoint(POINT_STATE state,int imageIndex,int x,int y)
+    {
+        this->state = state;
+        this->imageIndex = imageIndex;
+        this->x = x;
+        this->y = y;
+    }
 };
 
 #endif //POINT_H

@@ -41,8 +41,8 @@ struct VISION_PARAM
     Matrix33d R[CAM_NUM_MAX];
     RowVector3d T[CAM_NUM_MAX];
     MatrixXd xy[PT_NUM_MAX];
-    Matrix<double, PT_NUM_MAX, CAM_NUM_MAX> idx;
-
+    // Matrix<double, PT_NUM_MAX, CAM_NUM_MAX> idx;
+    MatrixXi idx;
     // Vector3d    Xr[PT_NUM_MAX];
 };
 
@@ -78,7 +78,7 @@ public:
                            MatrixXd x[],
                            Vector3d Xr[],
                            int PtNum,
-                           Matrix<double, PT_NUM_MAX, CAM_NUM_MAX> &idx,
+                           MatrixXi& idx,
                            double f0 = Default_f0);
 
     bool optimal_correction_all(
@@ -86,7 +86,7 @@ public:
         int CamNumAll,
         MatrixXd Xk0[],
         MatrixXd Xkc0[],
-        Matrix<double, PT_NUM_MAX, CAM_NUM_MAX> &idx,
+        MatrixXi& idx,
         double reperr[],
         int PtNum,
         int Max_Iter = Max_Iteration,

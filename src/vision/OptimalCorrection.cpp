@@ -8,7 +8,7 @@ MultipleViewTriangulation::optimal_correction_all(
     int CamNumAll,
     MatrixXd Xk0[],
     MatrixXd Xkc0[],
-    Matrix<double,PT_NUM_MAX,CAM_NUM_MAX>& idx,
+    MatrixXi& idx,
     double reperr[],
     int PtNum,
     int Max_Iter,
