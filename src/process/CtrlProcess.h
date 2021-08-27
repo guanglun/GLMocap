@@ -1,6 +1,7 @@
 #ifndef CTRLPROCESS_H
 #define CTRLPROCESS_H
 
+#include "workspace.h"
 #include <QObject>
 #include <QDebug>
 #include <QThread>

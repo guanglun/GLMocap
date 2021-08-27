@@ -36,7 +36,7 @@ int OPENVIO::open(void)
 
     if (dev_handle != NULL)
     {
-        DBG("already %s open", idShort);
+        //DBG("already %s open", idShort);
         return 0;
     }
 
@@ -372,7 +372,7 @@ int OPENVIO::sendCtrl(char request, uint8_t type, unsigned char *buffer, uint16_
     if (dev_handle != NULL)
     {
         //DBG("sendCtrl Start");
-        ret = libusb_control_transfer(dev_handle, LIBUSB_REQUEST_TYPE_VENDOR + type, request, 0, 0, buffer, len, 100);
+        ret = libusb_control_transfer(dev_handle, LIBUSB_REQUEST_TYPE_VENDOR + type, request, 0, 0, buffer, len, 3000);
         //DBG("sendCtrl End");
 
         if (ret < 0)
@@ -383,7 +383,7 @@ int OPENVIO::sendCtrl(char request, uint8_t type, unsigned char *buffer, uint16_
         else
         {
             DBG("sendCtrl %02X success. ret:%d", (uint8_t)request , ret);
-            return 0;
+            return ret;
         }
     }
 
@@ -557,8 +557,6 @@ int OPENVIO::ctrlCamSyncStatus(uint8_t state)
     {
         return -1;
     }
-        
-    QThread::msleep(10);
 
     ret = getCameraStatus();
     if (ret < 0)
@@ -583,8 +581,6 @@ int OPENVIO::ctrlCamSyncMode(uint8_t mode)
     {
         return -1;
     }
-    
-    QThread::msleep(10);
 
     ret = getCameraStatus();
     if (ret < 0)
@@ -609,8 +605,6 @@ int OPENVIO::ctrlCamFps(uint8_t fps)
     {
         return -1;
     }
-    
-    QThread::msleep(10);
 
     ret = getCameraStatus();
     if (ret < 0)
@@ -636,8 +630,6 @@ int OPENVIO::ctrlInfraredPwm(uint8_t pwm)
     {
         return -1;
     }
-    
-    QThread::msleep(10);
 
     ret = getCameraStatus();
     if (ret < 0)
@@ -671,11 +663,12 @@ int OPENVIO::ctrlCamSetFrameSizeNum(uint16_t num)
     return 0;
 }
 
+#define CAMERA_STATE_SIZE 13
 int OPENVIO::getCameraStatus()
 {
     int ret = 0;
-    ret = sendCtrl(REQUEST_GET_CAMERA_STATUS, LIBUSB_ENDPOINT_IN, ctrl_buffer, 13);
-    if (ret < 0)
+    ret = sendCtrl(REQUEST_GET_CAMERA_STATUS, LIBUSB_ENDPOINT_IN, ctrl_buffer, CAMERA_STATE_SIZE);
+    if (ret != CAMERA_STATE_SIZE)
     {
         return -1;
     }
@@ -717,8 +710,6 @@ int OPENVIO::ctrlCamSetExposure(int value)
     {
         return -1;
     }
-
-    QThread::msleep(10);
 
     ret = getCameraStatus();
     if (ret < 0)
