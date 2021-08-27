@@ -18,33 +18,35 @@ double distance(Point2f p1, Point2f p2)
 
 void CamProcess::match(vector<Point2f> centers)
 {
-
-    if (vPoint.size() == 0)
+    if (vio->visionProcess->matchState == MATCH_IDLE)
     {
-        //vPoint.clear();
+        vPoint.clear();
         for (int i = 0; i < centers.size(); i++)
         {
             vPoint.push_back(new GLPoint(POINT_STATE_NEW_FOUND, vio->number, centers[i].x, centers[i].y));
         }
     }
-    else if (vPoint.size() > 0 && centers.size() > 0)
+    else if (vio->visionProcess->matchState == MATCH_OK)
     {
-        for (int i = 0; i < vPoint.size(); i++)
+        if (vPoint.size() > 0 && centers.size() > 0)
         {
-            int minIndex = 0;
-            double min = 9999999, minTmp;
-            for (int cm = 0; cm < centers.size(); cm++)
+            for (int i = 0; i < vPoint.size(); i++)
             {
-                minTmp = distance(Point2f(vPoint[i]->x, vPoint[i]->y), centers[cm]);
-                if (minTmp < min)
+                int minIndex = 0;
+                double min = 9999999, minTmp;
+                for (int cm = 0; cm < centers.size(); cm++)
                 {
-                    min = minTmp;
-                    minIndex = cm;
+                    minTmp = distance(Point2f(vPoint[i]->x, vPoint[i]->y), centers[cm]);
+                    if (minTmp < min)
+                    {
+                        min = minTmp;
+                        minIndex = cm;
+                    }
                 }
-            }
 
-            vPoint[i]->x = centers[minIndex].x;
-            vPoint[i]->y = centers[minIndex].y;
+                vPoint[i]->x = centers[minIndex].x;
+                vPoint[i]->y = centers[minIndex].y;
+            }
         }
     }
 }
@@ -190,7 +192,11 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
     {
         for (int i = 0; i < vPoint.size(); i++)
         {
-            putText(sourceImg, std::to_string(i), Point(vPoint[i]->x, vPoint[i]->y - 15), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255, 0, 0), 2);
+            if(vio->visionProcess->matchState ==  MATCH_OK)
+            {
+                putText(sourceImg, std::to_string(vPoint[i]->id), Point(vPoint[i]->x, vPoint[i]->y - 15), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255, 0, 0), 2);
+            }
+            
             drawMarker(sourceImg, Point2f(vPoint[i]->x, vPoint[i]->y), Scalar(255, 0, 0), MarkerTypes::MARKER_CROSS, 20, 1, 8);
         }
     }

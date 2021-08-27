@@ -19,7 +19,8 @@ public:
     int imageIndex = -1;
     int x=-1;
     int y=-1;
-
+    int id = -1;
+    
     GLPoint();
     GLPoint(POINT_STATE state,int imageIndex,int x,int y)
     {

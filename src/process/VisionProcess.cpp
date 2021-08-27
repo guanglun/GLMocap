@@ -22,7 +22,19 @@ static int getIndex(double input[], int size, double search)
     return -1;
 }
 
-static void removeOther(int camNum, MatrixXi map, int indexResult[], vector<double> *rerrSort)
+static void eraseData(vector<double> *rerrSort, double eraseData)
+{
+    for (int i = 0; i < rerrSort->size(); i++)
+    {
+        if ((*rerrSort)[i] == eraseData)
+        {
+            rerrSort->erase(rerrSort->begin() + i);
+            break;
+        }
+    }
+}
+
+static void removeOther(int camNum, MatrixXi map, int indexResult[], vector<double> *rerrSort,double rerr[])
 {
     for (int pm = 0; pm < map.rows(); pm++)
     {
@@ -32,7 +44,9 @@ static void removeOther(int camNum, MatrixXi map, int indexResult[], vector<doub
             {
                 if (map.row(indexResult[0])(cm) == map.row(pm)(cm))
                 {
-                    rerrSort->erase(rerrSort->begin() + pm);
+                    //DBG("rerrSort size %d remove pm : %d",rerrSort->size(),pm);
+                    //rerrSort->erase(rerrSort->begin() + pm);
+                    eraseData(rerrSort,rerr[pm]);
                     break;
                 }
             }
@@ -40,7 +54,7 @@ static void removeOther(int camNum, MatrixXi map, int indexResult[], vector<doub
     }
 }
 
-void VisionProcess::matchPoint(void)
+int VisionProcess::matchPoint(void)
 {
 
     for (int i = 0; i < camNum - 1; i++)
@@ -48,7 +62,7 @@ void VisionProcess::matchPoint(void)
         if (camResult[i].vPoint.size() != camResult[i + 1].vPoint.size())
         {
             DBG("Error Return, vPoint size not match");
-            return;
+            return -1;
         }
     }
     pintNum = camResult[0].vPoint.size();
@@ -56,7 +70,7 @@ void VisionProcess::matchPoint(void)
     if (pintNum < 1)
     {
         DBG("Error Return, pintNum < 1");
-        return;
+        return -1;
     }
     //DBG("pintNum: %d",pintNum);
 
@@ -92,34 +106,50 @@ void VisionProcess::matchPoint(void)
                                                      idx,
                                                      rerr, map.rows());
 
+    std::cout << "===>>>result1:\r\n";
     for (int i = 0; i < map.rows(); i++)
     {
-        std::cout << "===>>>result1:\r\n" << map.row(i) << " ";
+        std::cout << i << " : " << map.row(i) << " ";
         mlog->show(QString::number(rerr[i]));
-        rerrSort.push_back(rerr[i]);
+        if(rerr[i] != -1)
+        {
+            rerrSort.push_back(rerr[i]);
+        }
+        
     }
 
     sort(rerrSort.begin(), rerrSort.end());
 
     for (int pm; pm < pintNum; pm++)
     {
+        
         indexResult[pm] = getIndex(rerr, map.rows(), rerrSort[pm]);
+        DBG("\r\nindex pm : %d",indexResult[pm]);
         if (indexResult[pm] == -1)
         {
             DBG("Error Return, indexResult[%d] == -1",pm);
-            return;
+            return -1;
         }
 
-        removeOther(camNum, map, indexResult, &rerrSort);
+        removeOther(camNum, map, indexResult, &rerrSort,rerr);
     }
 
+    std::cout << "===>>>result2:\r\n";
     for (int pm; pm < pintNum; pm++)
     {
-
         int index = getIndex(rerr, map.rows(), rerrSort[pm]);
-        std::cout << "===>>>result2:\r\n" << map.row(index) << " ";
+        std::cout << index << " : " << map.row(index) << " ";
         mlog->show(QString::number(rerr[index]));
+
+        for(int cm = 0;cm < camNum;cm++)
+        {
+            camResult[cm].vPoint[map.row(index)(cm)]->id = pm;
+        }
+        
     }
+
+    return 0;
+    
 }
 
 void VisionProcess::positionSlot(CAMERA_RESULT result)
@@ -196,17 +226,26 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
 
             //vision_param.xy[0].col(0)(0) = 10;
 
-            qint64 t1, t2;
-            t1 = QDateTime::currentDateTime().toMSecsSinceEpoch();
+            if(matchState == MATCH_IDLE)
+            {
+                qint64 t1, t2;
+                t1 = QDateTime::currentDateTime().toMSecsSinceEpoch();
+                matchState = MATCH_ING;
+                if(matchPoint() == 0)
+                {
+                    matchState = MATCH_OK;
+                }else{
+                    matchState = MATCH_IDLE;
+                }
+                // if (foundNum >= 3)
+                // {
+                //     multipleViewTriangulation.triangulation();
+                // }
 
-            matchPoint();
-            // if (foundNum >= 3)
-            // {
-            //     multipleViewTriangulation.triangulation();
-            // }
+                t2 = QDateTime::currentDateTime().toMSecsSinceEpoch();
+                mlog->show(" diff " + QString::number(t2 - t1));
+            }
 
-            t2 = QDateTime::currentDateTime().toMSecsSinceEpoch();
-            mlog->show(" diff " + QString::number(t2 - t1));
         }
     }
 }

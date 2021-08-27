@@ -17,6 +17,13 @@
 
 using namespace std;
 
+typedef enum MATCH_STATE{
+    MATCH_IDLE,
+    MATCH_ING,
+    MATCH_OK,
+
+}MATCH_STATE;
+
 typedef struct CAMERA_RESULT{
     int camIndex;
     int pointNum;
@@ -33,11 +40,13 @@ class VisionProcess:public QObject
 {
     Q_OBJECT
 private:
+    
     int camNum = 0;
     int pintNum = 0;
-    void matchPoint(void);
+    int matchPoint(void);
     void forloop(int pm,int cm);
 public:
+    MATCH_STATE matchState = MATCH_IDLE;
     int count = 0;
     bool isCapImage = false;
     

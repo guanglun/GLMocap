@@ -188,6 +188,7 @@ void WinUSBDriver::autoScan(void)
                                 vio->setItem(pModelOpenvio);
                                 vio->ctrlCamStatus(0);
                                 vio->camRecvStart();
+                                vio->visionProcess = visionProcess;
                                 isNew = true;
                             }else{
                                 vio->close();

@@ -55,7 +55,7 @@ private:
     
 public:
     CamProcess *camProcess;
-
+    VisionProcess *visionProcess;
     USBThread *camThread,*imuThread;
     enum SENSOR_STATUS camStatus,imuStatus;
     int recv_len_count = 0;
