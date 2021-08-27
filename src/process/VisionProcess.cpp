@@ -8,29 +8,67 @@ VisionProcess::VisionProcess(QObject *parent)
 void VisionProcess::init(int camNum)
 {
     this->camNum = camNum;
-    
+}
+
+static int getIndex(double input[], int size, double search)
+{
+    for (int i = 0; i < size; i++)
+    {
+        if (input[i] == search)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+static void removeOther(int camNum, MatrixXi map, int indexResult[], vector<double> *rerrSort)
+{
+    for (int pm = 0; pm < map.rows(); pm++)
+    {
+        for (int cm = 0; cm < camNum; cm++)
+        {
+            if (indexResult[0] != pm)
+            {
+                if (map.row(indexResult[0])(cm) == map.row(pm)(cm))
+                {
+                    rerrSort->erase(rerrSort->begin() + pm);
+                    break;
+                }
+            }
+        }
+    }
 }
 
 void VisionProcess::matchPoint(void)
 {
-    for(int i=0;i<camNum-1;i++)
+
+    for (int i = 0; i < camNum - 1; i++)
     {
-        if(camResult[i].vPoint.size() != camResult[i+1].vPoint.size())
+        if (camResult[i].vPoint.size() != camResult[i + 1].vPoint.size())
         {
-            DBG("Error Return");
+            DBG("Error Return, vPoint size not match");
             return;
         }
     }
     pintNum = camResult[0].vPoint.size();
+
+    if (pintNum < 1)
+    {
+        DBG("Error Return, pintNum < 1");
+        return;
+    }
     //DBG("pintNum: %d",pintNum);
-    
+
     CameraPointMap cpMap;
-    MatrixXi map = cpMap.getPointMap(camNum,pintNum);
+    MatrixXi map = cpMap.getPointMap(camNum, pintNum);
+    int indexResult[pintNum];
     //std::cout << map << std::endl;
 
     MatrixXd xy[map.rows()];
     MatrixXd xyc[map.rows()];
     double rerr[map.rows()];
+    vector<double> rerrSort;
 
     MatrixXi idx(map.rows(), camNum);
 
@@ -38,9 +76,9 @@ void VisionProcess::matchPoint(void)
     {
         for (int cm = 0; cm < camNum; cm++)
         {
-            
-            xy[i].resize(2,camNum);
-            xyc[i].resize(2,camNum);
+
+            xy[i].resize(2, camNum);
+            xyc[i].resize(2, camNum);
             xy[i].col(cm)(0) = camResult[cm].vPoint[map.row(i)(cm)]->x;
             xy[i].col(cm)(1) = camResult[cm].vPoint[map.row(i)(cm)]->y;
             idx.row(i)(cm) = 1;
@@ -56,8 +94,31 @@ void VisionProcess::matchPoint(void)
 
     for (int i = 0; i < map.rows(); i++)
     {
-        std::cout << map.row(i) << " ";
+        std::cout << "===>>>result1:\r\n" << map.row(i) << " ";
         mlog->show(QString::number(rerr[i]));
+        rerrSort.push_back(rerr[i]);
+    }
+
+    sort(rerrSort.begin(), rerrSort.end());
+
+    for (int pm; pm < pintNum; pm++)
+    {
+        indexResult[pm] = getIndex(rerr, map.rows(), rerrSort[pm]);
+        if (indexResult[pm] == -1)
+        {
+            DBG("Error Return, indexResult[%d] == -1",pm);
+            return;
+        }
+
+        removeOther(camNum, map, indexResult, &rerrSort);
+    }
+
+    for (int pm; pm < pintNum; pm++)
+    {
+
+        int index = getIndex(rerr, map.rows(), rerrSort[pm]);
+        std::cout << "===>>>result2:\r\n" << map.row(index) << " ";
+        mlog->show(QString::number(rerr[index]));
     }
 }
 
