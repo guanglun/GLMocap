@@ -419,7 +419,7 @@ void FormCamWindow::on_action_position_triggered()
 {
     if (!fVisionWindow.isVisible())
     {
-        connect(&qwinusb->visionProcess->multipleViewTriangulation, SIGNAL(onXYZSignals(double, double, double)), &fVisionWindow, SLOT(onXYZSlot(double, double, double)));
+        connect(&qwinusb->visionProcess->multipleViewTriangulation, SIGNAL(onXYZSignals(Vector3d *,int)), &fVisionWindow, SLOT(onXYZSlot(Vector3d *,int)));
         fVisionWindow.show();
     }
 }
@@ -428,7 +428,7 @@ void FormCamWindow::on_action3d_view_triggered()
 {
     if (!f3DViewWindow.isVisible())
     {
-        connect(&qwinusb->visionProcess->multipleViewTriangulation, SIGNAL(onXYZSignals(double, double, double)), &f3DViewWindow, SLOT(onXYZSlot(double, double, double)));
+        connect(&qwinusb->visionProcess->multipleViewTriangulation, SIGNAL(onXYZSignals(Vector3d *,int)), &f3DViewWindow, SLOT(onXYZSlot(Vector3d *,int)));
         f3DViewWindow.show();
     }
 }

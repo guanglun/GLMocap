@@ -145,7 +145,6 @@ int VisionProcess::matchPoint(void)
         {
             camResult[cm].vPoint[map.row(index)(cm)]->id = pm;
         }
-        
     }
 
     return 0;
@@ -209,20 +208,7 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
             // vision_param.CamNum = camNum;
             // vision_param.ptNum = 1;
 
-            // for (int i = 0; i < camNum; i++)
-            // {
-            //     if (camResult[i].pointNum <= 0)
-            //     {
-            //         vision_param.idx.row(0)(i) = 0;
-            //     }
-            //     else
-            //     {
-            //         foundNum++;
-            //         vision_param.idx.row(0)(i) = 1;
-            //         vision_param.xy[0].col(i)(0) = camResult[i].x[0];
-            //         vision_param.xy[0].col(i)(1) = camResult[i].y[0];
-            //     }
-            // }
+
 
             //vision_param.xy[0].col(0)(0) = 10;
 
@@ -244,6 +230,35 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
 
                 t2 = QDateTime::currentDateTime().toMSecsSinceEpoch();
                 //mlog->show(" diff " + QString::number(t2 - t1));
+            }else if(matchState == MATCH_OK)
+            {
+                pintNum = camResult[0].vPoint.size();
+                
+                vision_param.ptNum = pintNum;
+                vision_param.CamNum = camNum;
+
+                vision_param.idx.resize(camNum,pintNum);
+
+                for (int pm = 0; pm < pintNum; pm++)
+                {
+                    vision_param.xy[pm].resize(2,camNum);
+                    for (int cm = 0; cm < camNum; cm++)
+                    {
+                        for (int ppm = 0; ppm < pintNum; ppm++)
+                        {
+                            if(camResult[cm].vPoint[ppm]->id == pm)
+                            {
+                                foundNum++;
+                                vision_param.idx.row(cm)(pm) = 1;
+                                vision_param.xy[pm].col(cm)(0) = camResult[cm].vPoint[ppm]->x;
+                                vision_param.xy[pm].col(cm)(1) = camResult[cm].vPoint[ppm]->y;
+                                break;
+                            }
+                        }
+                    }
+                }       
+
+                multipleViewTriangulation.triangulation();
             }
 
         }

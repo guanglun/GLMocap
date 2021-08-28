@@ -8,6 +8,8 @@
 
 #include "workspace.h"
 
+#include "MultipleViewTriangulation.h"
+
 namespace Ui {
 class FormVisionWindow;
 }
@@ -21,7 +23,7 @@ public:
     ~FormVisionWindow();
 
 private slots:
-    void onXYZSlot(double x,double y,double z); 
+    void onXYZSlot(Vector3d *Xr,int size); 
 signals:
 
 private:

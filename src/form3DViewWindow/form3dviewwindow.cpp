@@ -24,9 +24,9 @@ Form3DViewWindow::~Form3DViewWindow()
     delete ui;
 }
 
-void Form3DViewWindow::onXYZSlot(double x,double y,double z)
+void Form3DViewWindow::onXYZSlot(Vector3d *Xr,int size)
 {
-    camview->setPosition(x/100,y/100,z/100);
+    camview->setPosition(Xr,size);
 }
 
 void Form3DViewWindow::onTimeOut()

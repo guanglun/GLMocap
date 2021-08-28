@@ -73,6 +73,7 @@
         "variant": "cpp",
         "multipleviewtriangulation.h": "c",
         "condition_variable": "cpp",
-        "future": "cpp"
+        "future": "cpp",
+        "iterator": "cpp"
     }
 }

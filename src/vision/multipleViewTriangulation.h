@@ -122,7 +122,7 @@ public:
 private slots:
     void positionSlot(int camIndex, double x, double y);
 signals:
-    void onXYZSignals(double x, double y, double z);
+    void onXYZSignals(Vector3d *Xr,int size);
 };
 
 #endif

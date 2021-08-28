@@ -11,7 +11,7 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 
-
+#include "MultipleViewTriangulation.h"
 
 class CamView : public QOpenGLWidget ,
                      protected QOpenGLFunctions
@@ -26,7 +26,7 @@ public:
     CamView(QWidget *parent = 0);
     ~CamView();
     void setAngle(float rol, float pit, float yaw);
-    void setPosition(float x, float y, float z);
+    void setPosition(Vector3d *Xr,int size);
 
 protected:
     //Three basic override function
@@ -54,6 +54,8 @@ private:
     float rol = 0,pit = 0,yaw = 0;
     float px = 0,py = 0,pz = 0;
 
+    Vector3d *Xr;
+    int size;
 
     void cameraTurn(double yaw, double pitch, double R_long);
     void cameraInit(double yaw, double pitch, double R_long);

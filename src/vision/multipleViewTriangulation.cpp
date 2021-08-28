@@ -1,6 +1,11 @@
 #include "MultipleViewTriangulation.h"
 #include <iostream>
 
+#include <opencv2/opencv.hpp>
+
+using namespace cv;
+using namespace std;
+
 // struct VISION_PARAM vision_param = {
 //     .CamNum = 0,
 // };
@@ -195,6 +200,11 @@ void MultipleViewTriangulation::positionSlot(int camIndex, double x,double y)
     
 }
 
+static double distance3d(Point3d p1,Point3d p2)
+{
+    return sqrt(pow(p1.x-p2.x,2)+pow(p1.y-p2.y,2)+pow(p1.z-p2.z,2));
+}
+
 void MultipleViewTriangulation::triangulation(void)
 {
     double rerr[vision_param.ptNum];
@@ -207,7 +217,20 @@ void MultipleViewTriangulation::triangulation(void)
                             rerr,vision_param.ptNum);
 
     triangulation_all(vision_param.P,vision_param.CamNum,vision_param.xy,Xr,vision_param.ptNum,vision_param.idx);
-    emit onXYZSignals(Xr[0](0,0),Xr[0](1,0),Xr[0](2,0));
+
+    // for(int pm = 0;pm<vision_param.ptNum;pm++)
+    // {
+    //     mlog->show(QString::number(pm) + " : " 
+    //                                     + QString::number(Xr[pm](0,0)) + " "
+    //                                     + QString::number(Xr[pm](1,0)) + " "
+    //                                     + QString::number(Xr[pm](2,0)));
+    // }
+    double dis = distance3d( Point3d(Xr[0](0,0),Xr[0](1,0),Xr[0](2,0)),
+                Point3d(Xr[1](0,0),Xr[1](1,0),Xr[1](2,0)));
+                
+    mlog->show("distance: " + QString::number(dis));
+
+    emit onXYZSignals(Xr,vision_param.ptNum);
 }
 
 Matrix3d MultipleViewTriangulation::eulerAnglesToRotationMatrix(Vector3d &theta)
