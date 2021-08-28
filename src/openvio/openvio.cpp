@@ -34,7 +34,7 @@ int OPENVIO::open(void)
 {
     int ret = 0;
 
-    if (dev_handle != NULL)
+    if (dev_handle != nullptr)
     {
         //DBG("already %s open", idShort);
         return 0;
@@ -68,7 +68,7 @@ int OPENVIO::open(void)
 claim_fail:
     libusb_close(dev_handle);
 open_fail:
-    dev_handle = NULL;
+    dev_handle = nullptr;
 init_fail:
     DBG("open fail");
     return -1;
@@ -76,13 +76,13 @@ init_fail:
 
 int OPENVIO::close(void)
 {
-    if (dev_handle != NULL)
+    if (dev_handle != nullptr)
     {
         libusb_release_interface(dev_handle, 0);
         libusb_close(dev_handle);
     }
     DBG("close");
-    dev_handle = NULL;
+    dev_handle = nullptr;
     return 0;
 }
 
@@ -364,12 +364,12 @@ void OPENVIO::closeSlot(void)
 int OPENVIO::sendCtrl(char request, uint8_t type, unsigned char *buffer, uint16_t len)
 {
     int ret = 0;
-    if (dev_handle == NULL)
+    if (dev_handle == nullptr)
     {
         open();
     }
 
-    if (dev_handle != NULL)
+    if (dev_handle != nullptr)
     {
         //DBG("sendCtrl Start");
         ret = libusb_control_transfer(dev_handle, LIBUSB_REQUEST_TYPE_VENDOR + type, request, 0, 0, buffer, len, 3000);

@@ -64,6 +64,9 @@ private slots:
     void on_pb_start_clicked();
     void on_pb_stop_clicked();
     void on_pb_capture_clicked();
+    void on_pb_init_module_clicked();
+    void on_pb_open_all_cam_clicked();
+
     void vioItemSelected(const QModelIndex &index);
     void doubleClickedSlot(const QModelIndex &index);
     void onTimeOut(); 
@@ -75,6 +78,7 @@ private slots:
     void on_actionLog_view_triggered();
     void on_actionUpgrade_triggered();
     void on_actionConfig_triggered();
+    void on_actionSet_threshold_triggered();
     
 private:
     Ui::FormCamWindow *ui;

@@ -63,9 +63,9 @@ private:
     bool is_open;
     
     libusb_device **devs,*dev;
-    libusb_device_handle *dev_handle = NULL;
+    libusb_device_handle *dev_handle = nullptr;
     struct libusb_device_descriptor desc;
-    libusb_config_descriptor *cfg = NULL;
+    libusb_config_descriptor *cfg = nullptr;
     libusb_device **usb_list;
     
 	struct libusb_config_descriptor* conf;

@@ -171,7 +171,7 @@ void FirmwareUpgrade::send_iap_reboot()
     frame_s_tmp.TargetID = TARGET_ID;
     frame_s_tmp.Cmd = CMD_IAP_RESET;
     frame_s_tmp.DataIndex = 0x00;
-    frame_s_tmp.frame_data = NULL;
+    frame_s_tmp.frame_data = nullptr;
     frame_s_tmp.send_frame_fun = send_usb_data;
 
     creat_send_cmd(&parse_usb, &frame_s_tmp);
@@ -185,7 +185,7 @@ void FirmwareUpgrade::send_iap_reboot_to_bootloader()
     frame_s_tmp.TargetID = TARGET_ID;
     frame_s_tmp.Cmd = CMD_IAP_REBOOT_TO_BOOTLOADER;
     frame_s_tmp.DataIndex = 0x00;
-    frame_s_tmp.frame_data = NULL;
+    frame_s_tmp.frame_data = nullptr;
     frame_s_tmp.send_frame_fun = send_usb_data;
 
     creat_send_cmd(&parse_usb, &frame_s_tmp);

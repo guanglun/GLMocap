@@ -51,10 +51,12 @@ void FormVioWindow::setQData(OPENVIO *vio)
     
     ui->lb_img->setScaledContents(true);
 
-    ctrlProcess->setVio(NULL,vio);
+    ctrlProcess->setVio(nullptr,vio);
 
     getCameraStatusSlot();
     vio->camProcess->setShowFlag(this->ui->cb_vision->checkState());
+
+    move((vio->number%2+1) * 10 + this->width()*(vio->number%2) ,this->height()*(vio->number/2) + (vio->number/2+1) * 40);
 }
 
 static bool isDirExist(QString fullPath)
@@ -158,7 +160,7 @@ void FormVioWindow::on_pb_vision_clicked()
 
 void FormVioWindow::on_pb_cam_clicked()
 {
-    ctrlProcess->setVio(NULL,vio);
+    ctrlProcess->setVio(nullptr,vio);
     if(ui->pb_cam->text().contains("cam start"))
     {
         emit ctrlCamStatusSignal(1);
@@ -170,7 +172,7 @@ void FormVioWindow::on_pb_cam_clicked()
 void FormVioWindow::on_pb_sync_clicked()
 {
     DBG("sync start");
-    ctrlProcess->setVio(NULL,vio);
+    ctrlProcess->setVio(nullptr,vio);
     if(ui->pb_sync->text().contains("sync start"))
     {
         emit ctrlCamSyncStatusSignal(1);
@@ -181,7 +183,7 @@ void FormVioWindow::on_pb_sync_clicked()
 
 void FormVioWindow::getCameraStatusSlot(void)
 {
-    ctrlProcess->setVio(NULL,vio);
+    //ctrlProcess->setVio(nullptr,vio);
     if(vio->camStatus != 0)
     {
         ui->pb_cam->setText("cam stop ");

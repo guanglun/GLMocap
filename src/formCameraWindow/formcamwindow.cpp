@@ -91,7 +91,7 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
     QAction *rightClickItem = submenu.exec(item);
     if (rightClickItem && rightClickItem->text().contains("Setup"))
     {
-        formCamConfig->setQData(NULL, vio);
+        formCamConfig->setQData(nullptr, vio);
         if (formCamConfig->isVisible() == false)
         {
             formCamConfig->show();
@@ -165,34 +165,34 @@ FormCamWindow::~FormCamWindow()
 
 void FormCamWindow::on_pb_start_clicked()
 {
-    ctrlProcess->setVio(&qwinusb->vioMap, NULL);
+    ctrlProcess->setVio(&qwinusb->vioMap, nullptr);
     qwinusb->visionProcess->init(qwinusb->vioMap.size());
     emit ctrlMultemCamStartSignal();
 }
 
 void FormCamWindow::on_pb_stop_clicked()
 {
-    ctrlProcess->setVio(&qwinusb->vioMap, NULL);
+    ctrlProcess->setVio(&qwinusb->vioMap, nullptr);
     emit ctrlMultemCamStopSignal();
 }
 
 void FormCamWindow::closeEvent(QCloseEvent *event)
 {
-    
+
     qwinusb->timer->stop();
 
     ctrlProcessThread.quit();
     ctrlProcessThread.wait();
 
-    if(f3DViewWindow.isEnabled())
+    if (f3DViewWindow.isEnabled())
         f3DViewWindow.close();
-    if(fVisionWindow.isEnabled())
-        fVisionWindow.close();        
-    if(fLogWindow.isEnabled())
-        fLogWindow.close();    
-    if(formCamConfig->isEnabled())
-        formCamConfig->close();   
-    
+    if (fVisionWindow.isEnabled())
+        fVisionWindow.close();
+    if (fLogWindow.isEnabled())
+        fLogWindow.close();
+    if (formCamConfig->isEnabled())
+        formCamConfig->close();
+
     qwinusb->closeDevice();
 }
 
@@ -225,7 +225,7 @@ static bool isDirExist(QString fullPath)
 
 void FormCamWindow::on_actionConfig_triggered()
 {
-    formCamConfig->setQData(&qwinusb->vioMap, NULL);
+    formCamConfig->setQData(&qwinusb->vioMap, nullptr);
     if (formCamConfig->isVisible() == false)
     {
         formCamConfig->show();
@@ -267,7 +267,7 @@ void FormCamWindow::on_pb_capture_clicked()
              it != qwinusb->vioMap.end(); it++)
         {
             OPENVIO *vio = it.value();
-            if (vio->dev_handle != NULL)
+            if (vio->dev_handle != nullptr)
             {
                 if (vio->number == -1)
                 {
@@ -289,6 +289,11 @@ void FormCamWindow::on_pb_capture_clicked()
         qwinusb->visionProcess->isCapImage = false;
         ui->pb_capture->setText("Capture");
     }
+}
+
+void FormCamWindow::on_pb_init_module_clicked()
+{
+    qwinusb->visionProcess->matchState = MATCH_IDLE;
 }
 
 void FormCamWindow::vioItemSelected(const QModelIndex &index)
@@ -331,6 +336,34 @@ void FormCamWindow::doubleClickedSlot(const QModelIndex &index)
     }
 }
 
+void FormCamWindow::on_pb_open_all_cam_clicked()
+{
+    for (QMap<uint8_t, OPENVIO *>::Iterator it = qwinusb->vioMap.begin();
+         it != qwinusb->vioMap.end(); it++)
+    {
+
+        OPENVIO *vio = it.value();
+        if (vio != nullptr)
+        {
+            if (vio->type == TYPE_OPENVIO)
+            {
+                if (vio->formVioWindow == nullptr)
+                {
+                    vio->formVioWindow = new FormVioWindow(ctrlProcess);
+                    vio->formVioWindow->setQData(vio);
+                }
+
+                if (vio->formVioWindow->isVisible() == false)
+                {
+                    vio->formVioWindow->show();
+                    //vio->open();
+                    //vio->camStart();
+                }
+            }
+        }
+    }
+}
+
 QString getSpeed(int speed)
 {
     QString speedStr;
@@ -362,8 +395,8 @@ void FormCamWindow::onTimeOut()
          it != qwinusb->vioMap.end(); it++)
     {
 
-            OPENVIO *vio = it.value();
-                if(vio != nullptr)
+        OPENVIO *vio = it.value();
+        if (vio != nullptr)
         {
             QString speedStr;
             recv_count_1s += vio->recv_count_1s;
@@ -376,7 +409,6 @@ void FormCamWindow::onTimeOut()
             vio->recv_count_1s = 0;
             vio->setSpeed(speedStr);
         }
-
     }
 
     status_speed->setText(getSpeed(recv_count_1s) + " " + QString::number(qwinusb->visionProcess->count) + "position/s");
@@ -453,5 +485,25 @@ void FormCamWindow::on_actionImg_save_path_triggered()
     {
         setting->setImagePath(srcDirPath);
         //qDebug() << "srcDirPath=" << srcDirPath;
+    }
+}
+
+void FormCamWindow::on_actionSet_threshold_triggered()
+{
+    int thr = setting->getThreshold();
+    bool bOk = false;
+    int threshold = QInputDialog::getInt(this,
+                                         "change threshold",
+                                         "input new threshold",
+                                         thr, //默认值
+                                         0,   //最小值
+                                         255, //最大值
+                                         1,   //步进
+                                         &bOk);
+
+    if (bOk && threshold >= 0 && threshold <= 255)
+    {
+
+        setting->setThreshold(threshold);
     }
 }

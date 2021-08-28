@@ -132,7 +132,7 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
     Mat image;
     Mat sourceImg = cv::Mat(qImage.height(), qImage.width(), CV_8UC1, qImage.bits());
 
-    threshold(sourceImg, image, 150, 255.0, THRESH_BINARY);
+    threshold(sourceImg, image, setting->threshold, 255.0, THRESH_BINARY);
 
     vector<vector<Point>> contours;
     vector<Vec4i> hierarchy;
@@ -142,6 +142,7 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
 
     //DBG("found number %d",contours.size());
 
+    vector<Point2f> points(contours.size());  //位置
     vector<Point2f> centers(contours.size()); //圆心
     vector<float> radius(contours.size());    //半径
 
@@ -163,13 +164,20 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
 
     for (int i = 0; i < contours.size(); i++)
     {
+        
         //contours[i]代表的是第i个轮廓，contours[i].size()代表的是第i个轮廓上所有的像素点数
         for (int j = 0; j < contours[i].size(); j++)
         {
             //绘制出contours向量内所有的像素点
+            points[i].x += contours[i][j].x;
+            points[i].y += contours[i][j].y;
+
             Point P = Point(contours[i][j].x, contours[i][j].y);
             Contours.at<uchar>(P) = 255;
         }
+
+        points[i].x /= contours[i].size();
+        points[i].y /= contours[i].size();
 
         //绘制轮廓
         //drawContours(imageContours,contours,i,Scalar(255),1,1,hierarchy);
@@ -180,13 +188,12 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
 
         if (i < PT_NUM_MAX)
         {
-
-            result.x[i] = centers[i].x;
-            result.y[i] = centers[i].y;
+            result.x[i] = points[i].x;
+            result.y[i] = points[i].y;
         }
     }
 
-    match(centers);
+    match(points);
 
     if (showFlag == Qt::CheckState::PartiallyChecked)
     {

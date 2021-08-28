@@ -29,11 +29,13 @@ private:
     struct SET_STRUCT GYR_OFFSET_X = {"GYR_OFFSET_X","0"};
     struct SET_STRUCT GYR_OFFSET_Y = {"GYR_OFFSET_Y","0"};
     struct SET_STRUCT GYR_OFFSET_Z = {"GYR_OFFSET_Z","0"};
-    
+
+    struct SET_STRUCT VISION_THRESHOLD = {"VISION_THRESHOLD","200"};
     
     QSettings *set;
     
 public:
+    int threshold = 200;
     QString imagePath;
     Setting();
     void getIMUOffset(T_int16_xyz *acc,T_int16_xyz *gyro);
@@ -51,6 +53,9 @@ public:
 
     QString getFirmwarePath();
     void setFirmwarePath(QString path);
+    int getThreshold();
+    void setThreshold(int thr);
+
 };
 
 #endif // SETTING_H

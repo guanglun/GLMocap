@@ -56,12 +56,11 @@ static void removeOther(int camNum, MatrixXi map, int indexResult[], vector<doub
 
 int VisionProcess::matchPoint(void)
 {
-
     for (int i = 0; i < camNum - 1; i++)
     {
         if (camResult[i].vPoint.size() != camResult[i + 1].vPoint.size())
         {
-            DBG("Error Return, vPoint size not match");
+            //DBG("Error Return, vPoint size not match");
             return -1;
         }
     }
@@ -69,7 +68,7 @@ int VisionProcess::matchPoint(void)
 
     if (pintNum < 1)
     {
-        DBG("Error Return, pintNum < 1");
+        //DBG("Error Return, pintNum < 1");
         return -1;
     }
     //DBG("pintNum: %d",pintNum);
@@ -105,24 +104,26 @@ int VisionProcess::matchPoint(void)
                                                      xyc,
                                                      idx,
                                                      rerr, map.rows());
-
-    std::cout << "===>>>result1:\r\n";
+    //std::cout << "===>>>result1:\r\n";
     for (int i = 0; i < map.rows(); i++)
     {
-        std::cout << i << " : " << map.row(i) << " ";
-        mlog->show(QString::number(rerr[i]));
+        //std::cout << i << " : " << map.row(i) << " ";
+        //mlog->show(QString::number(rerr[i]));
         if(rerr[i] != -1)
         {
             rerrSort.push_back(rerr[i]);
         }
         
     }
+    if(rerrSort.size() < pintNum)
+    {
+        //DBG("rerrSort size Error, Return");
+        return -1;
+    }
 
     sort(rerrSort.begin(), rerrSort.end());
-
     for (int pm; pm < pintNum; pm++)
     {
-        
         indexResult[pm] = getIndex(rerr, map.rows(), rerrSort[pm]);
         DBG("\r\nindex pm : %d",indexResult[pm]);
         if (indexResult[pm] == -1)
@@ -131,9 +132,8 @@ int VisionProcess::matchPoint(void)
             return -1;
         }
 
-        removeOther(camNum, map, indexResult, &rerrSort,rerr);
+        removeOther(camNum, map, &indexResult[pm], &rerrSort,rerr);
     }
-
     std::cout << "===>>>result2:\r\n";
     for (int pm; pm < pintNum; pm++)
     {
@@ -243,7 +243,7 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
                 // }
 
                 t2 = QDateTime::currentDateTime().toMSecsSinceEpoch();
-                mlog->show(" diff " + QString::number(t2 - t1));
+                //mlog->show(" diff " + QString::number(t2 - t1));
             }
 
         }

@@ -12,19 +12,18 @@ void CtrlProcess::setVio(QMap<uint8_t, OPENVIO*> *vioMap,OPENVIO *setvio)
 
 OPENVIO *CtrlProcess::getEach()
 {
-    OPENVIO *vio = NULL;
+    OPENVIO *vio = nullptr;
     
-    if (setvio != NULL && vioMap == NULL && count == 0)
+    if (setvio != nullptr && vioMap == nullptr && count == 0)
     {
         vio = setvio;
     }
-    else if (setvio == NULL && vioMap != NULL && count == 0)
+    else if (setvio == nullptr && vioMap != nullptr && count == 0)
     {
-        
         it = vioMap->begin();
         if(it != vioMap->end())
             vio = it.value();
-    }else if (setvio == NULL && vioMap != NULL)
+    }else if (setvio == nullptr && vioMap != nullptr)
     {
         it++;
         if(it != vioMap->end())
@@ -36,12 +35,12 @@ OPENVIO *CtrlProcess::getEach()
 
 int CtrlProcess::getLen(void)
 {
-    OPENVIO *vio = NULL;
-    if (vio != NULL && vioMap == NULL)
+    OPENVIO *vio = nullptr;
+    if (vio != nullptr && vioMap == nullptr)
     {
         return 1;
     }
-    else if (vio == NULL && vioMap != NULL)
+    else if (vio == nullptr && vioMap != nullptr)
     {
         return vioMap->size();
     }
@@ -50,13 +49,13 @@ int CtrlProcess::getLen(void)
 
 void CtrlProcess::setExposureSlot(int exposure)
 {
-    OPENVIO *vio = NULL;
+    OPENVIO *vio = nullptr;
     count = 0;
 
     do
     {
         vio = getEach();
-        if (vio != NULL)
+        if (vio != nullptr)
         {
             vio->open();
             if (vio->ctrlCamSetExposure(exposure) == 0)
@@ -71,44 +70,46 @@ void CtrlProcess::setExposureSlot(int exposure)
             }
         }
 
-    } while (vio != NULL);
+    } while (vio != nullptr);
 }
 
 void CtrlProcess::syncSlot(void)
 {
-    OPENVIO *vio = NULL;
+    OPENVIO *vio = nullptr;
     int len = getLen();
 
     count = 0;
     do
     {
         vio = getEach();
-        if (vio != NULL)
+        if (vio != nullptr)
         {
             vio->open();
         }
-    } while (vio != NULL);
+    } while (vio != nullptr);
 
     count = 0;
     do
     {
         vio = getEach();
-        if (vio != NULL)
+        if (vio != nullptr)
         {
             vio->ctrlCamStatus(1);
         }
-    } while (vio != NULL);
+    } while (vio != nullptr);
 
 }
 
-void CtrlProcess::ctrlCamStatusSlot(unsigned char state)
+void CtrlProcess::ctrlCamStatusSlot(unsigned char state,bool isSync)
 {
-    OPENVIO *vio = NULL;
+    
+    OPENVIO *vio = nullptr;
     count = 0;
     do
     {
         vio = getEach();
-        if (vio != NULL)
+        
+        if (vio != nullptr)
         {
             vio->open();
             if(vio->ctrlCamStatus(state) == 0)
@@ -122,17 +123,22 @@ void CtrlProcess::ctrlCamStatusSlot(unsigned char state)
                 vio->setStatus("Set CamStatus " + QString::number(state) + " Fail");
             }
         }
-    } while (vio != NULL);
+    } while (vio != nullptr);
+
+    if(isSync == true)
+    {
+        ctrlCamSyncStatusSlot(state);
+    }
 }
 
 void CtrlProcess::ctrlCamSyncStatusSlot(unsigned char state)
 {
-    OPENVIO *vio = NULL;
+    OPENVIO *vio = nullptr;
     count = 0;
     do
     {
         vio = getEach();
-        if (vio != NULL)
+        if (vio != nullptr)
         {
             vio->open();
             if(vio->ctrlCamSyncStatus(state) == 0)
@@ -146,17 +152,17 @@ void CtrlProcess::ctrlCamSyncStatusSlot(unsigned char state)
                 vio->setStatus("Set SyncStatus " + QString::number(state) + " Fail");
             }
         }
-    } while (vio != NULL);
+    } while (vio != nullptr);
 }
 
 void CtrlProcess::ctrlCamSyncModeSlot(unsigned char mode)
 {
-    OPENVIO *vio = NULL;
+    OPENVIO *vio = nullptr;
     count = 0;
     do
     {
         vio = getEach();
-        if (vio != NULL)
+        if (vio != nullptr)
         {
             vio->open();
             if(vio->ctrlCamSyncMode(mode) == 0)
@@ -170,17 +176,17 @@ void CtrlProcess::ctrlCamSyncModeSlot(unsigned char mode)
                 vio->setStatus("Set SyncMode " + QString::number(mode) + " Fail");
             }
         }
-    } while (vio != NULL);
+    } while (vio != nullptr);
 }
 
 void CtrlProcess::ctrlCamFpsSlot(unsigned char fps)
 {
-    OPENVIO *vio = NULL;
+    OPENVIO *vio = nullptr;
     count = 0;
     do
     {
         vio = getEach();
-        if (vio != NULL)
+        if (vio != nullptr)
         {
             vio->open();
             if(vio->ctrlCamFps(fps) == 0)
@@ -194,17 +200,17 @@ void CtrlProcess::ctrlCamFpsSlot(unsigned char fps)
                 vio->setStatus("Set fps " + QString::number(fps) + " Fail");
             }
         }
-    } while (vio != NULL);
+    } while (vio != nullptr);
 }
 
 void CtrlProcess::ctrlInfraredPwmSlot(unsigned char pwm)
 {
-    OPENVIO *vio = NULL;
+    OPENVIO *vio = nullptr;
     count = 0;
     do
     {
         vio = getEach();
-        if (vio != NULL)
+        if (vio != nullptr)
         {
             vio->open();
             if(vio->ctrlInfraredPwm(pwm) == 0)
@@ -218,17 +224,15 @@ void CtrlProcess::ctrlInfraredPwmSlot(unsigned char pwm)
                 vio->setStatus("Set InfraredPwm " + QString::number(pwm) + " Fail");
             }
         }
-    } while (vio != NULL);
+    } while (vio != nullptr);
 }
 
 void CtrlProcess::ctrlMultemCamStartSlot(void)
 {
-    ctrlCamStatusSlot(1);
-    ctrlCamSyncStatusSlot(1);
+    ctrlCamStatusSlot(1,true);
 }
 
 void CtrlProcess::ctrlMultemCamStopSlot(void)
 {
-    ctrlCamStatusSlot(0);
-    ctrlCamSyncStatusSlot(0);
+    ctrlCamStatusSlot(0,true);
 }

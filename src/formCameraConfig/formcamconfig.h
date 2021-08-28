@@ -27,7 +27,7 @@ public:
     ~FormCamConfig();
     QMap<uint8_t, OPENVIO*> *vioMap; 
     OPENVIO *vio;
-    void setQData(QMap<uint8_t, OPENVIO*> *vioMap = NULL,OPENVIO *vio = NULL);
+    void setQData(QMap<uint8_t, OPENVIO*> *vioMap = nullptr,OPENVIO *vio = nullptr);
 private slots:
     void on_pb_set_config_clicked();
     void on_pb_exit_clicked();

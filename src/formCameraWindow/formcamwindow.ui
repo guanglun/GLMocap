@@ -25,55 +25,80 @@
   <property name="windowTitle">
    <string>FormCamWindow</string>
   </property>
-    <widget class="QWidget" name="centralWidget">
-        <widget class="QListView" name="lv_openvio">
-            <property name="geometry">
-                <rect>
-                    <x>5</x>
-                    <y>0</y>
-                    <width>301</width>
-                    <height>441</height>
-                </rect>
-            </property>
-        </widget>
-        <widget class="QPushButton" name="pb_start">
-            <property name="geometry">
-                <rect>
-                    <x>10</x>
-                    <y>450</y>
-                    <width>75</width>
-                    <height>23</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>Start</string>
-            </property>
-        </widget>
-
-        <widget class="QPushButton" name="pb_stop">
-            <property name="geometry">
-            <rect>
-            <x>90</x>
-            <y>450</y>
-            <width>75</width>
-            <height>23</height>
-            </rect>
-            </property>
-            <property name="text">
-            <string>Stop</string>
-            </property>
-        </widget>
+  <widget class="QWidget" name="centralWidget">
+   <widget class="QListView" name="lv_openvio">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>0</y>
+      <width>301</width>
+      <height>421</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pb_start">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>430</y>
+      <width>61</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Start</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pb_stop">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>430</y>
+      <width>61</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Stop</string>
+    </property>
+   </widget>
    <widget class="QPushButton" name="pb_capture">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>450</y>
-      <width>75</width>
+      <x>150</x>
+      <y>430</y>
+      <width>61</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
      <string>Capture</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pb_init_module">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>430</y>
+      <width>81</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>InitModule</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pb_open_all_cam">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>460</y>
+      <width>81</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>OpenAllCam</string>
     </property>
    </widget>
   </widget>
@@ -92,6 +117,7 @@
     </property>
     <addaction name="actionImg_save_path"/>
     <addaction name="actionLoad_vision_param"/>
+    <addaction name="actionSet_threshold"/>
    </widget>
    <widget class="QMenu" name="menuWindow">
     <property name="title">
@@ -160,6 +186,11 @@
   <action name="actionConfig">
    <property name="text">
     <string>config</string>
+   </property>
+  </action>
+  <action name="actionSet_threshold">
+   <property name="text">
+    <string>set threshold</string>
    </property>
   </action>
  </widget>

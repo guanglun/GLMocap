@@ -60,18 +60,18 @@ FormCamConfig::FormCamConfig(CtrlProcess *ctrlProcess,QWidget *parent) : QWidget
 
 void FormCamConfig::setQData(QMap<uint8_t, OPENVIO*> *vioMap, OPENVIO *vio)
 {
-    OPENVIO *configvio = NULL;
+    OPENVIO *configvio = nullptr;
     this->vioMap = vioMap;
     this->vio = vio;
 
-    if (vioMap != NULL)
+    if (vioMap != nullptr)
     {
         this->setWindowTitle("camera config select " + QString::number(vioMap->size()));
         if(vioMap->size() != 0)
         {
             configvio = vioMap->values().at(0);
         }
-    }else if (vio != NULL)
+    }else if (vio != nullptr)
     {
         this->setWindowTitle("camera config select " + QString(vio->idShort));
         configvio = vio;
@@ -79,7 +79,7 @@ void FormCamConfig::setQData(QMap<uint8_t, OPENVIO*> *vioMap, OPENVIO *vio)
 
     ctrlProcess->setVio(vioMap,vio);
 
-    if(configvio != NULL)
+    if(configvio != nullptr)
     {
         ui->le_exposure->setText(QString::number(configvio->exposure));
         ui->le_fps->setText(QString::number(configvio->camera_fps));

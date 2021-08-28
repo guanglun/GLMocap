@@ -92,7 +92,7 @@ public:
     QString name = "";
     int number = -1;
 
-    libusb_device_handle *dev_handle = NULL;
+    libusb_device_handle *dev_handle = nullptr;
     libusb_device *dev;
     uint8_t devAddr;
     QStandardItemModel *pModelOpenvio;

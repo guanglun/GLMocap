@@ -61,7 +61,7 @@ void WinUSBDriver::onTimeOut()
 
 void WinUSBDriver::closeDevice(void)
 {
-    DBG("====>>> %d",vioMap.size());
+    //DBG("====>>> %d",vioMap.size());
 
     it = vioMap.begin();
     while (it != vioMap.end())
@@ -80,7 +80,7 @@ void WinUSBDriver::autoScan(void)
     //DBG("start scan");
 
     struct libusb_device *device;
-    libusb_device_handle *handle = NULL;
+    libusb_device_handle *handle = nullptr;
     int config = 0;
     int ret;
     int i;
@@ -239,7 +239,7 @@ void WinUSBDriver::send(QByteArray byte)
 {
     if (is_open)
     {
-        libusb_bulk_transfer(dev_handle, CTRL_EPADDR, (unsigned char *)byte.data(), byte.length(), NULL, 0xFFFF);
+        libusb_bulk_transfer(dev_handle, CTRL_EPADDR, (unsigned char *)byte.data(), byte.length(), nullptr, 0xFFFF);
     }
 }
 

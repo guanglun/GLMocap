@@ -17,7 +17,7 @@ class CtrlProcess:public QObject
     Q_OBJECT
 private:
     int count = 0;
-    OPENVIO *vio = NULL;    
+    OPENVIO *vio = nullptr;    
 public:
     QMap<uint8_t, OPENVIO*> *vioMap;
     QMap<uint8_t, OPENVIO*>::Iterator it;
@@ -30,7 +30,7 @@ public:
 public slots:
     void setExposureSlot(int exposure);
     void syncSlot(void);
-    void ctrlCamStatusSlot(unsigned char state);
+    void ctrlCamStatusSlot(unsigned char state,bool isSync=false);
     void ctrlCamSyncStatusSlot(unsigned char state);
     void ctrlCamSyncModeSlot(unsigned char mode);
     void ctrlCamFpsSlot(unsigned char fps);    

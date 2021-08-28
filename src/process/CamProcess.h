@@ -30,7 +30,7 @@ class CamProcess:public QObject
 private:
     
     
-    OPENVIO *vio = NULL;    
+    OPENVIO *vio = nullptr;    
     Qt::CheckState showFlag = Qt::CheckState::Unchecked;
     QHash<POINT_STATE, GLPoint *> *hPoint;
     vector<GLPoint *> vPoint;

@@ -12,6 +12,16 @@ Setting::Setting()
     qDebug() << "configure file path:" << setFile;
     set = new QSettings(setFile,QSettings::IniFormat);    
 
+    set->beginGroup("openvio");
+    QString thr  = set->value(VISION_THRESHOLD.SET_NAME).toString();
+    if(thr.isEmpty())
+    {
+        set->setValue(VISION_THRESHOLD.SET_NAME,VISION_THRESHOLD.DEFAULT_VALUE);
+        threshold = VISION_THRESHOLD.DEFAULT_VALUE.toInt();
+    }
+    set->endGroup(); 
+
+    getThreshold();
     getImagePath();
 }
 
@@ -26,7 +36,8 @@ void Setting::getIMUOffset(T_int16_xyz *acc,T_int16_xyz *gyro)
     QString gyr_offset_x  = set->value(GYR_OFFSET_X.SET_NAME).toString();
     QString gyr_offset_y  = set->value(GYR_OFFSET_Y.SET_NAME).toString();
     QString gyr_offset_z  = set->value(GYR_OFFSET_Z.SET_NAME).toString();
-    
+
+
     if(acc_offset_x.isEmpty())
     {
         set->setValue(ACC_OFFSET_X.SET_NAME,ACC_OFFSET_X.DEFAULT_VALUE);
@@ -131,6 +142,22 @@ QString Setting::getImagePath()
     imagePath = set->value("IMAGE_PATH").toString();
     set->endGroup(); 
     return imagePath;
+}
+
+int Setting::getThreshold()
+{
+    set->beginGroup("openvio");
+    threshold = set->value("VISION_THRESHOLD").toInt();
+    set->endGroup(); 
+    return threshold;
+}
+
+void Setting::setThreshold(int thr)
+{
+    set->beginGroup("openvio");
+    threshold = thr;
+    set->setValue("VISION_THRESHOLD",thr);
+    set->endGroup();     
 }
 
 void Setting::setVisionParamPath(QString path)
