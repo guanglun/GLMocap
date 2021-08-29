@@ -8,6 +8,8 @@
 
 using namespace Eigen;
 
+#include <opencv2/opencv.hpp>
+
 typedef Matrix<double, 3, 3> Matrix33d;
 typedef Matrix<double, 3, 4> Matrix34d;
 typedef Matrix<double, 3, 9> Matrix39d;
@@ -41,6 +43,10 @@ struct VISION_PARAM
     Matrix33d R[CAM_NUM_MAX];
     RowVector3d T[CAM_NUM_MAX];
     MatrixXd xy[PT_NUM_MAX];
+
+    Matrix3d   RGND;
+    RowVector3d TGND;
+    Vector3d eulerAngles;
     // Matrix<double, PT_NUM_MAX, CAM_NUM_MAX> idx;
     MatrixXi idx;
     // Vector3d    Xr[PT_NUM_MAX];
@@ -118,7 +124,8 @@ public:
     static Matrix3d eulerAnglesToRotationMatrix(Vector3d &theta);
     static bool isRotationMatirx(Matrix3d R);
     static Vector3d rotationMatrixToEulerAngles(Matrix3d &R);
-    void triangulation(void);
+    Vector3d * triangulation(void);
+    double distance3d(cv::Point3d p1,cv::Point3d p2);
 private slots:
     void positionSlot(int camIndex, double x, double y);
 signals:

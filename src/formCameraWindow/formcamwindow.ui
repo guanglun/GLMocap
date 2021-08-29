@@ -41,7 +41,7 @@
      <rect>
       <x>10</x>
       <y>430</y>
-      <width>61</width>
+      <width>81</width>
       <height>23</height>
      </rect>
     </property>
@@ -52,9 +52,9 @@
    <widget class="QPushButton" name="pb_stop">
     <property name="geometry">
      <rect>
-      <x>80</x>
+      <x>120</x>
       <y>430</y>
-      <width>61</width>
+      <width>81</width>
       <height>23</height>
      </rect>
     </property>
@@ -65,9 +65,9 @@
    <widget class="QPushButton" name="pb_capture">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>220</x>
       <y>430</y>
-      <width>61</width>
+      <width>81</width>
       <height>23</height>
      </rect>
     </property>
@@ -78,8 +78,8 @@
    <widget class="QPushButton" name="pb_init_module">
     <property name="geometry">
      <rect>
-      <x>220</x>
-      <y>430</y>
+      <x>120</x>
+      <y>460</y>
       <width>81</width>
       <height>23</height>
      </rect>
@@ -99,6 +99,19 @@
     </property>
     <property name="text">
      <string>OpenAllCam</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pb_init_gnd">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>460</y>
+      <width>81</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>InitGND</string>
     </property>
    </widget>
   </widget>

@@ -34,7 +34,7 @@ static void eraseData(vector<double> *rerrSort, double eraseData)
     }
 }
 
-static void removeOther(int camNum, MatrixXi map, int indexResult[], vector<double> *rerrSort,double rerr[])
+static void removeOther(int camNum, MatrixXi map, int indexResult[], vector<double> *rerrSort, double rerr[])
 {
     for (int pm = 0; pm < map.rows(); pm++)
     {
@@ -46,7 +46,7 @@ static void removeOther(int camNum, MatrixXi map, int indexResult[], vector<doub
                 {
                     //DBG("rerrSort size %d remove pm : %d",rerrSort->size(),pm);
                     //rerrSort->erase(rerrSort->begin() + pm);
-                    eraseData(rerrSort,rerr[pm]);
+                    eraseData(rerrSort, rerr[pm]);
                     break;
                 }
             }
@@ -54,8 +54,11 @@ static void removeOther(int camNum, MatrixXi map, int indexResult[], vector<doub
     }
 }
 
-int VisionProcess::matchPoint(void)
+int VisionProcess::checkVPointSize(void)
 {
+    if (camResult[0].vPoint.size() == 0)
+        return -1;
+
     for (int i = 0; i < camNum - 1; i++)
     {
         if (camResult[i].vPoint.size() != camResult[i + 1].vPoint.size())
@@ -64,24 +67,32 @@ int VisionProcess::matchPoint(void)
             return -1;
         }
     }
-    pintNum = camResult[0].vPoint.size();
+    return camResult[0].vPoint.size();
+}
 
-    if (pintNum < 1)
+int VisionProcess::matchPoint(void)
+{
+
+    pointNum = checkVPointSize();
+
+    if (pointNum < 1)
     {
-        //DBG("Error Return, pintNum < 1");
+        //DBG("Error Return, pointNum < 1");
         return -1;
     }
-    //DBG("pintNum: %d",pintNum);
+    //DBG("pointNum: %d",pointNum);
 
     CameraPointMap cpMap;
-    MatrixXi map = cpMap.getPointMap(camNum, pintNum);
-    int indexResult[pintNum];
+    MatrixXi map = cpMap.getPointMap(camNum, pointNum);
+    int indexResult[pointNum];
     //std::cout << map << std::endl;
 
     MatrixXd xy[map.rows()];
     MatrixXd xyc[map.rows()];
     double rerr[map.rows()];
     vector<double> rerrSort;
+
+    vector<GLPoint *> vPoint[camNum];
 
     MatrixXi idx(map.rows(), camNum);
 
@@ -109,46 +120,191 @@ int VisionProcess::matchPoint(void)
     {
         //std::cout << i << " : " << map.row(i) << " ";
         //mlog->show(QString::number(rerr[i]));
-        if(rerr[i] != -1)
+        if (rerr[i] != -1)
         {
             rerrSort.push_back(rerr[i]);
         }
-        
     }
-    if(rerrSort.size() < pintNum)
+    if (rerrSort.size() < pointNum)
     {
         //DBG("rerrSort size Error, Return");
         return -1;
     }
 
     sort(rerrSort.begin(), rerrSort.end());
-    for (int pm; pm < pintNum; pm++)
+    for (int pm; pm < pointNum; pm++)
     {
         indexResult[pm] = getIndex(rerr, map.rows(), rerrSort[pm]);
-        DBG("\r\nindex pm : %d",indexResult[pm]);
+        DBG("\r\nindex pm : %d", indexResult[pm]);
         if (indexResult[pm] == -1)
         {
-            DBG("Error Return, indexResult[%d] == -1",pm);
+            DBG("Error Return, indexResult[%d] == -1", pm);
             return -1;
         }
 
-        removeOther(camNum, map, &indexResult[pm], &rerrSort,rerr);
+        removeOther(camNum, map, &indexResult[pm], &rerrSort, rerr);
     }
     std::cout << "===>>>result2:\r\n";
-    for (int pm; pm < pintNum; pm++)
+    for (int pm = 0; pm < pointNum; pm++)
     {
         int index = getIndex(rerr, map.rows(), rerrSort[pm]);
         std::cout << index << " : " << map.row(index) << " ";
         mlog->show(QString::number(rerr[index]));
 
-        for(int cm = 0;cm < camNum;cm++)
+        for (int cm = 0; cm < camNum; cm++)
         {
             camResult[cm].vPoint[map.row(index)(cm)]->id = pm;
+            vPoint[cm].push_back(new GLPoint(
+                camResult[cm].vPoint[map.row(index)(cm)]->state,
+                camResult[cm].vPoint[map.row(index)(cm)]->imageIndex,
+                camResult[cm].vPoint[map.row(index)(cm)]->x,
+                camResult[cm].vPoint[map.row(index)(cm)]->y,
+                pm));
+        }
+    }
+
+    if (calGNDstate == CAL_START)
+    {
+        if (calibrateGND(vPoint) < 0)
+        {
+            return -1;
+        }
+        else
+        {
+            calGNDstate = CAL_IDLE;
         }
     }
 
     return 0;
-    
+}
+
+void swapid(int *id1, int *id2)
+{
+    int id = *id2;
+    *id2 = *id1;
+    *id1 = id;
+}
+
+void swapVPoint(GLPoint *p1, GLPoint *p2)
+{
+    swapid(&p1->id, &p2->id);
+    swap(p1, p2);
+}
+
+int VisionProcess::calibrateGND(vector<GLPoint *> *vPoint)
+{
+    if (pointNum != 3)
+    {
+        DBG("calibrateGND Error Return, pointNum != 3");
+        return -1;
+    }
+
+    Vector3d *Xr = triangulation();
+    vector<double> dis;
+
+    dis.push_back(multipleViewTriangulation.distance3d(
+        cv::Point3d(Xr[0](0, 0), Xr[0](1, 0), Xr[0](2, 0)),
+        cv::Point3d(Xr[1](0, 0), Xr[1](1, 0), Xr[1](2, 0))));
+
+    dis.push_back(multipleViewTriangulation.distance3d(
+        cv::Point3d(Xr[0](0, 0), Xr[0](1, 0), Xr[0](2, 0)),
+        cv::Point3d(Xr[2](0, 0), Xr[2](1, 0), Xr[2](2, 0))));
+
+    dis.push_back(multipleViewTriangulation.distance3d(
+        cv::Point3d(Xr[1](0, 0), Xr[1](1, 0), Xr[1](2, 0)),
+        cv::Point3d(Xr[2](0, 0), Xr[2](1, 0), Xr[2](2, 0))));
+
+    mlog->show("dis: " + QString::number(dis[0]) + " " + QString::number(dis[1]) + " " + QString::number(dis[2]));
+
+    if (dis[2] < dis[1] && dis[1] < dis[0])
+    {
+        for (int cm = 0; cm < camNum; cm++)
+            swapVPoint(vPoint[cm][1], vPoint[cm][2]);
+    }
+    else if (dis[1] < dis[0] && dis[0] < dis[2])
+    {
+        for (int cm = 0; cm < camNum; cm++)
+            swapVPoint(vPoint[cm][1], vPoint[cm][0]);
+    }
+    else if (dis[0] < dis[2] && dis[2] < dis[1])
+    {
+        for (int cm = 0; cm < camNum; cm++)
+            swapVPoint(vPoint[cm][0], vPoint[cm][2]);
+    }
+    else if (dis[0] < dis[1] && dis[1] < dis[2])
+    {
+        for (int cm = 0; cm < camNum; cm++)
+        {
+            swapVPoint(vPoint[cm][0], vPoint[cm][2]);
+            swapVPoint(vPoint[cm][1], vPoint[cm][0]);
+        }
+    }
+    else if (dis[1] < dis[2] && dis[2] < dis[0])
+    {
+        for (int cm = 0; cm < camNum; cm++)
+        {
+            swapVPoint(vPoint[cm][0], vPoint[cm][1]);
+            swapVPoint(vPoint[cm][0], vPoint[cm][2]);
+        }
+    }
+
+    for (int cm = 0; cm < camNum; cm++)
+    {
+        for (int pm = 0; pm < pointNum; pm++)
+        {
+            camResult[cm].vPoint[pm]->state = vPoint[cm][pm]->state;
+            camResult[cm].vPoint[pm]->imageIndex = vPoint[cm][pm]->imageIndex;
+            camResult[cm].vPoint[pm]->x = vPoint[cm][pm]->x;
+            camResult[cm].vPoint[pm]->y = vPoint[cm][pm]->y;
+            camResult[cm].vPoint[pm]->id = vPoint[cm][pm]->id;
+        }
+        vPoint[cm].clear();
+    }
+
+    Xr = triangulation();
+
+    for (int cm = 0; cm < pointNum; cm++)
+    {
+        mlog->show(
+            QString::number(cm) + " : " +
+            QString::number(Xr[cm](0, 0)) + " " +
+            QString::number(Xr[cm](1, 0)) + " " +
+            QString::number(Xr[cm](2, 0)));
+    }
+
+    double tar[3] = {
+        Xr[0](0, 0)-Xr[1](0, 0),
+        Xr[0](1, 0)-Xr[1](1, 0),
+        Xr[0](2, 0)-Xr[1](2, 0),
+    };
+
+    mlog->show("tar : " +
+            QString::number(tar[0]) + " " +
+            QString::number(tar[1]) + " " +
+            QString::number(tar[2]));
+
+//https://zhuanlan.zhihu.com/p/93563218
+
+    Eigen::Vector3d rvec (tar[0], tar[1], tar[2]);     
+    double n_norm = rvec.norm();
+    Eigen::AngleAxisd rotation_vector (n_norm, rvec/n_norm);
+
+    vision_param.RGND = rotation_vector.toRotationMatrix();
+
+    std::cout << vision_param.RGND << std::endl;
+
+    //2.1 旋转矩阵转换为欧拉角
+    //ZYX顺序，即先绕x轴roll,再绕y轴pitch,最后绕z轴yaw,0表示X轴,1表示Y轴,2表示Z轴
+    vision_param.eulerAngles = vision_param.RGND.eulerAngles(0, 1, 2); 
+    std::cout << vision_param.eulerAngles << endl;
+
+
+    vision_param.TGND << Xr[0](0, 0), Xr[0](1, 0), Xr[0](2, 0);
+
+
+
+    dis.clear();
+    return 0;
 }
 
 void VisionProcess::positionSlot(CAMERA_RESULT result)
@@ -208,20 +364,20 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
             // vision_param.CamNum = camNum;
             // vision_param.ptNum = 1;
 
-
-
             //vision_param.xy[0].col(0)(0) = 10;
 
-            if(matchState == MATCH_IDLE)
+            if (matchState == MATCH_START)
             {
                 qint64 t1, t2;
                 t1 = QDateTime::currentDateTime().toMSecsSinceEpoch();
                 matchState = MATCH_ING;
-                if(matchPoint() == 0)
+                if (matchPoint() == 0)
                 {
                     matchState = MATCH_OK;
-                }else{
-                    matchState = MATCH_IDLE;
+                }
+                else
+                {
+                    matchState = MATCH_START;
                 }
                 // if (foundNum >= 3)
                 // {
@@ -230,37 +386,47 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
 
                 t2 = QDateTime::currentDateTime().toMSecsSinceEpoch();
                 //mlog->show(" diff " + QString::number(t2 - t1));
-            }else if(matchState == MATCH_OK)
-            {
-                pintNum = camResult[0].vPoint.size();
-                
-                vision_param.ptNum = pintNum;
-                vision_param.CamNum = camNum;
-
-                vision_param.idx.resize(camNum,pintNum);
-
-                for (int pm = 0; pm < pintNum; pm++)
-                {
-                    vision_param.xy[pm].resize(2,camNum);
-                    for (int cm = 0; cm < camNum; cm++)
-                    {
-                        for (int ppm = 0; ppm < pintNum; ppm++)
-                        {
-                            if(camResult[cm].vPoint[ppm]->id == pm)
-                            {
-                                foundNum++;
-                                vision_param.idx.row(cm)(pm) = 1;
-                                vision_param.xy[pm].col(cm)(0) = camResult[cm].vPoint[ppm]->x;
-                                vision_param.xy[pm].col(cm)(1) = camResult[cm].vPoint[ppm]->y;
-                                break;
-                            }
-                        }
-                    }
-                }       
-
-                multipleViewTriangulation.triangulation();
             }
-
+            else if (matchState == MATCH_OK)
+            {
+                triangulation();
+            }
         }
     }
+}
+
+Vector3d *VisionProcess::triangulation(void)
+{
+    pointNum = checkVPointSize();
+
+    if (pointNum < 1)
+    {
+        //DBG("Error Return, pointNum < 1");
+        return nullptr;
+    }
+
+    vision_param.ptNum = pointNum;
+    vision_param.CamNum = camNum;
+
+    vision_param.idx.resize(camNum, pointNum);
+
+    for (int pm = 0; pm < pointNum; pm++)
+    {
+        vision_param.xy[pm].resize(2, camNum);
+        for (int cm = 0; cm < camNum; cm++)
+        {
+            for (int ppm = 0; ppm < pointNum; ppm++)
+            {
+                if (camResult[cm].vPoint[ppm]->id == pm)
+                {
+                    vision_param.idx.row(cm)(pm) = 1;
+                    vision_param.xy[pm].col(cm)(0) = camResult[cm].vPoint[ppm]->x;
+                    vision_param.xy[pm].col(cm)(1) = camResult[cm].vPoint[ppm]->y;
+                    break;
+                }
+            }
+        }
+    }
+
+    return multipleViewTriangulation.triangulation();
 }

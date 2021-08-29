@@ -19,7 +19,7 @@ public:
     static void drawSphere(GLfloat xx = 0.0,
                     GLfloat yy = 0.0,
                     GLfloat zz = 0.0,
-                    GLfloat radius = 0.1,
+                    GLfloat radius = 0.02,
                     GLfloat M = 100.0,
                     GLfloat N = 100.0);
 };

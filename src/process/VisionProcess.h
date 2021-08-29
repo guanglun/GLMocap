@@ -19,10 +19,16 @@ using namespace std;
 
 typedef enum MATCH_STATE{
     MATCH_IDLE,
+    MATCH_START,
     MATCH_ING,
     MATCH_OK,
-
+    MATCH_TRACK,
 }MATCH_STATE;
+
+typedef enum CAL_STATE{
+    CAL_IDLE,
+    CAL_START,
+}CAL_STATE;
 
 typedef struct CAMERA_RESULT{
     int camIndex;
@@ -42,11 +48,16 @@ class VisionProcess:public QObject
 private:
     
     int camNum = 0;
-    int pintNum = 0;
+    int pointNum = 0;
     int matchPoint(void);
+    int checkVPointSize(void);
+    int calibrateGND(vector<GLPoint *> *vPoint);
     void forloop(int pm,int cm);
 public:
+
     MATCH_STATE matchState = MATCH_IDLE;
+    CAL_STATE calGNDstate = CAL_IDLE;
+
     int count = 0;
     bool isCapImage = false;
     
@@ -57,6 +68,7 @@ public:
 
     MultipleViewTriangulation multipleViewTriangulation;
     VisionProcess(QObject* parent = nullptr);
+    Vector3d *triangulation(void);
     void init(int camNum);
 public slots:
     void positionSlot(CAMERA_RESULT result);  

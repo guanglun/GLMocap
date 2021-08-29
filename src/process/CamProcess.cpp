@@ -18,7 +18,7 @@ double distance(Point2f p1, Point2f p2)
 
 void CamProcess::match(vector<Point2f> centers)
 {
-    if (vio->visionProcess->matchState == MATCH_IDLE)
+    if (vio->visionProcess->matchState == MATCH_START)
     {
         vPoint.clear();
         for (int i = 0; i < centers.size(); i++)
@@ -48,6 +48,13 @@ void CamProcess::match(vector<Point2f> centers)
                 vPoint[i]->y = centers[minIndex].y;
             }
         }
+    }
+
+    if (vio->visionProcess->matchState == MATCH_START ||
+        vio->visionProcess->matchState == MATCH_OK)
+    {
+        result.vPoint = vPoint;
+        emit positionSignals(result);
     }
 }
 
@@ -164,7 +171,7 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
 
     for (int i = 0; i < contours.size(); i++)
     {
-        
+
         //contours[i]代表的是第i个轮廓，contours[i].size()代表的是第i个轮廓上所有的像素点数
         for (int j = 0; j < contours[i].size(); j++)
         {
@@ -199,17 +206,14 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
     {
         for (int i = 0; i < vPoint.size(); i++)
         {
-            if(vio->visionProcess->matchState ==  MATCH_OK)
+            if (vio->visionProcess->matchState == MATCH_OK)
             {
                 putText(sourceImg, std::to_string(vPoint[i]->id), Point(vPoint[i]->x, vPoint[i]->y - 15), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255, 0, 0), 2);
             }
-            
+
             drawMarker(sourceImg, Point2f(vPoint[i]->x, vPoint[i]->y), Scalar(255, 0, 0), MarkerTypes::MARKER_CROSS, 20, 1, 8);
         }
     }
-
-    result.vPoint = vPoint;
-    emit positionSignals(result);
 
     cv::cvtColor(imageContours, image, cv::COLOR_BGR2RGB);
     QImage qImg = QImage((const unsigned char *)(image.data), image.cols, image.rows, image.step, QImage::Format_RGB888);

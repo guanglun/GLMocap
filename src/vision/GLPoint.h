@@ -22,6 +22,12 @@ public:
     int id = -1;
     
     GLPoint();
+    GLPoint(POINT_STATE state,
+    int imageIndex,
+    int x,
+    int y,
+    int id);
+    
     GLPoint(POINT_STATE state,int imageIndex,int x,int y)
     {
         this->state = state;
@@ -29,6 +35,8 @@ public:
         this->x = x;
         this->y = y;
     }
+
+    void show(void);
 };
 
 #endif //POINT_H

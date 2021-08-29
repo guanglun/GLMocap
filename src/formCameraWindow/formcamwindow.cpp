@@ -1,6 +1,8 @@
 #include "formcamwindow.h"
 #include "ui_formcamwindow.h"
 
+#include <QDesktopWidget>
+
 Setting *setting;
 Log *mlog;
 
@@ -8,6 +10,10 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
                                                 ui(new Ui::FormCamWindow)
 {
     ui->setupUi(this);
+
+    QDesktopWidget* desktopWidget = QApplication::desktop();
+    move(desktopWidget->screenGeometry().width()/2,
+    desktopWidget->screenGeometry().height()/2 - this->height()/2);
 
     this->setWindowTitle("OPENVIO");
 
@@ -293,8 +299,14 @@ void FormCamWindow::on_pb_capture_clicked()
 
 void FormCamWindow::on_pb_init_module_clicked()
 {
-    qwinusb->visionProcess->matchState = MATCH_IDLE;
+    qwinusb->visionProcess->matchState = MATCH_START;
 }
+
+void FormCamWindow::on_pb_init_gnd_clicked()
+{
+    qwinusb->visionProcess->matchState = MATCH_START;
+    qwinusb->visionProcess->calGNDstate = CAL_START;
+}   
 
 void FormCamWindow::vioItemSelected(const QModelIndex &index)
 {

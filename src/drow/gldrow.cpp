@@ -14,33 +14,33 @@ void GLDrow::DrowGrid(void)
     {
         
         glBegin(GL_LINES);
-        glVertex3f(-4.0, cnt, -0.5);
-        glVertex3f(4.0, cnt, -0.5);
+        glVertex3f(-4.0, cnt, 0);
+        glVertex3f(4.0, cnt, 0);
         glEnd();
 
         glBegin(GL_LINES);
-        glVertex3f(cnt, -4.0,  -0.5);
-        glVertex3f(cnt, 4.0,  -0.5);
+        glVertex3f(cnt, -4.0,  0);
+        glVertex3f(cnt, 4.0,  0);
         glEnd();
     }
 
     glLineWidth(3);//设置线段宽度
     glColor3f(0.0, 0.0, 1.0);
     glBegin(GL_LINES);
-    glVertex3f(-4.0, -4.0, -0.5);
-    glVertex3f(-4.0, -4.0, 0.5);
+    glVertex3f(-4.0, -4.0, 0);
+    glVertex3f(-4.0, -4.0, 1);
     glEnd();
 
     glColor3f(0.0, 1.0, 0.0);
     glBegin(GL_LINES);
-    glVertex3f(-4.0, -4.0, -0.5);
-    glVertex3f(-4.0, -3.0, -0.5);
+    glVertex3f(-4.0, -4.0, 0);
+    glVertex3f(-4.0, -3.0, 0);
     glEnd();
 
     glColor3f(1.0, 0.0, 0.0);
     glBegin(GL_LINES);
-    glVertex3f(-4.0, -4.0, -0.5);
-    glVertex3f(-3.0, -4.0, -0.5);
+    glVertex3f(-4.0, -4.0, 0);
+    glVertex3f(-3.0, -4.0, 0);
     glEnd();    
 }
 

@@ -50,44 +50,53 @@ void CamView::paintGL()
               center[0], center[1], center[2],
               up[0], up[1], up[2]);
 
-
+    /*网格*/
+    glPushMatrix();
+    glRotatef(vision_param.eulerAngles[0] * ARC_TO_DEG, 1, 0, 0);
+    glRotatef(vision_param.eulerAngles[1] * ARC_TO_DEG, 0, 1, 0);
+    glRotatef(vision_param.eulerAngles[2] * ARC_TO_DEG, 0, 0, 1);   
+     
+    GLDrow::DrowGrid();
+    glPopMatrix();
 
     for (int pm = 0; pm < size; pm++)
     {
         glPushMatrix();
-        glTranslatef(Xr[pm](0, 0)/100, Xr[pm](1, 0)/100, Xr[pm](2, 0)/100);
+        glTranslatef(Xr[pm](0, 0)/1000, Xr[pm](1, 0)/1000, Xr[pm](2, 0)/1000);
+        glTranslatef(-vision_param.TGND[0]/1000,-vision_param.TGND[1]/1000,-vision_param.TGND[2]/1000);
+
+
         glColor3f(1.0, 0.0, 0.0);
         GLDrow::drawSphere();
         glPopMatrix();
     }
 
-    /*网格*/
-    // glPushMatrix();
-    // glTranslatef(0.0,0.0,-0.8);//下移
-    // GLDrow::DrowGrid();
-    // glPopMatrix();
 
+    for (int i = 0; i < vision_param.CamNum; i++)
+    {
+        /*相机*/
+        glPushMatrix();
 
-    // for (int i = 0; i < vision_param.CamNum; i++)
-    // {
-    //     /*相机*/
-    //     glPushMatrix();
+        //DBG("Drow %d",i);
 
-    //     //DBG("Drow %d",i);
+        //std::cout << vision_param.R[i] << std::endl;
 
-    //     //std::cout << vision_param.R[i] << std::endl;
+        Vector3d v = MultipleViewTriangulation::rotationMatrixToEulerAngles(vision_param.R[i]);
 
-    //     Vector3d v = MultipleViewTriangulation::rotationMatrixToEulerAngles(vision_param.R[i]);
+        glTranslatef(vision_param.TGND[0]/1000,vision_param.TGND[1]/1000,vision_param.TGND[2]/1000);
+        glRotatef(vision_param.eulerAngles[0] * ARC_TO_DEG, 1, 0, 0);
+        glRotatef(vision_param.eulerAngles[1] * ARC_TO_DEG, 0, 1, 0);
+        glRotatef(vision_param.eulerAngles[2] * ARC_TO_DEG, 0, 0, 1);
 
-    //     glRotatef(v(0, 0) * ARC_TO_DEG, 1, 0, 0);
-    //     glRotatef(v(1, 0) * ARC_TO_DEG, 0, 1, 0);
-    //     glRotatef(v(2, 0) * ARC_TO_DEG, 0, 0, 1);
+        glRotatef(v(0, 0) * ARC_TO_DEG, 1, 0, 0);
+        glRotatef(v(1, 0) * ARC_TO_DEG, 0, 1, 0);
+        glRotatef(v(2, 0) * ARC_TO_DEG, 0, 0, 1);
 
-    //     glTranslatef(vision_param.T[i](0, 0) / 1000, vision_param.T[i](0, 1) / 1000, vision_param.T[i](0, 2) / 1000);
+        glTranslatef(vision_param.T[i](0, 0) / 1000, vision_param.T[i](0, 1) / 1000, vision_param.T[i](0, 2) / 1000);
 
-    //     GLDrow::DrowCam();
-    //     glPopMatrix();
-    // }
+        GLDrow::DrowCam();
+        glPopMatrix();
+    }
 
     QMetaObject::invokeMethod(this, "update", Qt::QueuedConnection);
     view_fps_1s++;
