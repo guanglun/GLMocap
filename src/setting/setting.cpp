@@ -219,16 +219,18 @@ bool Setting::loadVisionParam(QString path)
         &p11, &p12, &p13,
         &p21, &p22, &p23,
         &p31, &p32, &p33);
-
-        vision_param.R[i] << p11, p12, p13, p21, p22, p23, p31, p32, p33;
-        //std::cout << "R" <<i<<":\n"<< vision_param.R[i] << std::endl;
+        Matrix33d R_;
+        R_ << p11, p12, p13, p21, p22, p23, p31, p32, p33;
+        vision_param.R[i] = R_.transpose();
+        std::cout << "R" <<i<<":\n"<< vision_param.R[i] << std::endl;
 
         QString T = set_vision->value(QString("T"+QString::number(i))).toString();
         sscanf_s(T.toStdString().data(), "%lf,%lf,%lf", 
         &p11, &p12, &p13);
-
-        vision_param.T[i] << p11, p12, p13;
-        //std::cout << "T" <<i<<":\n"<< vision_param.T[i] << std::endl;
+        RowVector3d T_;
+        T_ << p11, p12, p13;
+        vision_param.T[i] = -T_;
+        std::cout << "T" <<i<<":\n"<< vision_param.T[i] << std::endl;
     }
 
     vision_param.xy[0].resize(2,vision_param.CamNum);

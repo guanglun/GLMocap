@@ -16,6 +16,7 @@ Form3DViewWindow::Form3DViewWindow(QWidget *parent) :
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
     timer->start(1000);    
+    
 }
 
 Form3DViewWindow::~Form3DViewWindow()

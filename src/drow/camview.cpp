@@ -31,13 +31,14 @@ void CamView::initializeGL()
     glDepthFunc(GL_LEQUAL);
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-    cameraInit(10, 30, 4.0f);
+    cameraInit(10, 30, 14.0f);
 }
 
 void CamView::updateGL()
 {
 }
 
+#define TRAN_SIZE 1000
 void CamView::paintGL()
 {
 
@@ -57,13 +58,13 @@ void CamView::paintGL()
     glColor3f(1.0, 0.0, 0.0);
     glBegin(GL_LINES);
     glVertex3f(0.0, 0.0, 0.0);
-    glVertex3f(1.5, 0.0, 0.0);
+    glVertex3f(0.5, 0.0, 0.0);
     glEnd();
 
     glColor3f(0.0, 1.0, 0.0);
     glBegin(GL_LINES);
     glVertex3f(0.0, 0.0, 0.0);
-    glVertex3f(0.0, 1.0, 0.0);
+    glVertex3f(0.0, 0.5, 0.0);
     glEnd();
 
     glColor3f(0.0, 0.0, 1.0);
@@ -75,9 +76,9 @@ void CamView::paintGL()
 
     /*网格*/
     glPushMatrix();
-    glRotatef(vision_param.eulerAngles[0] * ARC_TO_DEG, 1, 0, 0);
-    glRotatef(vision_param.eulerAngles[1] * ARC_TO_DEG, 0, 1, 0);
-    glRotatef(vision_param.eulerAngles[2] * ARC_TO_DEG, 0, 0, 1);   
+    // glRotatef(vision_param.eulerAngles[0] * ARC_TO_DEG, 1, 0, 0);
+    // glRotatef(vision_param.eulerAngles[1] * ARC_TO_DEG, 0, 1, 0);
+    // glRotatef(vision_param.eulerAngles[2] * ARC_TO_DEG, 0, 0, 1);   
      
     GLDrow::DrowGrid();
     glPopMatrix();
@@ -85,8 +86,14 @@ void CamView::paintGL()
     for (int pm = 0; pm < size; pm++)
     {
         glPushMatrix();
-        glTranslatef(Xr[pm](0, 0)/1000, Xr[pm](1, 0)/1000, Xr[pm](2, 0)/1000);
-        glTranslatef(-vision_param.TGND[0]/1000,-vision_param.TGND[1]/1000,-vision_param.TGND[2]/1000);
+
+        glRotatef(vision_param.eulerAngles[0] * ARC_TO_DEG, 1, 0, 0);
+        glRotatef(vision_param.eulerAngles[1] * ARC_TO_DEG, 0, 1, 0);
+        glRotatef(vision_param.eulerAngles[2] * ARC_TO_DEG, 0, 0, 1);
+        glTranslatef(vision_param.TGND[0]/TRAN_SIZE,vision_param.TGND[1]/TRAN_SIZE,vision_param.TGND[2]/TRAN_SIZE);
+
+        glTranslatef(Xr[pm](0, 0)/TRAN_SIZE, Xr[pm](1, 0)/TRAN_SIZE, Xr[pm](2, 0)/TRAN_SIZE);
+        
 
 
         glColor3f(1.0, 0.0, 0.0);
@@ -104,32 +111,82 @@ void CamView::paintGL()
 
         //std::cout << vision_param.R[i] << std::endl;
 
-        Vector3d v = MultipleViewTriangulation::rotationMatrixToEulerAngles(vision_param.R[i]);
+        glRotatef(vision_param.eulerAngles[0] * ARC_TO_DEG, 1, 0, 0);
+        glRotatef(vision_param.eulerAngles[1] * ARC_TO_DEG, 0, 1, 0);
+        glRotatef(vision_param.eulerAngles[2] * ARC_TO_DEG, 0, 0, 1);
+        glTranslatef(vision_param.TGND[0]/TRAN_SIZE,vision_param.TGND[1]/TRAN_SIZE,vision_param.TGND[2]/TRAN_SIZE);
 
-        // glTranslatef(vision_param.TGND[0]/1000,vision_param.TGND[1]/1000,vision_param.TGND[2]/1000);
-        // glRotatef(vision_param.eulerAngles[0] * ARC_TO_DEG, 1, 0, 0);
-        // glRotatef(vision_param.eulerAngles[1] * ARC_TO_DEG, 0, 1, 0);
-        // glRotatef(vision_param.eulerAngles[2] * ARC_TO_DEG, 0, 0, 1);
+        //Vector3d v = vision_param.R[i].transpose().eulerAngles(2, 1, 0);
+
+//////////////////////////////////////////////////////////////////
+
+        // Vector3d v = vision_param.R[i].eulerAngles(2, 1, 0);
+
+        // glRotatef(v(0, 0) * ARC_TO_DEG, 1, 0, 0);
+        // glRotatef(v(1, 0) * ARC_TO_DEG, 0, 1, 0);
+        // glRotatef(v(2, 0) * ARC_TO_DEG, 0, 0, 1);
+
+        // glTranslatef(
+        //     vision_param.T[i](0, 0) / TRAN_SIZE, 
+        //     vision_param.T[i](0, 1) / TRAN_SIZE, 
+        //     vision_param.T[i](0, 2) / TRAN_SIZE);
+
+///////////////////////////////////////////////////////////////////
+
+	    cv::Mat R_T = (cv::Mat_<double>(4, 4) <<
+		vision_param.R[i].row(0)(0),vision_param.R[i].row(0)(1),vision_param.R[i].row(0)(2),vision_param.T[i].row(0)(0),
+		vision_param.R[i].row(1)(0),vision_param.R[i].row(1)(1),vision_param.R[i].row(1)(2),vision_param.T[i].row(0)(1),
+		vision_param.R[i].row(2)(0),vision_param.R[i].row(2)(1),vision_param.R[i].row(2)(2),vision_param.T[i].row(0)(2),
+		0, 0, 0, 1
+		);
+
+        R_T = R_T.inv();
+
+        Matrix33d R_;
+        R_ <<
+                R_T.at<double>(0, 0),R_T.at<double>(0, 1),R_T.at<double>(0, 2),
+                R_T.at<double>(1, 0),R_T.at<double>(1, 1),R_T.at<double>(1, 2),
+                R_T.at<double>(2, 0),R_T.at<double>(2, 1),R_T.at<double>(2, 2);
+        RowVector3d T_;
+        T_ <<
+                R_T.at<double>(0, 3),R_T.at<double>(1, 3),R_T.at<double>(2, 3);
+
+        Vector3d v = R_.eulerAngles(2, 1, 0);
 
         glRotatef(v(0, 0) * ARC_TO_DEG, 1, 0, 0);
         glRotatef(v(1, 0) * ARC_TO_DEG, 0, 1, 0);
         glRotatef(v(2, 0) * ARC_TO_DEG, 0, 0, 1);
 
-        double T[3];
-        
-        T[0] =  -vision_param.T[i](0, 0)*vision_param.R[i].row(0)(0) 
-                -vision_param.T[i](0, 1)*vision_param.R[i].row(0)(1)
-                -vision_param.T[i](0, 2)*vision_param.R[i].row(0)(2);
-        T[1] =  -vision_param.T[i](0, 0)*vision_param.R[i].row(1)(0) 
-                -vision_param.T[i](0, 1)*vision_param.R[i].row(1)(1)
-                -vision_param.T[i](0, 2)*vision_param.R[i].row(1)(2);
-        T[2] =  -vision_param.T[i](0, 0)*vision_param.R[i].row(2)(0) 
-                -vision_param.T[i](0, 1)*vision_param.R[i].row(2)(1)
-                -vision_param.T[i](0, 2)*vision_param.R[i].row(2)(2);      
+        glTranslatef(
+            T_(0, 0) / TRAN_SIZE, 
+            T_(0, 1) / TRAN_SIZE, 
+            T_(0, 2) / TRAN_SIZE);
 
-        glTranslatef(T[0] / 100, T[1] / 100, T[2] / 100);
+/////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+        // double T[3];
+        // T[0] =  -vision_param.T[i](0, 0)*vision_param.R[i].row(0)(0) 
+        //         -vision_param.T[i](0, 1)*vision_param.R[i].row(0)(1)
+        //         -vision_param.T[i](0, 2)*vision_param.R[i].row(0)(2);
+        // T[1] =  -vision_param.T[i](0, 0)*vision_param.R[i].row(1)(0) 
+        //         -vision_param.T[i](0, 1)*vision_param.R[i].row(1)(1)
+        //         -vision_param.T[i](0, 2)*vision_param.R[i].row(1)(2);
+        // T[2] =  -vision_param.T[i](0, 0)*vision_param.R[i].row(2)(0) 
+        //         -vision_param.T[i](0, 1)*vision_param.R[i].row(2)(1)
+        //         -vision_param.T[i](0, 2)*vision_param.R[i].row(2)(2);      
+
+        // glTranslatef(T[0] / TRAN_SIZE, T[1] / TRAN_SIZE, T[2] / TRAN_SIZE);
 
         glBegin(GL_LINES);
+        glColor3f(0.0, 0.0, 1.0);
         glVertex3f(0.0, 0.0, 0.0);
         glVertex3f(0.0, 0.0, 10.0);
         glEnd();    
@@ -291,11 +348,11 @@ void CamView::wheelEvent(QWheelEvent *event)
 
     if (event->delta() > 0)
     {
-        farCam -= 0.1;
+        farCam -= 0.1*10;
     }
     else
     {
-        farCam += 0.1;
+        farCam += 0.1*10;
     }
 
     cameraTurn(yawCam, pitchCam, farCam);

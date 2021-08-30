@@ -267,7 +267,7 @@ bool MultipleViewTriangulation::isRotationMatirx(Matrix3d R)
 
 Vector3d MultipleViewTriangulation::rotationMatrixToEulerAngles(Matrix3d &R)
 {
-    return R.transpose().eulerAngles(0, 1, 2); 
+    return R.transpose().eulerAngles(2, 1, 0); 
 
     // assert(isRotationMatirx(R));
     // double sy = sqrt(R(0,0) * R(0,0) + R(1,0) * R(1,0));

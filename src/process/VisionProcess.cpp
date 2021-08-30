@@ -272,16 +272,21 @@ int VisionProcess::calibrateGND(vector<GLPoint *> *vPoint)
             QString::number(Xr[cm](2, 0)));
     }
 
-    double tar[3] = {
-        Xr[0](0, 0)-Xr[1](0, 0),
-        Xr[0](1, 0)-Xr[1](1, 0),
-        Xr[0](2, 0)-Xr[1](2, 0),
-    };
+    // mlog->show("rel : " +
+    //         QString::number(tar[0]) + " " +
+    //         QString::number(tar[1]) + " " +
+    //         QString::number(tar[2]));
 
-    mlog->show("tar : " +
-            QString::number(tar[0]) + " " +
-            QString::number(tar[1]) + " " +
-            QString::number(tar[2]));
+    // double tar[3] = {
+    //     Xr[0](0, 0)-Xr[1](0, 0),
+    //     Xr[0](1, 0)-Xr[1](1, 0),
+    //     Xr[0](2, 0)-Xr[1](2, 0),
+    // };
+
+    // mlog->show("tar : " +
+    //         QString::number(tar[0]) + " " +
+    //         QString::number(tar[1]) + " " +
+    //         QString::number(tar[2]));
 
 //https://zhuanlan.zhihu.com/p/93563218
 
@@ -306,25 +311,25 @@ int VisionProcess::calibrateGND(vector<GLPoint *> *vPoint)
 
 	srcPoints.push_back(cv::Point3f(140, 0, 0));
     srcPoints.push_back(cv::Point3f(0, 0, 0));
-    srcPoints.push_back(cv::Point3f(0, 60, 0));
+    srcPoints.push_back(cv::Point3f(0, -80, 0));
 
     for (int cm = 0; cm < pointNum; cm++)
     {
 	    dstPoints.push_back(cv::Point3f(Xr[cm](0, 0), Xr[cm](1, 0), Xr[cm](2, 0)));
     }
 
-    cv::Mat RT = MultipleViewTriangulation::Get3DR_TransMatrix(srcPoints, dstPoints);
+    cv::Mat RT = MultipleViewTriangulation::Get3DR_TransMatrix(srcPoints, dstPoints).inv();
     
     vision_param.RGND <<    RT.at<double>(0, 0),RT.at<double>(0, 1),RT.at<double>(0, 2),
                             RT.at<double>(1, 0),RT.at<double>(1, 1),RT.at<double>(1, 2),
                             RT.at<double>(2, 0),RT.at<double>(2, 1),RT.at<double>(2, 2);
     
-    vision_param.TGND <<    RT.at<double>(0, 3),RT.at<double>(1, 3),RT.at<double>(2, 3);
+    vision_param.TGND << -Xr[1](0, 0), -Xr[1](1, 0), -Xr[1](2, 0);//RT.at<double>(0, 3),RT.at<double>(1, 3),RT.at<double>(2, 3);
 
     std::cout << vision_param.RGND << endl;
     std::cout << vision_param.TGND << endl;
 
-    vision_param.eulerAngles = vision_param.RGND.eulerAngles(2, 1, 0); 
+    vision_param.eulerAngles = vision_param.RGND.eulerAngles(0, 1, 2); 
     std::cout << vision_param.eulerAngles << endl;
 
     dis.clear();
