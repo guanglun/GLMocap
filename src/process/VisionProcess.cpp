@@ -285,23 +285,47 @@ int VisionProcess::calibrateGND(vector<GLPoint *> *vPoint)
 
 //https://zhuanlan.zhihu.com/p/93563218
 
-    Eigen::Vector3d rvec (tar[0], tar[1], tar[2]);     
-    double n_norm = rvec.norm();
-    Eigen::AngleAxisd rotation_vector (n_norm, rvec/n_norm);
+    // Eigen::Vector3d rvec (tar[0], tar[1], tar[2]);     
+    // double n_norm = rvec.norm();
+    // Eigen::AngleAxisd rotation_vector (n_norm, rvec/n_norm);
 
-    vision_param.RGND = rotation_vector.toRotationMatrix();
+    // vision_param.RGND = rotation_vector.toRotationMatrix();
 
-    std::cout << vision_param.RGND << std::endl;
+    // std::cout << vision_param.RGND << std::endl;
 
-    //2.1 旋转矩阵转换为欧拉角
-    //ZYX顺序，即先绕x轴roll,再绕y轴pitch,最后绕z轴yaw,0表示X轴,1表示Y轴,2表示Z轴
-    vision_param.eulerAngles = vision_param.RGND.eulerAngles(0, 1, 2); 
+    // //2.1 旋转矩阵转换为欧拉角
+    // //ZYX顺序，即先绕x轴roll,再绕y轴pitch,最后绕z轴yaw,0表示X轴,1表示Y轴,2表示Z轴
+    // vision_param.eulerAngles = vision_param.RGND.eulerAngles(0, 1, 2); 
+    // std::cout << vision_param.eulerAngles << endl;
+
+
+    // vision_param.TGND << Xr[0](0, 0), Xr[0](1, 0), Xr[0](2, 0);
+
+	std::vector<cv::Point3f> srcPoints;
+	std::vector<cv::Point3f>  dstPoints;
+
+	srcPoints.push_back(cv::Point3f(140, 0, 0));
+    srcPoints.push_back(cv::Point3f(0, 0, 0));
+    srcPoints.push_back(cv::Point3f(0, 60, 0));
+
+    for (int cm = 0; cm < pointNum; cm++)
+    {
+	    dstPoints.push_back(cv::Point3f(Xr[cm](0, 0), Xr[cm](1, 0), Xr[cm](2, 0)));
+    }
+
+    cv::Mat RT = MultipleViewTriangulation::Get3DR_TransMatrix(srcPoints, dstPoints);
+    
+    vision_param.RGND <<    RT.at<double>(0, 0),RT.at<double>(0, 1),RT.at<double>(0, 2),
+                            RT.at<double>(1, 0),RT.at<double>(1, 1),RT.at<double>(1, 2),
+                            RT.at<double>(2, 0),RT.at<double>(2, 1),RT.at<double>(2, 2);
+    
+    vision_param.TGND <<    RT.at<double>(0, 3),RT.at<double>(1, 3),RT.at<double>(2, 3);
+
+    std::cout << vision_param.RGND << endl;
+    std::cout << vision_param.TGND << endl;
+
+    vision_param.eulerAngles = vision_param.RGND.eulerAngles(2, 1, 0); 
     std::cout << vision_param.eulerAngles << endl;
-
-
-    vision_param.TGND << Xr[0](0, 0), Xr[0](1, 0), Xr[0](2, 0);
-
-
 
     dis.clear();
     return 0;

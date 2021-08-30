@@ -126,6 +126,9 @@ public:
     static Vector3d rotationMatrixToEulerAngles(Matrix3d &R);
     Vector3d * triangulation(void);
     double distance3d(cv::Point3d p1,cv::Point3d p2);
+
+
+    static cv::Mat Get3DR_TransMatrix(const std::vector<cv::Point3f>& srcPoints, const std::vector<cv::Point3f>&  dstPoints);
 private slots:
     void positionSlot(int camIndex, double x, double y);
 signals:

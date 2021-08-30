@@ -50,6 +50,29 @@ void CamView::paintGL()
               center[0], center[1], center[2],
               up[0], up[1], up[2]);
 
+
+    //坐标轴显示
+    glPushMatrix();
+    glLineWidth(3);//设置线段宽度
+    glColor3f(1.0, 0.0, 0.0);
+    glBegin(GL_LINES);
+    glVertex3f(0.0, 0.0, 0.0);
+    glVertex3f(1.5, 0.0, 0.0);
+    glEnd();
+
+    glColor3f(0.0, 1.0, 0.0);
+    glBegin(GL_LINES);
+    glVertex3f(0.0, 0.0, 0.0);
+    glVertex3f(0.0, 1.0, 0.0);
+    glEnd();
+
+    glColor3f(0.0, 0.0, 1.0);
+    glBegin(GL_LINES);
+    glVertex3f(0.0, 0.0, 0.0);
+    glVertex3f(0.0, 0.0, 0.5);
+    glEnd();    
+    glPopMatrix();
+
     /*网格*/
     glPushMatrix();
     glRotatef(vision_param.eulerAngles[0] * ARC_TO_DEG, 1, 0, 0);
@@ -83,16 +106,33 @@ void CamView::paintGL()
 
         Vector3d v = MultipleViewTriangulation::rotationMatrixToEulerAngles(vision_param.R[i]);
 
-        glTranslatef(vision_param.TGND[0]/1000,vision_param.TGND[1]/1000,vision_param.TGND[2]/1000);
-        glRotatef(vision_param.eulerAngles[0] * ARC_TO_DEG, 1, 0, 0);
-        glRotatef(vision_param.eulerAngles[1] * ARC_TO_DEG, 0, 1, 0);
-        glRotatef(vision_param.eulerAngles[2] * ARC_TO_DEG, 0, 0, 1);
+        // glTranslatef(vision_param.TGND[0]/1000,vision_param.TGND[1]/1000,vision_param.TGND[2]/1000);
+        // glRotatef(vision_param.eulerAngles[0] * ARC_TO_DEG, 1, 0, 0);
+        // glRotatef(vision_param.eulerAngles[1] * ARC_TO_DEG, 0, 1, 0);
+        // glRotatef(vision_param.eulerAngles[2] * ARC_TO_DEG, 0, 0, 1);
 
         glRotatef(v(0, 0) * ARC_TO_DEG, 1, 0, 0);
         glRotatef(v(1, 0) * ARC_TO_DEG, 0, 1, 0);
         glRotatef(v(2, 0) * ARC_TO_DEG, 0, 0, 1);
 
-        glTranslatef(vision_param.T[i](0, 0) / 1000, vision_param.T[i](0, 1) / 1000, vision_param.T[i](0, 2) / 1000);
+        double T[3];
+        
+        T[0] =  -vision_param.T[i](0, 0)*vision_param.R[i].row(0)(0) 
+                -vision_param.T[i](0, 1)*vision_param.R[i].row(0)(1)
+                -vision_param.T[i](0, 2)*vision_param.R[i].row(0)(2);
+        T[1] =  -vision_param.T[i](0, 0)*vision_param.R[i].row(1)(0) 
+                -vision_param.T[i](0, 1)*vision_param.R[i].row(1)(1)
+                -vision_param.T[i](0, 2)*vision_param.R[i].row(1)(2);
+        T[2] =  -vision_param.T[i](0, 0)*vision_param.R[i].row(2)(0) 
+                -vision_param.T[i](0, 1)*vision_param.R[i].row(2)(1)
+                -vision_param.T[i](0, 2)*vision_param.R[i].row(2)(2);      
+
+        glTranslatef(T[0] / 100, T[1] / 100, T[2] / 100);
+
+        glBegin(GL_LINES);
+        glVertex3f(0.0, 0.0, 0.0);
+        glVertex3f(0.0, 0.0, 10.0);
+        glEnd();    
 
         GLDrow::DrowCam();
         glPopMatrix();
