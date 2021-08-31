@@ -333,7 +333,8 @@ cv::Mat MultipleViewTriangulation::Get3DR_TransMatrix(const std::vector<cv::Poin
 		//三行
 		srcMat.at<double>(0, i) = srcPoints[i].x - centerSrc.x;
 		srcMat.at<double>(1, i) = srcPoints[i].y - centerSrc.y;
-		srcMat.at<double>(2, i) = srcPoints[i].z - centerSrc.z; dstMat.at<double>(0, i) = dstPoints[i].x - centerDst.x;
+		srcMat.at<double>(2, i) = srcPoints[i].z - centerSrc.z; 
+        dstMat.at<double>(0, i) = dstPoints[i].x - centerDst.x;
 		dstMat.at<double>(1, i) = dstPoints[i].y - centerDst.y;
 		dstMat.at<double>(2, i) = dstPoints[i].z - centerDst.z;
 

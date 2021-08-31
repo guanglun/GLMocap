@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 
 project(MultiCam LANGUAGES C CXX)
 
-find_package(Qt5 COMPONENTS Core Widgets Gui OpenGL REQUIRED)
+find_package(Qt5 COMPONENTS Core Widgets Gui OpenGL Network REQUIRED)
 find_package(OpenCV 4.5.3 REQUIRED)
 find_package(OpenGL REQUIRED)
 
@@ -77,6 +77,8 @@ add_executable(MultiCam
 
     src/gl_protocol/frame_send.c
     src/gl_protocol/frame_parse.c
+
+    src/px4/PX4Thread/PX4Thread.cpp
 )
 
 include_directories(
@@ -102,6 +104,9 @@ include_directories(
                     src/MuItemCtrl
                     src/vision
                     src/openvio
+                    src/px4/mavlink
+                    src/px4/mavlink/common
+                    src/px4/PX4Thread
                     lib/eigen-3.2.10
                     lib/libusb/include/libusb-1.0
                     ${OpenCV_INCLUDE_DIRS}
@@ -121,6 +126,7 @@ target_link_libraries(MultiCam
                         Qt5::Widgets
                         Qt5::Core
                         Qt5::Gui
+                        Qt5::Network
                         Qt5::OpenGL
                         ${OPENGL_LIBRARIES}
                         ${CMAKE_SOURCE_DIR}/lib/libusb/MinGW32/dll/libusb-1.0.dll.a

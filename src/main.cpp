@@ -3,7 +3,7 @@
 #include "formcamwindow.h"
 #include "formcvwindow.h"
 
-
+#include "PX4Thread.h"
 
 int main(int argc, char *argv[])
 {
@@ -12,5 +12,8 @@ int main(int argc, char *argv[])
     FormCamWindow fCamWindow;
     fCamWindow.show();
 
+    PX4Thread px4Thread;
+    px4Thread.start();
+    
     return a.exec();
 }
