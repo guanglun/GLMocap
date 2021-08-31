@@ -51,10 +51,9 @@ void CamView::paintGL()
               center[0], center[1], center[2],
               up[0], up[1], up[2]);
 
-
     //坐标轴显示
     glPushMatrix();
-    glLineWidth(3);//设置线段宽度
+    glLineWidth(3); //设置线段宽度
     glColor3f(1.0, 0.0, 0.0);
     glBegin(GL_LINES);
     glVertex3f(0.0, 0.0, 0.0);
@@ -71,15 +70,15 @@ void CamView::paintGL()
     glBegin(GL_LINES);
     glVertex3f(0.0, 0.0, 0.0);
     glVertex3f(0.0, 0.0, 0.5);
-    glEnd();    
+    glEnd();
     glPopMatrix();
 
     /*网格*/
     glPushMatrix();
     // glRotatef(vision_param.eulerAngles[0] * ARC_TO_DEG, 1, 0, 0);
     // glRotatef(vision_param.eulerAngles[1] * ARC_TO_DEG, 0, 1, 0);
-    // glRotatef(vision_param.eulerAngles[2] * ARC_TO_DEG, 0, 0, 1);   
-     
+    // glRotatef(vision_param.eulerAngles[2] * ARC_TO_DEG, 0, 0, 1);
+
     GLDrow::DrowGrid();
     glPopMatrix();
 
@@ -90,17 +89,14 @@ void CamView::paintGL()
         glRotatef(vision_param.eulerAngles[0] * ARC_TO_DEG, 1, 0, 0);
         glRotatef(vision_param.eulerAngles[1] * ARC_TO_DEG, 0, 1, 0);
         glRotatef(vision_param.eulerAngles[2] * ARC_TO_DEG, 0, 0, 1);
-        glTranslatef(vision_param.TGND[0]/TRAN_SIZE,vision_param.TGND[1]/TRAN_SIZE,vision_param.TGND[2]/TRAN_SIZE);
+        glTranslatef(vision_param.TGND[0] / TRAN_SIZE, vision_param.TGND[1] / TRAN_SIZE, vision_param.TGND[2] / TRAN_SIZE);
 
-        glTranslatef(Xr[pm](0, 0)/TRAN_SIZE, Xr[pm](1, 0)/TRAN_SIZE, Xr[pm](2, 0)/TRAN_SIZE);
-        
-
+        glTranslatef(Xr[pm](0, 0) / TRAN_SIZE, Xr[pm](1, 0) / TRAN_SIZE, Xr[pm](2, 0) / TRAN_SIZE);
 
         glColor3f(1.0, 0.0, 0.0);
         GLDrow::drawSphere();
         glPopMatrix();
     }
-
 
     for (int i = 0; i < vision_param.CamNum; i++)
     {
@@ -114,31 +110,32 @@ void CamView::paintGL()
         glRotatef(vision_param.eulerAngles[0] * ARC_TO_DEG, 1, 0, 0);
         glRotatef(vision_param.eulerAngles[1] * ARC_TO_DEG, 0, 1, 0);
         glRotatef(vision_param.eulerAngles[2] * ARC_TO_DEG, 0, 0, 1);
-        glTranslatef(vision_param.TGND[0]/TRAN_SIZE,vision_param.TGND[1]/TRAN_SIZE,vision_param.TGND[2]/TRAN_SIZE);
+        glTranslatef(vision_param.TGND[0] / TRAN_SIZE, vision_param.TGND[1] / TRAN_SIZE, vision_param.TGND[2] / TRAN_SIZE);
 
         //Vector3d v = vision_param.R[i].transpose().eulerAngles(2, 1, 0);
 
-//////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////
 
         // Vector3d v = vision_param.R[i].eulerAngles(2, 1, 0);
 
-        // glRotatef(v(0, 0) * ARC_TO_DEG, 1, 0, 0);
-        // glRotatef(v(1, 0) * ARC_TO_DEG, 0, 1, 0);
-        // glRotatef(v(2, 0) * ARC_TO_DEG, 0, 0, 1);
+        // glRotatef(-v(0, 0) * ARC_TO_DEG, 1, 0, 0);
+        // glRotatef(-v(1, 0) * ARC_TO_DEG, 0, 1, 0);
+        // glRotatef(-v(2, 0) * ARC_TO_DEG, 0, 0, 1);
 
+        // std::cout << v << std::endl;
         // glTranslatef(
-        //     vision_param.T[i](0, 0) / TRAN_SIZE, 
-        //     vision_param.T[i](0, 1) / TRAN_SIZE, 
+        //     vision_param.T[i](0, 0) / TRAN_SIZE,
+        //     vision_param.T[i](0, 1) / TRAN_SIZE,
         //     vision_param.T[i](0, 2) / TRAN_SIZE);
 
-///////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////
 
-	    cv::Mat R_T = (cv::Mat_<double>(4, 4) <<
-		vision_param.R[i].row(0)(0),vision_param.R[i].row(0)(1),vision_param.R[i].row(0)(2),vision_param.T[i].row(0)(0),
-		vision_param.R[i].row(1)(0),vision_param.R[i].row(1)(1),vision_param.R[i].row(1)(2),vision_param.T[i].row(0)(1),
-		vision_param.R[i].row(2)(0),vision_param.R[i].row(2)(1),vision_param.R[i].row(2)(2),vision_param.T[i].row(0)(2),
-		0, 0, 0, 1
-		);
+        cv::Mat R_T = (cv::Mat_<double>(4, 4) <<
+        vision_param.R[i].row(0)(0),vision_param.R[i].row(0)(1),vision_param.R[i].row(0)(2),vision_param.T[i].row(0)(0),
+        vision_param.R[i].row(1)(0),vision_param.R[i].row(1)(1),vision_param.R[i].row(1)(2),vision_param.T[i].row(0)(1),
+        vision_param.R[i].row(2)(0),vision_param.R[i].row(2)(1),vision_param.R[i].row(2)(2),vision_param.T[i].row(0)(2),
+        0, 0, 0, 1
+        );
 
         R_T = R_T.inv();
 
@@ -151,37 +148,29 @@ void CamView::paintGL()
         T_ <<
                 R_T.at<double>(0, 3),R_T.at<double>(1, 3),R_T.at<double>(2, 3);
 
-        Vector3d v = R_.eulerAngles(2, 1, 0);
+        Vector3d v = R_.eulerAngles(0, 1, 2);
 
-        glRotatef(v(0, 0) * ARC_TO_DEG, 1, 0, 0);
-        glRotatef(v(1, 0) * ARC_TO_DEG, 0, 1, 0);
-        glRotatef(v(2, 0) * ARC_TO_DEG, 0, 0, 1);
+        glRotatef(-v(0, 0) * ARC_TO_DEG, 1, 0, 0);
+        glRotatef(-v(1, 0) * ARC_TO_DEG, 0, 1, 0);
+        glRotatef(-v(2, 0) * ARC_TO_DEG, 0, 0, 1);
 
         glTranslatef(
-            T_(0, 0) / TRAN_SIZE, 
-            T_(0, 1) / TRAN_SIZE, 
+            T_(0, 0) / TRAN_SIZE,
+            T_(0, 1) / TRAN_SIZE,
             T_(0, 2) / TRAN_SIZE);
 
-/////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
+        /////////////////////////////////////////////////////
 
         // double T[3];
-        // T[0] =  -vision_param.T[i](0, 0)*vision_param.R[i].row(0)(0) 
+        // T[0] =  -vision_param.T[i](0, 0)*vision_param.R[i].row(0)(0)
         //         -vision_param.T[i](0, 1)*vision_param.R[i].row(0)(1)
         //         -vision_param.T[i](0, 2)*vision_param.R[i].row(0)(2);
-        // T[1] =  -vision_param.T[i](0, 0)*vision_param.R[i].row(1)(0) 
+        // T[1] =  -vision_param.T[i](0, 0)*vision_param.R[i].row(1)(0)
         //         -vision_param.T[i](0, 1)*vision_param.R[i].row(1)(1)
         //         -vision_param.T[i](0, 2)*vision_param.R[i].row(1)(2);
-        // T[2] =  -vision_param.T[i](0, 0)*vision_param.R[i].row(2)(0) 
+        // T[2] =  -vision_param.T[i](0, 0)*vision_param.R[i].row(2)(0)
         //         -vision_param.T[i](0, 1)*vision_param.R[i].row(2)(1)
-        //         -vision_param.T[i](0, 2)*vision_param.R[i].row(2)(2);      
+        //         -vision_param.T[i](0, 2)*vision_param.R[i].row(2)(2);
 
         // glTranslatef(T[0] / TRAN_SIZE, T[1] / TRAN_SIZE, T[2] / TRAN_SIZE);
 
@@ -189,7 +178,7 @@ void CamView::paintGL()
         glColor3f(0.0, 0.0, 1.0);
         glVertex3f(0.0, 0.0, 0.0);
         glVertex3f(0.0, 0.0, 10.0);
-        glEnd();    
+        glEnd();
 
         GLDrow::DrowCam();
         glPopMatrix();
@@ -348,11 +337,11 @@ void CamView::wheelEvent(QWheelEvent *event)
 
     if (event->delta() > 0)
     {
-        farCam -= 0.1*10;
+        farCam -= 0.1 * 10;
     }
     else
     {
-        farCam += 0.1*10;
+        farCam += 0.1 * 10;
     }
 
     cameraTurn(yawCam, pitchCam, farCam);
