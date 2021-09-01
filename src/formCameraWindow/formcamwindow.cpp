@@ -308,6 +308,12 @@ void FormCamWindow::on_pb_init_gnd_clicked()
     qwinusb->visionProcess->calGNDstate = CAL_START;
 }   
 
+void FormCamWindow::on_pb_find_drone_clicked()
+{
+    qwinusb->visionProcess->matchState = MATCH_START;
+    qwinusb->visionProcess->findDroneState = FIND_MODULE_START;
+}
+
 void FormCamWindow::vioItemSelected(const QModelIndex &index)
 {
 }
@@ -431,7 +437,7 @@ void FormCamWindow::on_action_position_triggered()
 {
     if (!fVisionWindow.isVisible())
     {
-        connect(&qwinusb->visionProcess->multipleViewTriangulation, SIGNAL(onXYZSignals(Vector3d *,int)), &fVisionWindow, SLOT(onXYZSlot(Vector3d *,int)));
+        connect(qwinusb->visionProcess, SIGNAL(onXYZSignals(Vector3d *,int)), &fVisionWindow, SLOT(onXYZSlot(Vector3d *,int)));
         fVisionWindow.show();
     }
 }
@@ -440,7 +446,7 @@ void FormCamWindow::on_action3d_view_triggered()
 {
     if (!f3DViewWindow.isVisible())
     {
-        connect(&qwinusb->visionProcess->multipleViewTriangulation, SIGNAL(onXYZSignals(Vector3d *,int)), &f3DViewWindow, SLOT(onXYZSlot(Vector3d *,int)));
+        connect(qwinusb->visionProcess, SIGNAL(onXYZSignals(Vector3d *,int)), &f3DViewWindow, SLOT(onXYZSlot(Vector3d *,int)));
         f3DViewWindow.show();
     }
 }

@@ -28,7 +28,14 @@ typedef enum MATCH_STATE{
 typedef enum CAL_STATE{
     CAL_IDLE,
     CAL_START,
+    CAL_OK,
 }CAL_STATE;
+
+typedef enum FIND_MODULE_STATE{
+    FIND_MODULE_IDLE,
+    FIND_MODULE_START,
+    FIND_MODULE_OK,
+}FIND_MODULE_STATE;
 
 typedef struct CAMERA_RESULT{
     int camIndex;
@@ -52,14 +59,18 @@ private:
     int matchPoint(void);
     int checkVPointSize(void);
     int calibrateGND(vector<GLPoint *> *vPoint);
+    int findDroneModule(vector<GLPoint *> *vPoint);
     void forloop(int pm,int cm);
 public:
 
     MATCH_STATE matchState = MATCH_IDLE;
     CAL_STATE calGNDstate = CAL_IDLE;
+    FIND_MODULE_STATE findDroneState = FIND_MODULE_IDLE;
+
 
     int count = 0;
     bool isCapImage = false;
+    
     
     CAMERA_RESULT camResult[CAM_NUM_MAX];
 
@@ -73,7 +84,7 @@ public:
 public slots:
     void positionSlot(CAMERA_RESULT result);  
 signals:
-
+    void onXYZSignals(Vector3d *Xr,int size);
 };
  
 #endif // VISIONPROCESS_H

@@ -75,10 +75,6 @@ void CamView::paintGL()
 
     /*网格*/
     glPushMatrix();
-    // glRotatef(vision_param.eulerAngles[0] * ARC_TO_DEG, 1, 0, 0);
-    // glRotatef(vision_param.eulerAngles[1] * ARC_TO_DEG, 0, 1, 0);
-    // glRotatef(vision_param.eulerAngles[2] * ARC_TO_DEG, 0, 0, 1);
-
     GLDrow::DrowGrid();
     glPopMatrix();
 
@@ -86,10 +82,10 @@ void CamView::paintGL()
     {
         glPushMatrix();
 
-        glRotatef(vision_param.eulerAngles[0] * ARC_TO_DEG, 1, 0, 0);
-        glRotatef(vision_param.eulerAngles[1] * ARC_TO_DEG, 0, 1, 0);
-        glRotatef(vision_param.eulerAngles[2] * ARC_TO_DEG, 0, 0, 1);
-        glTranslatef(vision_param.TGND[0] / TRAN_SIZE, vision_param.TGND[1] / TRAN_SIZE, vision_param.TGND[2] / TRAN_SIZE);
+        // glRotatef(vision_param.eulerAngles[0] * ARC_TO_DEG, 1, 0, 0);
+        // glRotatef(vision_param.eulerAngles[1] * ARC_TO_DEG, 0, 1, 0);
+        // glRotatef(vision_param.eulerAngles[2] * ARC_TO_DEG, 0, 0, 1);
+        // glTranslatef(vision_param.TGND[0] / TRAN_SIZE, vision_param.TGND[1] / TRAN_SIZE, vision_param.TGND[2] / TRAN_SIZE);
 
         glTranslatef(Xr[pm](0, 0) / TRAN_SIZE, Xr[pm](1, 0) / TRAN_SIZE, Xr[pm](2, 0) / TRAN_SIZE);
 

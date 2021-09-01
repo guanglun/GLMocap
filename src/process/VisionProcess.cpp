@@ -171,7 +171,18 @@ int VisionProcess::matchPoint(void)
         }
         else
         {
-            calGNDstate = CAL_IDLE;
+            calGNDstate = CAL_OK;
+        }
+    }
+    else if (findDroneState == FIND_MODULE_START)
+    {
+        if (findDroneModule(vPoint) < 0)
+        {
+            return -1;
+        }
+        else
+        {
+            findDroneState = FIND_MODULE_OK;
         }
     }
 
@@ -189,6 +200,80 @@ void swapVPoint(GLPoint *p1, GLPoint *p2)
 {
     swapid(&p1->id, &p2->id);
     swap(p1, p2);
+}
+
+int VisionProcess::findDroneModule(vector<GLPoint *> *vPoint)
+{
+    if (pointNum != 3)
+    {
+        DBG("calibrateGND Error Return, pointNum != 3");
+        return -1;
+    }
+
+    Vector3d *Xr = triangulation();
+    vector<double> dis;
+
+    dis.push_back(multipleViewTriangulation.distance3d(
+        cv::Point3d(Xr[0](0, 0), Xr[0](1, 0), Xr[0](2, 0)),
+        cv::Point3d(Xr[1](0, 0), Xr[1](1, 0), Xr[1](2, 0))));
+
+    dis.push_back(multipleViewTriangulation.distance3d(
+        cv::Point3d(Xr[0](0, 0), Xr[0](1, 0), Xr[0](2, 0)),
+        cv::Point3d(Xr[2](0, 0), Xr[2](1, 0), Xr[2](2, 0))));
+
+    dis.push_back(multipleViewTriangulation.distance3d(
+        cv::Point3d(Xr[1](0, 0), Xr[1](1, 0), Xr[1](2, 0)),
+        cv::Point3d(Xr[2](0, 0), Xr[2](1, 0), Xr[2](2, 0))));
+
+    mlog->show("dis: " + QString::number(dis[0]) + " " + QString::number(dis[1]) + " " + QString::number(dis[2]));
+
+    if (dis[2] < dis[1] && dis[1] < dis[0])
+    {
+        for (int cm = 0; cm < camNum; cm++)
+            swapVPoint(vPoint[cm][1], vPoint[cm][2]);
+    }
+    else if (dis[1] < dis[0] && dis[0] < dis[2])
+    {
+        for (int cm = 0; cm < camNum; cm++)
+            swapVPoint(vPoint[cm][1], vPoint[cm][0]);
+    }
+    else if (dis[0] < dis[2] && dis[2] < dis[1])
+    {
+        for (int cm = 0; cm < camNum; cm++)
+            swapVPoint(vPoint[cm][0], vPoint[cm][2]);
+    }
+    else if (dis[0] < dis[1] && dis[1] < dis[2])
+    {
+        for (int cm = 0; cm < camNum; cm++)
+        {
+            swapVPoint(vPoint[cm][0], vPoint[cm][2]);
+            swapVPoint(vPoint[cm][1], vPoint[cm][0]);
+        }
+    }
+    else if (dis[1] < dis[2] && dis[2] < dis[0])
+    {
+        for (int cm = 0; cm < camNum; cm++)
+        {
+            swapVPoint(vPoint[cm][0], vPoint[cm][1]);
+            swapVPoint(vPoint[cm][0], vPoint[cm][2]);
+        }
+    }
+
+    for (int cm = 0; cm < camNum; cm++)
+    {
+        for (int pm = 0; pm < pointNum; pm++)
+        {
+            camResult[cm].vPoint[pm]->state = vPoint[cm][pm]->state;
+            camResult[cm].vPoint[pm]->imageIndex = vPoint[cm][pm]->imageIndex;
+            camResult[cm].vPoint[pm]->x = vPoint[cm][pm]->x;
+            camResult[cm].vPoint[pm]->y = vPoint[cm][pm]->y;
+            camResult[cm].vPoint[pm]->id = vPoint[cm][pm]->id;
+        }
+        vPoint[cm].clear();
+    }
+
+    dis.clear();
+    return 0;
 }
 
 int VisionProcess::calibrateGND(vector<GLPoint *> *vPoint)
@@ -288,9 +373,9 @@ int VisionProcess::calibrateGND(vector<GLPoint *> *vPoint)
     //         QString::number(tar[1]) + " " +
     //         QString::number(tar[2]));
 
-//https://zhuanlan.zhihu.com/p/93563218
+    //https://zhuanlan.zhihu.com/p/93563218
 
-    // Eigen::Vector3d rvec (tar[0], tar[1], tar[2]);     
+    // Eigen::Vector3d rvec (tar[0], tar[1], tar[2]);
     // double n_norm = rvec.norm();
     // Eigen::AngleAxisd rotation_vector (n_norm, rvec/n_norm);
 
@@ -300,36 +385,35 @@ int VisionProcess::calibrateGND(vector<GLPoint *> *vPoint)
 
     // //2.1 旋转矩阵转换为欧拉角
     // //ZYX顺序，即先绕x轴roll,再绕y轴pitch,最后绕z轴yaw,0表示X轴,1表示Y轴,2表示Z轴
-    // vision_param.eulerAngles = vision_param.RGND.eulerAngles(0, 1, 2); 
+    // vision_param.eulerAngles = vision_param.RGND.eulerAngles(0, 1, 2);
     // std::cout << vision_param.eulerAngles << endl;
-
 
     // vision_param.TGND << Xr[0](0, 0), Xr[0](1, 0), Xr[0](2, 0);
 
-	std::vector<cv::Point3f> srcPoints;
-	std::vector<cv::Point3f>  dstPoints;
+    std::vector<cv::Point3f> srcPoints;
+    std::vector<cv::Point3f> dstPoints;
 
-	srcPoints.push_back(cv::Point3f(140, 0, 0));
+    srcPoints.push_back(cv::Point3f(140, 0, 0));
     srcPoints.push_back(cv::Point3f(0, 0, 0));
     srcPoints.push_back(cv::Point3f(0, -80, 0));
 
     for (int cm = 0; cm < pointNum; cm++)
     {
-	    dstPoints.push_back(cv::Point3f(Xr[cm](0, 0), Xr[cm](1, 0), Xr[cm](2, 0)));
+        dstPoints.push_back(cv::Point3f(Xr[cm](0, 0), Xr[cm](1, 0), Xr[cm](2, 0)));
     }
 
     cv::Mat RT = MultipleViewTriangulation::Get3DR_TransMatrix(srcPoints, dstPoints).inv();
-    
-    vision_param.RGND <<    RT.at<double>(0, 0),RT.at<double>(0, 1),RT.at<double>(0, 2),
-                            RT.at<double>(1, 0),RT.at<double>(1, 1),RT.at<double>(1, 2),
-                            RT.at<double>(2, 0),RT.at<double>(2, 1),RT.at<double>(2, 2);
-    
-    vision_param.TGND << -Xr[1](0, 0), -Xr[1](1, 0), -Xr[1](2, 0);//RT.at<double>(0, 3),RT.at<double>(1, 3),RT.at<double>(2, 3);
+
+    vision_param.RGND << RT.at<double>(0, 0), RT.at<double>(0, 1), RT.at<double>(0, 2),
+        RT.at<double>(1, 0), RT.at<double>(1, 1), RT.at<double>(1, 2),
+        RT.at<double>(2, 0), RT.at<double>(2, 1), RT.at<double>(2, 2);
+
+    vision_param.TGND << -Xr[1](0, 0), -Xr[1](1, 0), -Xr[1](2, 0); //RT.at<double>(0, 3),RT.at<double>(1, 3),RT.at<double>(2, 3);
 
     std::cout << vision_param.RGND << endl;
     std::cout << vision_param.TGND << endl;
 
-    vision_param.eulerAngles = vision_param.RGND.eulerAngles(0, 1, 2); 
+    vision_param.eulerAngles = vision_param.RGND.eulerAngles(0, 1, 2);
     std::cout << vision_param.eulerAngles << endl;
 
     dis.clear();
@@ -418,7 +502,64 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
             }
             else if (matchState == MATCH_OK)
             {
-                triangulation();
+                if (calGNDstate == CAL_OK)
+                {
+                    Vector3d *Xr = triangulation();
+                    for (int pm = 0; pm < vision_param.ptNum; pm++)
+                    {
+                        Matrix<double, 3, 1> T;
+                        T << vision_param.TGND[0],vision_param.TGND[1],vision_param.TGND[2];
+                        Xr[pm] = vision_param.RGND * Xr[pm] + T;
+                    }
+
+                    emit onXYZSignals(Xr, vision_param.ptNum);
+                }
+
+                else if (findDroneState == FIND_MODULE_OK)
+                {
+                    Vector3d *Xr = triangulation();
+                    for (int pm = 0; pm < vision_param.ptNum; pm++)
+                    {
+                        Matrix<double, 3, 1> T;
+                        T << vision_param.TGND[0],vision_param.TGND[1],vision_param.TGND[2];
+                        Xr[pm] = vision_param.RGND * Xr[pm] + T;
+                    }
+
+                    std::vector<cv::Point3f> srcPoints;
+                    std::vector<cv::Point3f> dstPoints;
+
+                    srcPoints.push_back(cv::Point3f(140, 0, 0));
+                    srcPoints.push_back(cv::Point3f(0, 0, 0));
+                    srcPoints.push_back(cv::Point3f(0, -80, 0));
+
+                    for (int cm = 0; cm < pointNum; cm++)
+                    {
+                        dstPoints.push_back(cv::Point3f(Xr[cm](0, 0), Xr[cm](1, 0), Xr[cm](2, 0)));
+                    }
+
+                    cv::Mat RT = MultipleViewTriangulation::Get3DR_TransMatrix(srcPoints, dstPoints).inv();
+
+                    Matrix3d R_Drone;
+                    RowVector3d T_Drone;
+                    Vector3d eulerAnglesDrone;
+
+                    R_Drone << RT.at<double>(0, 0), RT.at<double>(0, 1), RT.at<double>(0, 2),
+                        RT.at<double>(1, 0), RT.at<double>(1, 1), RT.at<double>(1, 2),
+                        RT.at<double>(2, 0), RT.at<double>(2, 1), RT.at<double>(2, 2);
+                    eulerAnglesDrone = R_Drone.eulerAngles(0, 1, 2) * 180 / M_PI;
+
+                    T_Drone << -Xr[1](0, 0), -Xr[1](1, 0), -Xr[1](2, 0);
+
+                    mlog->show("pos : " +
+                               QString::number(T_Drone(0, 0)) + " " +
+                               QString::number(T_Drone(1, 0)) + " " +
+                               QString::number(T_Drone(2, 0)) + " " +
+                               QString::number(eulerAnglesDrone[0]) + " " +
+                               QString::number(eulerAnglesDrone[1]) + " " +
+                               QString::number(eulerAnglesDrone[2]));
+
+                    emit onXYZSignals(Xr, vision_param.ptNum);
+                }
             }
         }
     }

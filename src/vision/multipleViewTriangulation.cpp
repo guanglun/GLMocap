@@ -228,8 +228,6 @@ Vector3d *MultipleViewTriangulation::triangulation(void)
                 
     // mlog->show("distance: " + QString::number(dis));
 
-    emit onXYZSignals(Xr,vision_param.ptNum);
-
     return Xr;
 }
 
@@ -309,7 +307,9 @@ cv::Mat MultipleViewTriangulation::Get3DR_TransMatrix(const std::vector<cv::Poin
 	{
 		srcSumX += srcPoints[i].x;
 		srcSumY += srcPoints[i].y;
-		srcSumZ += srcPoints[i].z; dstSumX += dstPoints[i].x;
+		srcSumZ += srcPoints[i].z; 
+        
+        dstSumX += dstPoints[i].x;
 		dstSumY += dstPoints[i].y;
 		dstSumZ += dstPoints[i].z;
 	}
