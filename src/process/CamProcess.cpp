@@ -50,8 +50,8 @@ void CamProcess::match(vector<Point2f> centers)
         }
     }
 
-    if (vio->visionProcess->matchState == MATCH_START ||
-        vio->visionProcess->matchState == MATCH_OK)
+    // if (vio->visionProcess->matchState == MATCH_START ||
+    //     vio->visionProcess->matchState == MATCH_OK)
     {
         result.vPoint = vPoint;
         emit positionSignals(result);

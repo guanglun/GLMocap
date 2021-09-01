@@ -12,8 +12,10 @@ using namespace Eigen;
 
 typedef Matrix<double, 3, 3> Matrix33d;
 typedef Matrix<double, 3, 4> Matrix34d;
+typedef Matrix<double, 4, 4> Matrix44d;
 typedef Matrix<double, 3, 9> Matrix39d;
 typedef Matrix<double, 6, 1> Vector6d;
+typedef Matrix<double, 3, 1> Vector3d;
 typedef Matrix<double, 6, 3> Matrix63d;
 typedef Matrix<double, 6, 6> Matrix6d;
 typedef Matrix<double, 9, 1> Vector9d;
@@ -44,8 +46,10 @@ struct VISION_PARAM
     RowVector3d T[CAM_NUM_MAX];
     MatrixXd xy[PT_NUM_MAX];
 
+    Matrix44d RTGNDINV;
     Matrix3d   RGND;
     RowVector3d TGND;
+
     Vector3d eulerAngles;
     // Matrix<double, PT_NUM_MAX, CAM_NUM_MAX> idx;
     MatrixXi idx;

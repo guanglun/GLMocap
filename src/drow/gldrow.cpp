@@ -8,9 +8,9 @@ GLDrow::GLDrow()
 //画网格
 void GLDrow::DrowGrid(void)
 {
-    glLineWidth(1);//设置线段宽度
+    glLineWidth(0.1);//设置线段宽度
     glColor3f(1.0, 1.0, 1.0);
-    for (double cnt=-4.0;cnt<4.2;cnt+=0.2)
+    for (double cnt=-4.0;cnt<4.2;cnt+=0.4)
     {
         
         glBegin(GL_LINES);

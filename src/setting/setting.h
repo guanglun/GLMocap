@@ -33,7 +33,8 @@ private:
     struct SET_STRUCT VISION_THRESHOLD = {"VISION_THRESHOLD","200"};
     
     QSettings *set;
-    
+    QSettings *set_vision;
+
 public:
     int threshold = 200;
     QString imagePath;
@@ -55,7 +56,7 @@ public:
     void setFirmwarePath(QString path);
     int getThreshold();
     void setThreshold(int thr);
-
+    void saveGNDVisionParam(void);
 };
 
 #endif // SETTING_H

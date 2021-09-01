@@ -82,11 +82,6 @@ void CamView::paintGL()
     {
         glPushMatrix();
 
-        // glRotatef(vision_param.eulerAngles[0] * ARC_TO_DEG, 1, 0, 0);
-        // glRotatef(vision_param.eulerAngles[1] * ARC_TO_DEG, 0, 1, 0);
-        // glRotatef(vision_param.eulerAngles[2] * ARC_TO_DEG, 0, 0, 1);
-        // glTranslatef(vision_param.TGND[0] / TRAN_SIZE, vision_param.TGND[1] / TRAN_SIZE, vision_param.TGND[2] / TRAN_SIZE);
-
         glTranslatef(Xr[pm](0, 0) / TRAN_SIZE, Xr[pm](1, 0) / TRAN_SIZE, Xr[pm](2, 0) / TRAN_SIZE);
 
         glColor3f(1.0, 0.0, 0.0);
@@ -106,7 +101,7 @@ void CamView::paintGL()
         glRotatef(vision_param.eulerAngles[0] * ARC_TO_DEG, 1, 0, 0);
         glRotatef(vision_param.eulerAngles[1] * ARC_TO_DEG, 0, 1, 0);
         glRotatef(vision_param.eulerAngles[2] * ARC_TO_DEG, 0, 0, 1);
-        glTranslatef(vision_param.TGND[0] / TRAN_SIZE, vision_param.TGND[1] / TRAN_SIZE, vision_param.TGND[2] / TRAN_SIZE);
+        glTranslatef(-vision_param.TGND[0] / TRAN_SIZE, -vision_param.TGND[1] / TRAN_SIZE, -vision_param.TGND[2] / TRAN_SIZE);
 
         //Vector3d v = vision_param.R[i].transpose().eulerAngles(2, 1, 0);
 
@@ -170,11 +165,11 @@ void CamView::paintGL()
 
         // glTranslatef(T[0] / TRAN_SIZE, T[1] / TRAN_SIZE, T[2] / TRAN_SIZE);
 
-        glBegin(GL_LINES);
-        glColor3f(0.0, 0.0, 1.0);
-        glVertex3f(0.0, 0.0, 0.0);
-        glVertex3f(0.0, 0.0, 10.0);
-        glEnd();
+        // glBegin(GL_LINES);
+        // glColor3f(0.0, 0.0, 1.0);
+        // glVertex3f(0.0, 0.0, 0.0);
+        // glVertex3f(0.0, 0.0, 10.0);
+        // glEnd();
 
         GLDrow::DrowCam();
         glPopMatrix();

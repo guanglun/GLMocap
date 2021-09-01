@@ -300,6 +300,7 @@ void FormCamWindow::on_pb_capture_clicked()
 void FormCamWindow::on_pb_init_module_clicked()
 {
     qwinusb->visionProcess->matchState = MATCH_START;
+    qwinusb->visionProcess->findDroneState = FIND_MODULE_START;
 }
 
 void FormCamWindow::on_pb_init_gnd_clicked()
