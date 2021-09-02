@@ -25,6 +25,7 @@ class OPENVIO;
 class USBThread;
 #include "usbthread.h"
 
+#include "PX4Thread.h"
 
 #define OPENVIO_IDVENDOR                2012
 #define OPENVIO_IDPRODUCT               2012
@@ -79,6 +80,7 @@ private:
 
     QThread visionProcessThread;
 public:
+    PX4Thread px4Thread;
     QTimer *timer;
     VisionProcess *visionProcess;
     QStandardItemModel *pModelOpenvio;

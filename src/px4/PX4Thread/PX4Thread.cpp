@@ -5,6 +5,7 @@
 #define SYSTEM_ID 1
 #define COMPONENT_ID 1
 
+#define TARGET_IP "192.168.137.18"
 static uint64_t microsSinceEpoch();
 
 PX4Thread::PX4Thread()
@@ -21,24 +22,11 @@ void PX4Thread::run()
     mavlink_message_t msg;
     uint16_t len;
 
-    float x = 10, y = 21, z = 13;
-    float roll, pitch, yaw;
-
-    setInterval(MAVLINK_MSG_ID_VISION_POSITION_ESTIMATE, 1000000);
+    setInterval(MAVLINK_MSG_ID_ODOMETRY, 20000);
     setInterval(MAVLINK_MSG_ID_ATTITUDE, 100000);
 
     for (;;)
     {
-
-        float covariance[21] = {NAN};
-        //uint8_t reset_counter = 10;
-        mavlink_msg_vision_position_estimate_pack(1, 1, &msg,
-                                                  microsSinceEpoch(),
-                                                  x, y, z,
-                                                  roll, pitch, yaw,
-                                                  covariance, 0);
-        len = mavlink_msg_to_send_buffer(buf, &msg);
-        bytes_sent = m_pUdpServer->writeDatagram((const char *)buf, len, QHostAddress("192.168.2.1"), 14550);
 
         QThread::msleep(100);
     }
@@ -89,6 +77,26 @@ static uint64_t microsSinceEpoch()
     return micros;
 }
 
+void PX4Thread::setPos(float x, float y, float z, float roll, float pitch, float yaw)
+{
+    this->x = x;
+    this->y = y;
+    this->z = z;
+    this->roll = roll;
+    this->pitch = pitch;
+    this->yaw = yaw;
+
+    float covariance[21] = {NAN};
+    //uint8_t reset_counter = 10;
+    mavlink_msg_vision_position_estimate_pack(1, 1, &msg,
+                                              microsSinceEpoch(),
+                                              x, y, z,
+                                              roll, pitch, yaw,
+                                              covariance, 0);
+    len = mavlink_msg_to_send_buffer(buf, &msg);
+    bytes_sent = m_pUdpServer->writeDatagram((const char *)buf, len, QHostAddress(TARGET_IP), 14550);
+}
+
 void PX4Thread::setInterval(int id, int interval_us)
 {
     mavlink_command_long_t interval;
@@ -102,7 +110,7 @@ void PX4Thread::setInterval(int id, int interval_us)
     mavlink_msg_command_long_encode(255, 0, &msg, &interval);
 
     len = mavlink_msg_to_send_buffer(buf, &msg);
-    bytes_sent = m_pUdpServer->writeDatagram((const char *)buf, len, QHostAddress("192.168.2.1"), 14550);
+    bytes_sent = m_pUdpServer->writeDatagram((const char *)buf, len, QHostAddress(TARGET_IP), 14550);
 }
 
 /* Ctrl Success

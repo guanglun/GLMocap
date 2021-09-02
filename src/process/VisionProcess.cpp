@@ -1,8 +1,9 @@
 #include "VisionProcess.h"
 #include "CameraPointMap.h"
 
-VisionProcess::VisionProcess(QObject *parent)
+VisionProcess::VisionProcess(PX4Thread *px4,QObject *parent)
 {
+    this->px4 = px4;
 }
 
 void VisionProcess::init(int camNum)
@@ -543,12 +544,23 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
                         Xr[pm] << PT(0,0),PT(1,0),PT(2,0);
                     }
 
+                    // mlog->show("pis : " +
+                    //            QString::number(Xr[0](0, 0)) + " " +
+                    //            QString::number(Xr[0](1, 0)) + " " +
+                    //            QString::number(Xr[0](2, 0)) + " " +
+                    //            QString::number(Xr[1](0, 0)) + " " +
+                    //            QString::number(Xr[1](1, 0)) + " " +
+                    //            QString::number(Xr[1](2, 0)) + " " +
+                    //            QString::number(Xr[2](0, 0)) + " " +
+                    //            QString::number(Xr[2](1, 0)) + " " +
+                    //            QString::number(Xr[2](2, 0)));
+
                     std::vector<cv::Point3f> srcPoints;
                     std::vector<cv::Point3f> dstPoints;
 
-                    srcPoints.push_back(cv::Point3f(140, 0, 0));
+                    srcPoints.push_back(cv::Point3f(61, 0, 0));
                     srcPoints.push_back(cv::Point3f(0, 0, 0));
-                    srcPoints.push_back(cv::Point3f(0, -80, 0));
+                    srcPoints.push_back(cv::Point3f(0, -41, 0));
 
                     for (int cm = 0; cm < pointNum; cm++)
                     {
@@ -564,10 +576,16 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
                     R_Drone <<  RT.at<double>(0, 0), RT.at<double>(0, 1), RT.at<double>(0, 2),
                                 RT.at<double>(1, 0), RT.at<double>(1, 1), RT.at<double>(1, 2),
                                 RT.at<double>(2, 0), RT.at<double>(2, 1), RT.at<double>(2, 2);
-
-                    eulerAnglesDrone = R_Drone.eulerAngles(2, 1, 0) * 180 / M_PI;
+                    //std::cout << R_Drone << endl;
+                    eulerAnglesDrone = R_Drone.transpose().eulerAngles(2, 1, 0);// * 180 / M_PI;
+                    // eulerAnglesDrone[0] += 180;
+                    // eulerAnglesDrone[1] += 180;
+                    // eulerAnglesDrone[2] += 180;
 
                     T_Drone << Xr[1](0, 0), Xr[1](1, 0), Xr[1](2, 0);
+
+                    px4->setPos(Xr[1](0, 0)/1000, Xr[1](1, 0)/1000, Xr[1](2, 0)/1000,
+                                eulerAnglesDrone[2],eulerAnglesDrone[1],eulerAnglesDrone[0]);
 
                     mlog->show("pos : " +
                                QString::number(T_Drone(0, 0), 'f', 2) + "\t" +

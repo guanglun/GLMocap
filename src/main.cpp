@@ -11,9 +11,6 @@ int main(int argc, char *argv[])
 
     FormCamWindow fCamWindow;
     fCamWindow.show();
-
-    PX4Thread px4Thread;
-    px4Thread.start();
     
     return a.exec();
 }

@@ -15,6 +15,8 @@
 #include "GLPoint.h"
 #include "MultipleViewTriangulation.h"
 
+#include "PX4Thread.h"
+
 using namespace std;
 
 typedef enum MATCH_STATE{
@@ -56,6 +58,8 @@ private:
     
     int camNum = 0;
     int pointNum = 0;
+    PX4Thread *px4;
+    
     int matchPoint(void);
     int checkVPointSize(void);
     int calibrateGND(vector<GLPoint *> *vPoint);
@@ -78,7 +82,7 @@ public:
     qint64 saveLastTime = 0;
 
     MultipleViewTriangulation multipleViewTriangulation;
-    VisionProcess(QObject* parent = nullptr);
+    VisionProcess(PX4Thread *px4,QObject* parent = nullptr);
     Vector3d *triangulation(void);
     void init(int camNum);
 public slots:

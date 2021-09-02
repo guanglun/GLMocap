@@ -20,10 +20,13 @@ private:
     int bytes_sent;
     mavlink_message_t msg;
     uint16_t len;
+    float x = 0, y = 0, z = 0;
+    float roll = 0, pitch = 0, yaw = 0;
 
 public:
     PX4Thread();
     void run();
+    void setPos(float x, float y, float z, float roll, float pitch, float yaw);
     void setInterval(int id,int interval_us);
 signals:
 
