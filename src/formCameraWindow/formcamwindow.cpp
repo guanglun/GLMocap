@@ -15,7 +15,7 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
     move(desktopWidget->screenGeometry().width()/2,
     desktopWidget->screenGeometry().height()/2 - this->height()/2);
 
-    this->setWindowTitle("OPENVIO");
+    this->setWindowTitle("GLMocap");
 
     setting = new Setting();
 
@@ -24,7 +24,7 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
     mlog = new Log();
 
     connect(mlog, SIGNAL(logSignal(QString)), &fLogWindow, SLOT(logSlot(QString)));
-    mlog->show("OPENVIO StartUp", LOG_DEBUG);
+    mlog->show("GLMocap StartUp", LOG_DEBUG);
 
     QStandardItemModel *pModelOpenvio = new QStandardItemModel();
     MuItemCam *pItemCam = new MuItemCam(this);
