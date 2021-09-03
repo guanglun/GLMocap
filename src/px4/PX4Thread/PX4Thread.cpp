@@ -5,14 +5,15 @@
 #define SYSTEM_ID 1
 #define COMPONENT_ID 1
 
-#define TARGET_IP "192.168.137.18"
+#define TARGET_IP       "192.168.137.18"
+#define TARGET_PORT     14550
 static uint64_t microsSinceEpoch();
 
 PX4Thread::PX4Thread()
 {
     m_pUdpServer = new QUdpSocket();
-    connect(m_pUdpServer, SIGNAL(readyRead()), this, SLOT(dataReceived()));
-    m_pUdpServer->bind(14550);
+
+    m_pUdpServer->bind(TARGET_PORT);
 }
 
 void PX4Thread::run()
@@ -27,40 +28,45 @@ void PX4Thread::run()
 
     for (;;)
     {
-
-        QThread::msleep(100);
-    }
-}
-
-void PX4Thread::dataReceived()
-{
-    while (m_pUdpServer->hasPendingDatagrams()) //有数据报可读
-    {
-        QByteArray datagram;
-        datagram.resize(m_pUdpServer->pendingDatagramSize());
-        m_pUdpServer->readDatagram(datagram.data(), datagram.size(), &sender, &senderPort);
-
-        // QString strMes(datagram);
-        // qDebug() << strMes;
-        mavlink_message_t msg;
-        mavlink_status_t status;
-        for (int i = 0; i < datagram.size(); i++)
+        while (m_pUdpServer->hasPendingDatagrams()) //有数据报可读
         {
-            if (mavlink_parse_char(MAVLINK_COMM_0, datagram.data()[i], &msg, &status))
+            QByteArray datagram;
+            datagram.resize(m_pUdpServer->pendingDatagramSize());
+            m_pUdpServer->readDatagram(datagram.data(), datagram.size(), &sender, &senderPort);
+
+            // QString strMes(datagram);
+            // qDebug() << strMes;
+            mavlink_message_t msg;
+            mavlink_status_t status;
+            for (int i = 0; i < datagram.size(); i++)
             {
-                // Packet received
-                //printf("Received packet: SYS: %d, COMP: %d, LEN: %d, MSG ID: %d\r\n", msg.sysid, msg.compid, msg.len, msg.msgid);
-                //printf(".");
-                switch (msg.msgid)
+                if (mavlink_parse_char(MAVLINK_COMM_0, datagram.data()[i], &msg, &status))
                 {
-                case MAVLINK_MSG_ID_ODOMETRY:
-                    printf("Received packet: SYS: %d, COMP: %d, LEN: %d, MSG ID: %d\r\n", msg.sysid, msg.compid, msg.len, msg.msgid);
-                    break;
-                default:
-                    break;
+                    // Packet received
+                    //printf("Received packet: SYS: %d, COMP: %d, LEN: %d, MSG ID: %d\r\n", msg.sysid, msg.compid, msg.len, msg.msgid);
+                    //printf(".");
+                    switch (msg.msgid)
+                    {
+                    case MAVLINK_MSG_ID_ODOMETRY:  //#331
+                        printf("Received packet: SYS: %d, COMP: %d, LEN: %d, MSG ID: %d\r\n", msg.sysid, msg.compid, msg.len, msg.msgid);
+
+                        mavlink_odometry_t odometry;
+                        mavlink_msg_odometry_decode(&msg, &odometry);
+
+                        printf("%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\r\n",
+                                odometry.x,odometry.y,odometry.z,
+                                odometry.q[0],odometry.q[1],odometry.q[2],odometry.q[3]);
+
+
+                        break;
+                    default:
+                        break;
+                    }
                 }
             }
         }
+
+        QThread::msleep(1);
     }
 }
 
@@ -94,7 +100,7 @@ void PX4Thread::setPos(float x, float y, float z, float roll, float pitch, float
                                               roll, pitch, yaw,
                                               covariance, 0);
     len = mavlink_msg_to_send_buffer(buf, &msg);
-    bytes_sent = m_pUdpServer->writeDatagram((const char *)buf, len, QHostAddress(TARGET_IP), 14550);
+    bytes_sent = m_pUdpServer->writeDatagram((const char *)buf, len, QHostAddress(TARGET_IP), TARGET_PORT);
 }
 
 void PX4Thread::setInterval(int id, int interval_us)
@@ -110,7 +116,7 @@ void PX4Thread::setInterval(int id, int interval_us)
     mavlink_msg_command_long_encode(255, 0, &msg, &interval);
 
     len = mavlink_msg_to_send_buffer(buf, &msg);
-    bytes_sent = m_pUdpServer->writeDatagram((const char *)buf, len, QHostAddress(TARGET_IP), 14550);
+    bytes_sent = m_pUdpServer->writeDatagram((const char *)buf, len, QHostAddress(TARGET_IP), TARGET_PORT);
 }
 
 /* Ctrl Success
@@ -125,7 +131,7 @@ void PX4Thread::setInterval(int id, int interval_us)
         mavlink_msg_command_long_encode(255, 0, &msg, &interval);
 
         len = mavlink_msg_to_send_buffer(buf, &msg);
-        bytes_sent = m_pUdpServer->writeDatagram((const char *)buf, len, QHostAddress("192.168.2.1"), 14550);
+        bytes_sent = m_pUdpServer->writeDatagram((const char *)buf, len, QHostAddress("192.168.2.1"), TARGET_PORT);
 
         //Send Heartbeat
         // mavlink_msg_heartbeat_pack(SYSTEM_ID, COMPONENT_ID, &msg, MAV_TYPE_QUADROTOR, MAV_AUTOPILOT_PX4, MAV_MODE_GUIDED_ARMED, 0, MAV_STATE_ACTIVE);

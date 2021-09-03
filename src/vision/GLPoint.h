@@ -9,6 +9,7 @@ typedef enum POINT_STATE{
     POINT_STATE_FOUND_MARK
 }POINT_STATE;
 
+#define FILTER_SIZE 4
 class GLPoint
 {
 
@@ -21,6 +22,10 @@ public:
     int y=-1;
     int id = -1;
     
+    int filter[FILTER_SIZE][2];
+    int filterCount = 0;
+    bool isFilerInit = false;
+
     GLPoint();
     GLPoint(POINT_STATE state,
     int imageIndex,
@@ -36,6 +41,8 @@ public:
         this->y = y;
     }
 
+    void initFiler(void);
+    void setXY(int x,int y);
     void show(void);
 };
 

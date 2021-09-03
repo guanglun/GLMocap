@@ -576,16 +576,15 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
                     R_Drone <<  RT.at<double>(0, 0), RT.at<double>(0, 1), RT.at<double>(0, 2),
                                 RT.at<double>(1, 0), RT.at<double>(1, 1), RT.at<double>(1, 2),
                                 RT.at<double>(2, 0), RT.at<double>(2, 1), RT.at<double>(2, 2);
-                    //std::cout << R_Drone << endl;
-                    eulerAnglesDrone = R_Drone.transpose().eulerAngles(2, 1, 0);// * 180 / M_PI;
-                    // eulerAnglesDrone[0] += 180;
-                    // eulerAnglesDrone[1] += 180;
-                    // eulerAnglesDrone[2] += 180;
+
+                    //eulerAnglesDrone = R_Drone.eulerAngles(2, 1, 0);// * 180 / M_PI;
+
+                    eulerAnglesDrone = MultipleViewTriangulation::rotationMatrixToEulerAngles(R_Drone);
 
                     T_Drone << Xr[1](0, 0), Xr[1](1, 0), Xr[1](2, 0);
 
-                    px4->setPos(Xr[1](0, 0)/1000, Xr[1](1, 0)/1000, Xr[1](2, 0)/1000,
-                                eulerAnglesDrone[2],eulerAnglesDrone[1],eulerAnglesDrone[0]);
+                    px4->setPos(Xr[1](0, 0)/1000, -Xr[1](1, 0)/1000, -Xr[1](2, 0)/1000,
+                                eulerAnglesDrone[0],eulerAnglesDrone[1],eulerAnglesDrone[2]);
 
                     mlog->show("pos : " +
                                QString::number(T_Drone(0, 0), 'f', 2) + "\t" +

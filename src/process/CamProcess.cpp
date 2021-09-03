@@ -44,8 +44,9 @@ void CamProcess::match(vector<Point2f> centers)
                     }
                 }
 
-                vPoint[i]->x = centers[minIndex].x;
-                vPoint[i]->y = centers[minIndex].y;
+                //vPoint[i]->x = centers[minIndex].x;
+                //vPoint[i]->y = centers[minIndex].y;
+                vPoint[i]->setXY(centers[minIndex].x,centers[minIndex].y);
             }
         }
     }

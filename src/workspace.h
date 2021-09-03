@@ -41,8 +41,6 @@
 
 // #define errprintf(fmt, ...){fprintf(stderr, __FUNCTION__ fmt, __VAR_ARGS__); }
 
-
-
 //#define DBG(args...)      QDBG("DEBUG   ", ##args)
 
 extern Setting *setting;

@@ -263,27 +263,28 @@ bool MultipleViewTriangulation::isRotationMatirx(Matrix3d R)
     return (shouldIdenity - I).norm() < err;
 }
 
+//return roll pitch yaw
+//see https://blog.csdn.net/weixin_39654751/article/details/111584053
 Vector3d MultipleViewTriangulation::rotationMatrixToEulerAngles(Matrix3d &R)
 {
-    return R.transpose().eulerAngles(2, 1, 0); 
 
-    // assert(isRotationMatirx(R));
-    // double sy = sqrt(R(0,0) * R(0,0) + R(1,0) * R(1,0));
-    // bool singular = sy < 1e-6;
-    // double x, y, z;
-    // if (!singular)
-    // {
-    //     x = atan2( R(2,1), R(2,2));
-    //     y = atan2(-R(2,0), sy);
-    //     z = atan2( R(1,0), R(0,0));
-    // }
-    // else
-    // {
-    //     x = atan2(-R(1,2), R(1,1));
-    //     y = atan2(-R(2,0), sy);
-    //     z = 0;
-    // }
-    // return {x, y, z};
+    assert(isRotationMatirx(R));
+    double sy = sqrt(R(0,0) * R(0,0) + R(1,0) * R(1,0));
+    bool singular = sy < 1e-6;
+    double x, y, z;
+    if (!singular)
+    {
+        x = atan2( R(2,1), R(2,2));
+        y = atan2(-R(2,0), sy);
+        z = atan2( R(1,0), R(0,0));
+    }
+    else
+    {
+        x = atan2(-R(1,2), R(1,1));
+        y = atan2(-R(2,0), sy);
+        z = 0;
+    }
+    return {x, y, z};
 }
 
 cv::Mat MultipleViewTriangulation::Get3DR_TransMatrix(const std::vector<cv::Point3f>& srcPoints, const std::vector<cv::Point3f>&  dstPoints)

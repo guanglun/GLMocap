@@ -31,7 +31,7 @@ public:
 signals:
 
 private slots:
-    void dataReceived();
+
 };
 
 #endif
