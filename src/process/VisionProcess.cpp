@@ -531,8 +531,8 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
                     //            QString::number(Xr[0](0, 0)) + " " +
                     //            QString::number(Xr[0](1, 0)) + " " +
                     //            QString::number(Xr[0](2, 0)));
-
-                    emit onXYZSignals(Xr, vision_param.ptNum);
+                    
+                    emit onXYZSignals(Xr,&eulerAnglesDrone, vision_param.ptNum);
                 }else if (findDroneState == FIND_MODULE_OK)
                 {
                     Vector3d *Xr = triangulation();
@@ -571,12 +571,11 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
 
                     Matrix3d R_Drone;
                     Vector3d T_Drone;
-                    Vector3d eulerAnglesDrone;
 
                     R_Drone <<  RT.at<double>(0, 0), RT.at<double>(0, 1), RT.at<double>(0, 2),
                                 RT.at<double>(1, 0), RT.at<double>(1, 1), RT.at<double>(1, 2),
                                 RT.at<double>(2, 0), RT.at<double>(2, 1), RT.at<double>(2, 2);
-
+                    R_Drone = R_Drone.transpose();
                     //eulerAnglesDrone = R_Drone.eulerAngles(2, 1, 0);// * 180 / M_PI;
 
                     eulerAnglesDrone = MultipleViewTriangulation::rotationMatrixToEulerAngles(R_Drone);
@@ -584,17 +583,17 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
                     T_Drone << Xr[1](0, 0), Xr[1](1, 0), Xr[1](2, 0);
 
                     px4->setPos(Xr[1](0, 0)/1000, -Xr[1](1, 0)/1000, -Xr[1](2, 0)/1000,
-                                eulerAnglesDrone[0],eulerAnglesDrone[1],eulerAnglesDrone[2]);
+                                -eulerAnglesDrone[0],eulerAnglesDrone[1],eulerAnglesDrone[2]);
 
-                    mlog->show("pos : " +
-                               QString::number(T_Drone(0, 0), 'f', 2) + "\t" +
-                               QString::number(T_Drone(1, 0), 'f', 2) + "\t" +
-                               QString::number(T_Drone(2, 0), 'f', 2) + "\t" +
-                               QString::number(eulerAnglesDrone[0], 'f', 2) + "\t" +
-                               QString::number(eulerAnglesDrone[1], 'f', 2) + "\t" +
-                               QString::number(eulerAnglesDrone[2], 'f', 2));
+                    // mlog->show("pos : " +
+                    //            QString::number(T_Drone(0, 0), 'f', 2) + "\t" +
+                    //            QString::number(T_Drone(1, 0), 'f', 2) + "\t" +
+                    //            QString::number(T_Drone(2, 0), 'f', 2) + "\t" +
+                    //            QString::number(eulerAnglesDrone[0], 'f', 2) + "\t" +
+                    //            QString::number(eulerAnglesDrone[1], 'f', 2) + "\t" +
+                    //            QString::number(eulerAnglesDrone[2], 'f', 2));
 
-                    emit onXYZSignals(Xr, vision_param.ptNum);
+                    emit onXYZSignals(Xr,&eulerAnglesDrone, vision_param.ptNum);
                 }
             }
         }

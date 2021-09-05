@@ -27,7 +27,7 @@ class FormVioWindow;
 #include "formvisionwindow.h"
 #include "form3dviewwindow.h"
 #include "formlogwindow.h"
-
+#include "formpx4window.h"
 #include "CtrlProcess.h"
 
 class MuItemCtrl;
@@ -54,6 +54,7 @@ public:
     FormVisionWindow fVisionWindow;
     Form3DViewWindow f3DViewWindow;
     FormLogWindow fLogWindow;
+    FormPx4Window fPx4Window;
     MuItemCtrl *muItemCtrl;
     FormCamConfig *formCamConfig;
 
@@ -77,6 +78,7 @@ private slots:
     void on_actionImg_save_path_triggered();
     void on_action_position_triggered();
     void on_action3d_view_triggered();
+    void on_actionPx4_view_triggered();
     void on_actionLoad_vision_param_triggered();
     void on_actionLog_view_triggered();
     void on_actionUpgrade_triggered();

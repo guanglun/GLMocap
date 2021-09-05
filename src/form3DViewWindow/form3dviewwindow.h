@@ -28,7 +28,7 @@ private:
     QTimer *timer;
 
 private slots:
-    void onXYZSlot(Vector3d *Xr,int size); 
+    void onXYZSlot(Vector3d *Xr,Vector3d *pos,int size); 
     void onTimeOut();
 signals:
 

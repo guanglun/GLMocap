@@ -26,6 +26,7 @@ QT5_WRAP_UI( UI_HEADERS
     ${CMAKE_SOURCE_DIR}/src/formVisionWindow/formvisionwindow.ui
     ${CMAKE_SOURCE_DIR}/src/form3DViewWindow/form3dviewwindow.ui
     ${CMAKE_SOURCE_DIR}/src/formLogWindow/formlogwindow.ui
+    ${CMAKE_SOURCE_DIR}/src/px4/formpx4window.ui
 )
 
 add_executable(MultiCam 
@@ -52,6 +53,7 @@ add_executable(MultiCam
     src/MuItemCtrl/MuItemCtrlThread.cpp
     src/process/CamProcess.cpp
     src/process/VisionProcess.cpp
+    src/px4/formpx4window.cpp
 
     src/vision/GLPoint.cpp
 
@@ -107,6 +109,7 @@ include_directories(
                     src/px4/mavlink
                     src/px4/mavlink/common
                     src/px4/PX4Thread
+                    src/px4
                     lib/eigen-3.2.10
                     lib/libusb/include/libusb-1.0
                     ${OpenCV_INCLUDE_DIRS}

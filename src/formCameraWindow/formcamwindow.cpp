@@ -68,6 +68,8 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
     connect(this, SIGNAL(ctrlMultemCamStopSignal()), ctrlProcess, SLOT(ctrlMultemCamStopSlot()));
 
     formCamConfig = new FormCamConfig(ctrlProcess);
+
+    fPx4Window.setPX4Thread(&qwinusb->px4Thread);
 }
 
 void FormCamWindow::ProvideContextMenu(const QPoint &pos)
@@ -198,7 +200,8 @@ void FormCamWindow::closeEvent(QCloseEvent *event)
         fLogWindow.close();
     if (formCamConfig->isEnabled())
         formCamConfig->close();
-
+    if (fPx4Window.isEnabled())
+        fPx4Window.close();
     qwinusb->closeDevice();
 }
 
@@ -438,7 +441,7 @@ void FormCamWindow::on_action_position_triggered()
 {
     if (!fVisionWindow.isVisible())
     {
-        connect(qwinusb->visionProcess, SIGNAL(onXYZSignals(Vector3d *,int)), &fVisionWindow, SLOT(onXYZSlot(Vector3d *,int)));
+        connect(qwinusb->visionProcess, SIGNAL(onXYZSignals(Vector3d *,Vector3d *,int)), &fVisionWindow, SLOT(onXYZSlot(Vector3d *,Vector3d *,int)));
         fVisionWindow.show();
     }
 }
@@ -447,8 +450,17 @@ void FormCamWindow::on_action3d_view_triggered()
 {
     if (!f3DViewWindow.isVisible())
     {
-        connect(qwinusb->visionProcess, SIGNAL(onXYZSignals(Vector3d *,int)), &f3DViewWindow, SLOT(onXYZSlot(Vector3d *,int)));
+        connect(qwinusb->visionProcess, SIGNAL(onXYZSignals(Vector3d *,Vector3d *,int)), &f3DViewWindow, SLOT(onXYZSlot(Vector3d *,Vector3d *,int)));
         f3DViewWindow.show();
+    }
+}
+
+void FormCamWindow::on_actionPx4_view_triggered()
+{
+    if (!fPx4Window.isVisible())
+    {
+        //connect(qwinusb->visionProcess, SIGNAL(onXYZSignals(Vector3d *,int)), &f3DViewWindow, SLOT(onXYZSlot(Vector3d *,int)));
+        fPx4Window.show();
     }
 }
 

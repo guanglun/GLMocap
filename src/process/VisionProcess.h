@@ -59,7 +59,8 @@ private:
     int camNum = 0;
     int pointNum = 0;
     PX4Thread *px4;
-    
+    Vector3d eulerAnglesDrone;
+
     int matchPoint(void);
     int checkVPointSize(void);
     int calibrateGND(vector<GLPoint *> *vPoint);
@@ -88,7 +89,7 @@ public:
 public slots:
     void positionSlot(CAMERA_RESULT result);  
 signals:
-    void onXYZSignals(Vector3d *Xr,int size);
+    void onXYZSignals(Vector3d *Xr,Vector3d *pos,int size);
 };
  
 #endif // VISIONPROCESS_H

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>582</width>
+    <width>814</width>
     <height>351</height>
    </rect>
   </property>
@@ -28,9 +28,9 @@
   <widget class="QLabel" name="lb_x">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>120</x>
      <y>20</y>
-     <width>521</width>
+     <width>261</width>
      <height>101</height>
     </rect>
    </property>
@@ -42,15 +42,15 @@
     </font>
    </property>
    <property name="text">
-    <string>0.0</string>
+    <string>0.00</string>
    </property>
   </widget>
   <widget class="QLabel" name="lb_y">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>120</x>
      <y>120</y>
-     <width>521</width>
+     <width>261</width>
      <height>101</height>
     </rect>
    </property>
@@ -62,15 +62,15 @@
     </font>
    </property>
    <property name="text">
-    <string>0.0</string>
+    <string>0.00</string>
    </property>
   </widget>
   <widget class="QLabel" name="lb_z">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>120</x>
      <y>220</y>
-     <width>521</width>
+     <width>261</width>
      <height>101</height>
     </rect>
    </property>
@@ -82,7 +82,187 @@
     </font>
    </property>
    <property name="text">
-    <string>0.0</string>
+    <string>0.00</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lb_x_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>20</y>
+     <width>71</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>60</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>X:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lb_x_3">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>120</y>
+     <width>71</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>60</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Y:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lb_x_4">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>220</y>
+     <width>71</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>60</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Z:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lb_x_5">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>120</y>
+     <width>161</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>60</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>PIT:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lb_roll">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>20</y>
+     <width>221</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>60</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>0.00</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lb_x_7">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>20</y>
+     <width>161</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>60</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>ROL:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lb_x_8">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>220</y>
+     <width>161</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>60</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>YAW:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lb_pitch">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>120</y>
+     <width>221</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>60</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>0.00</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lb_yaw">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>220</y>
+     <width>221</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>60</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>0.00</string>
    </property>
   </widget>
  </widget>

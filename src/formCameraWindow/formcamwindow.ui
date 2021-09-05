@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>314</width>
-    <height>541</height>
+    <height>560</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -139,6 +139,7 @@
     <addaction name="action_position"/>
     <addaction name="action3d_view"/>
     <addaction name="actionLog_view"/>
+    <addaction name="actionPx4_view"/>
    </widget>
    <widget class="QMenu" name="menuOperations">
     <property name="title">
@@ -204,6 +205,11 @@
   <action name="actionSet_threshold">
    <property name="text">
     <string>set threshold</string>
+   </property>
+  </action>
+  <action name="actionPx4_view">
+   <property name="text">
+    <string>px4 view</string>
    </property>
   </action>
  </widget>
