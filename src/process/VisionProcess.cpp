@@ -558,9 +558,9 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
                     std::vector<cv::Point3f> srcPoints;
                     std::vector<cv::Point3f> dstPoints;
 
-                    srcPoints.push_back(cv::Point3f(61, 0, 0));
+                    srcPoints.push_back(cv::Point3f(110, 0, 0));
                     srcPoints.push_back(cv::Point3f(0, 0, 0));
-                    srcPoints.push_back(cv::Point3f(0, -41, 0));
+                    srcPoints.push_back(cv::Point3f(0, -70, 0));
 
                     for (int cm = 0; cm < pointNum; cm++)
                     {
