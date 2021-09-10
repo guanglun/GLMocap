@@ -10,9 +10,10 @@
 
 #include <QMouseEvent>
 #include <QWheelEvent>
+#include <QList>
 
 #include "MultipleViewTriangulation.h"
-
+#include "PlanPoint.h"
 class CamView : public QOpenGLWidget ,
                      protected QOpenGLFunctions
 {
@@ -22,11 +23,13 @@ public:
 
     int view_fps_1s = 0;
     int point_fps_1s = 0;
-    
+    QList<PlanPoint *> ppList;
+
     CamView(QWidget *parent = 0);
     ~CamView();
     void setAngle(float rol, float pit, float yaw);
     void setPosition(Vector3d *Xr,int size);
+    void setPlan(QList<PlanPoint *> list);
 
 protected:
     //Three basic override function

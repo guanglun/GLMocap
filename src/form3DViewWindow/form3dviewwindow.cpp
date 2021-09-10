@@ -30,6 +30,12 @@ void Form3DViewWindow::onXYZSlot(Vector3d *Xr,Vector3d *pos,int size)
     camview->setPosition(Xr,size);
 }
 
+void Form3DViewWindow::onPlanSlot(QList<PlanPoint *> list)
+{
+    camview->setPlan(list);
+}
+
+
 void Form3DViewWindow::onTimeOut()
 {
     QString speedStr = "view : ";

@@ -1,14 +1,14 @@
-#ifndef MUITEMCAM_H
-#define MUITEMCAM_H
+#ifndef MUITEMPOINT_H
+#define MUITEMPOINT_H
 
 #include <QPainter>
 #include <QStyledItemDelegate>
-#include "MuItemCamData.h"
+#include "MuItemPointData.h"
 
-class MuItemCam : public QStyledItemDelegate
+class MuItemPoint : public QStyledItemDelegate
 {
 public:
-    MuItemCam(QObject *parent = nullptr);
+    MuItemPoint(QObject *parent = nullptr);
 
     // painting
     void paint(QPainter *painter,

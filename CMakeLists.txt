@@ -54,6 +54,8 @@ add_executable(MultiCam
     src/process/CamProcess.cpp
     src/process/VisionProcess.cpp
     src/px4/formpx4window.cpp
+    src/PathPlan/PlanPoint.cpp
+    src/PathPlan/MuItemPoint.cpp
 
     src/vision/GLPoint.cpp
 
@@ -64,6 +66,7 @@ add_executable(MultiCam
     src/easytool/easytool.cpp
     src/easytool/findstr.cpp
     src/process/CtrlProcess.cpp
+    src/process/PlanFlyProcess.cpp
     src/image/image.cpp
     src/drow/camview.cpp
     src/drow/glview.cpp
@@ -110,6 +113,7 @@ include_directories(
                     src/px4/mavlink/common
                     src/px4/PX4Thread
                     src/px4
+                    src/PathPlan
                     lib/eigen-3.2.10
                     lib/libusb/include/libusb-1.0
                     ${OpenCV_INCLUDE_DIRS}

@@ -312,11 +312,11 @@ void FormCamWindow::on_pb_init_gnd_clicked()
     qwinusb->visionProcess->calGNDstate = CAL_START;
 }   
 
-void FormCamWindow::on_pb_find_drone_clicked()
-{
-    qwinusb->visionProcess->matchState = MATCH_START;
-    qwinusb->visionProcess->findDroneState = FIND_MODULE_START;
-}
+// void FormCamWindow::on_pb_find_drone_clicked()
+// {
+//     qwinusb->visionProcess->matchState = MATCH_START;
+//     qwinusb->visionProcess->findDroneState = FIND_MODULE_START;
+// }
 
 void FormCamWindow::vioItemSelected(const QModelIndex &index)
 {
@@ -451,6 +451,7 @@ void FormCamWindow::on_action3d_view_triggered()
     if (!f3DViewWindow.isVisible())
     {
         connect(qwinusb->visionProcess, SIGNAL(onXYZSignals(Vector3d *,Vector3d *,int)), &f3DViewWindow, SLOT(onXYZSlot(Vector3d *,Vector3d *,int)));
+        connect(&fPx4Window, SIGNAL(onPlanSignals(QList<PlanPoint *>)), &f3DViewWindow, SLOT(onPlanSlot(QList<PlanPoint *>)));
         f3DViewWindow.show();
     }
 }
@@ -459,7 +460,7 @@ void FormCamWindow::on_actionPx4_view_triggered()
 {
     if (!fPx4Window.isVisible())
     {
-        //connect(qwinusb->visionProcess, SIGNAL(onXYZSignals(Vector3d *,int)), &f3DViewWindow, SLOT(onXYZSlot(Vector3d *,int)));
+        connect(&fPx4Window, SIGNAL(onPlanSignals(QList<PlanPoint *>)), &f3DViewWindow, SLOT(onPlanSlot(QList<PlanPoint *>)));
         fPx4Window.show();
     }
 }

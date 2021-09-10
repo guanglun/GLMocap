@@ -29,6 +29,7 @@ private:
 
 private slots:
     void onXYZSlot(Vector3d *Xr,Vector3d *pos,int size); 
+    void onPlanSlot(QList<PlanPoint *> list);
     void onTimeOut();
 signals:
 

@@ -68,7 +68,7 @@ private slots:
     void on_pb_init_module_clicked();
     void on_pb_open_all_cam_clicked();
     void on_pb_init_gnd_clicked();
-    void on_pb_find_drone_clicked();
+    //void on_pb_find_drone_clicked();
 
 
     void vioItemSelected(const QModelIndex &index);

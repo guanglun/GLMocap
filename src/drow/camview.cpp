@@ -31,7 +31,7 @@ void CamView::initializeGL()
     glDepthFunc(GL_LEQUAL);
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-    cameraInit(10, 30, 14.0f);
+    cameraInit(80, 30, 6.0f);
 }
 
 void CamView::updateGL()
@@ -52,26 +52,12 @@ void CamView::paintGL()
               up[0], up[1], up[2]);
 
     //坐标轴显示
-    glPushMatrix();
-    glLineWidth(3); //设置线段宽度
     glColor3f(1.0, 0.0, 0.0);
-    glBegin(GL_LINES);
-    glVertex3f(0.0, 0.0, 0.0);
-    glVertex3f(0.5, 0.0, 0.0);
-    glEnd();
-
+    GLDrow::DrowArrow(0, 0, 0, 0.8, 0, 0);
     glColor3f(0.0, 1.0, 0.0);
-    glBegin(GL_LINES);
-    glVertex3f(0.0, 0.0, 0.0);
-    glVertex3f(0.0, 0.5, 0.0);
-    glEnd();
-
+    GLDrow::DrowArrow(0, 0, 0, 0.0, 0.8, 0);
     glColor3f(0.0, 0.0, 1.0);
-    glBegin(GL_LINES);
-    glVertex3f(0.0, 0.0, 0.0);
-    glVertex3f(0.0, 0.0, 0.5);
-    glEnd();
-    glPopMatrix();
+    GLDrow::DrowArrow(0, 0, 0, 0, 0, 0.8);
 
     /*网格*/
     glPushMatrix();
@@ -121,23 +107,19 @@ void CamView::paintGL()
 
         ///////////////////////////////////////////////////////////////////
 
-        cv::Mat R_T = (cv::Mat_<double>(4, 4) <<
-        vision_param.R[i].row(0)(0),vision_param.R[i].row(0)(1),vision_param.R[i].row(0)(2),vision_param.T[i].row(0)(0),
-        vision_param.R[i].row(1)(0),vision_param.R[i].row(1)(1),vision_param.R[i].row(1)(2),vision_param.T[i].row(0)(1),
-        vision_param.R[i].row(2)(0),vision_param.R[i].row(2)(1),vision_param.R[i].row(2)(2),vision_param.T[i].row(0)(2),
-        0, 0, 0, 1
-        );
+        cv::Mat R_T = (cv::Mat_<double>(4, 4) << vision_param.R[i].row(0)(0), vision_param.R[i].row(0)(1), vision_param.R[i].row(0)(2), vision_param.T[i].row(0)(0),
+                       vision_param.R[i].row(1)(0), vision_param.R[i].row(1)(1), vision_param.R[i].row(1)(2), vision_param.T[i].row(0)(1),
+                       vision_param.R[i].row(2)(0), vision_param.R[i].row(2)(1), vision_param.R[i].row(2)(2), vision_param.T[i].row(0)(2),
+                       0, 0, 0, 1);
 
         R_T = R_T.inv();
 
         Matrix33d R_;
-        R_ <<
-                R_T.at<double>(0, 0),R_T.at<double>(0, 1),R_T.at<double>(0, 2),
-                R_T.at<double>(1, 0),R_T.at<double>(1, 1),R_T.at<double>(1, 2),
-                R_T.at<double>(2, 0),R_T.at<double>(2, 1),R_T.at<double>(2, 2);
+        R_ << R_T.at<double>(0, 0), R_T.at<double>(0, 1), R_T.at<double>(0, 2),
+            R_T.at<double>(1, 0), R_T.at<double>(1, 1), R_T.at<double>(1, 2),
+            R_T.at<double>(2, 0), R_T.at<double>(2, 1), R_T.at<double>(2, 2);
         RowVector3d T_;
-        T_ <<
-                R_T.at<double>(0, 3),R_T.at<double>(1, 3),R_T.at<double>(2, 3);
+        T_ << R_T.at<double>(0, 3), R_T.at<double>(1, 3), R_T.at<double>(2, 3);
 
         Vector3d v = R_.eulerAngles(0, 1, 2);
 
@@ -175,6 +157,25 @@ void CamView::paintGL()
         glPopMatrix();
     }
 
+    //Plan
+    if (ppList.size() >= 2)
+    {
+        for (int i = 0; i < ppList.size() - 1; i++)
+        {
+            if(ppList.at(i + 1)->state == PLAN_POINT_STATE_WAIT)
+                glColor3f(1.0, 1.0, 0.0);
+            else if(ppList.at(i + 1)->state == PLAN_POINT_STATE_GOING)
+                glColor3f(0.0, 1.0, 1.0);
+            else if(ppList.at(i + 1)->state == PLAN_POINT_STATE_ARRIVE)
+                glColor3f(1.0, 0.0, 1.0);
+
+            GLDrow::DrowArrow(
+                ppList.at(i)->mpd->x, ppList.at(i)->mpd->y, ppList.at(i)->mpd->z,
+                ppList.at(i + 1)->mpd->x, ppList.at(i + 1)->mpd->y, ppList.at(i + 1)->mpd->z,
+                0.001);
+        }
+    }
+
     QMetaObject::invokeMethod(this, "update", Qt::QueuedConnection);
     view_fps_1s++;
 }
@@ -196,6 +197,11 @@ void CamView::setAngle(float rol, float pit, float yaw)
     this->rol = rol;
     this->pit = pit;
     this->yaw = yaw;
+}
+
+void CamView::setPlan(QList<PlanPoint *> list)
+{
+    ppList = list;
 }
 
 void CamView::setPosition(Vector3d *Xr, int size)
