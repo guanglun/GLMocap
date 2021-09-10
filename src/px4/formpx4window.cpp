@@ -16,6 +16,7 @@ FormPx4Window::FormPx4Window(QWidget *parent) : QWidget(parent),
     ui->lv_plan->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->lv_plan->setContextMenuPolicy(Qt::CustomContextMenu);
 
+    qRegisterMetaType<QItemSelection>("QItemSelection");
     qRegisterMetaType<PLAN_POINT_STATE>("PLAN_POINT_STATE");
     planFlyProcess = new PlanFlyProcess(this);
     planFlyProcess->setQListView(ui->lv_plan);

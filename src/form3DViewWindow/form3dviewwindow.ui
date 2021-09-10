@@ -35,6 +35,41 @@
       <number>0</number>
      </property>
      <item>
+      <widget class="QPushButton" name="pb_reset_trajectory">
+       <property name="text">
+        <string>reset trajectory</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="cb_show_trajectory">
+       <property name="text">
+        <string>show trajectory</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="cb_show_plan">
+       <property name="text">
+        <string>show plan</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="cb_show_axis">
+       <property name="text">
+        <string>show axis</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="cb_show_cam">
+       <property name="text">
+        <string>show camera</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QLabel" name="lb_3dview_fps">
        <property name="text">
         <string>view : 0fps</string>

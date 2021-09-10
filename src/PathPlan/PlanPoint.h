@@ -32,7 +32,7 @@ public:
     QStandardItem *item;
     PlanPoint();
 
-    PlanPoint(float x, float y, float z, int waitTime = 1000, PLAN_POINT_TYPE type = PLAN_POINT_TYPE_WT)
+    PlanPoint(float x, float y, float z, int waitTime = 2000, PLAN_POINT_TYPE type = PLAN_POINT_TYPE_WT)
     {
         mpd = new MuItemPointData();
         item = new QStandardItem();

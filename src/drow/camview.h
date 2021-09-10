@@ -11,9 +11,11 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QList>
+//#include <QCheckBox>
 
 #include "MultipleViewTriangulation.h"
 #include "PlanPoint.h"
+
 class CamView : public QOpenGLWidget ,
                      protected QOpenGLFunctions
 {
@@ -21,16 +23,36 @@ class CamView : public QOpenGLWidget ,
 
 public:
 
+    double eye[3];
+    double center[3];
+    double up[3];
+    
+    double yawCam, pitchCam, farCam;
+    
+    int clickX,clickY;
+    float rol = 0,pit = 0,yaw = 0;
+    float px = 0,py = 0,pz = 0;
+
+    Vector3d *Xr;
+    int size = 0;
+    bool isClearTrajectoryList = false;
+
     int view_fps_1s = 0;
     int point_fps_1s = 0;
     QList<PlanPoint *> ppList;
+    QList<Vector3d> trajectoryList;
+
+    enum Qt::CheckState cs_show_trajectory = Qt::CheckState::Unchecked;
+    enum Qt::CheckState cs_show_plan = Qt::CheckState::Unchecked;
+    enum Qt::CheckState cs_show_axis = Qt::CheckState::Unchecked;
+    enum Qt::CheckState cs_show_cam = Qt::CheckState::Unchecked;
 
     CamView(QWidget *parent = 0);
     ~CamView();
     void setAngle(float rol, float pit, float yaw);
     void setPosition(Vector3d *Xr,int size);
     void setPlan(QList<PlanPoint *> list);
-
+    
 protected:
     //Three basic override function
     void initializeGL() Q_DECL_OVERRIDE;          //Initialize the OpenGL funciton and send data
@@ -47,18 +69,7 @@ protected:
     
 private:
     
-    double eye[3];
-    double center[3];
-    double up[3];
-    
-    double yawCam, pitchCam, farCam;
-    
-    int clickX,clickY;
-    float rol = 0,pit = 0,yaw = 0;
-    float px = 0,py = 0,pz = 0;
 
-    Vector3d *Xr;
-    int size;
 
     void cameraTurn(double yaw, double pitch, double R_long);
     void cameraInit(double yaw, double pitch, double R_long);

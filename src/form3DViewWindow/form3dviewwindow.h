@@ -31,6 +31,14 @@ private slots:
     void onXYZSlot(Vector3d *Xr,Vector3d *pos,int size); 
     void onPlanSlot(QList<PlanPoint *> list);
     void onTimeOut();
+
+    void cbShowTrajectoryStateChangedSlot(int);
+    void cbShowPlanStateChangedSlot(int); 
+    void cbShowAxisStateChangedSlot(int); 
+    void cbShowCamStateChangedSlot(int); 
+    
+    void on_pb_reset_trajectory_clicked();
+    
 signals:
 
 private:
