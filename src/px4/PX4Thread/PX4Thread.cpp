@@ -49,7 +49,7 @@ void PX4Thread::run()
                     switch (msg.msgid)
                     {
                     case MAVLINK_MSG_ID_ODOMETRY: //#331
-                        printf("Received packet: SYS: %d, COMP: %d, LEN: %d, MSG ID: %d\r\n", msg.sysid, msg.compid, msg.len, msg.msgid);
+                        //printf("Received packet: SYS: %d, COMP: %d, LEN: %d, MSG ID: %d\r\n", msg.sysid, msg.compid, msg.len, msg.msgid);
 
                         mavlink_odometry_t odometry;
                         mavlink_msg_odometry_decode(&msg, &odometry);
@@ -105,13 +105,13 @@ void PX4Thread::setPos(float x, float y, float z, float roll, float pitch, float
     this->pitch = pitch;
     this->yaw = yaw;
 
-    mlog->show("pos : " +
-               QString::number(this->x, 'f', 2) + "\t" +
-               QString::number(this->y, 'f', 2) + "\t" +
-               QString::number(this->z, 'f', 2) + "\t" +
-               QString::number(this->roll, 'f', 2) + "\t" +
-               QString::number(this->pitch, 'f', 2) + "\t" +
-               QString::number(this->yaw, 'f', 2));
+    // mlog->show("pos : " +
+    //            QString::number(this->x, 'f', 2) + "\t" +
+    //            QString::number(this->y, 'f', 2) + "\t" +
+    //            QString::number(this->z, 'f', 2) + "\t" +
+    //            QString::number(this->roll, 'f', 2) + "\t" +
+    //            QString::number(this->pitch, 'f', 2) + "\t" +
+    //            QString::number(this->yaw, 'f', 2));
 
     uint8_t buf[BUFFER_LENGTH];
     int bytes_sent;
