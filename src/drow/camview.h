@@ -16,12 +16,17 @@
 #include "MultipleViewTriangulation.h"
 #include "PlanPoint.h"
 
+#include "model.h"
+
 class CamView : public QOpenGLWidget ,
                      protected QOpenGLFunctions
 {
     Q_OBJECT
 
 public:
+
+    Model* model;
+    QOpenGLShaderProgram shaderProgram;
 
     double eye[3];
     double center[3];

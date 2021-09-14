@@ -10,6 +10,8 @@ if (MSVC)
 add_compile_options(/wd4200 /wd4267 /wd4102 /wd4309 /wd4305)
 endif()
 
+add_compile_options(-Wno-attributes)
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC OFF)
 set(CMAKE_AUTOMOC ON)
@@ -84,6 +86,9 @@ add_executable(MultiCam
     src/gl_protocol/frame_parse.c
 
     src/px4/PX4Thread/PX4Thread.cpp
+
+    src/drow/model.cpp
+    src/drow/mesh.cpp
 )
 
 include_directories(
@@ -116,6 +121,7 @@ include_directories(
                     src/PathPlan
                     lib/eigen-3.2.10
                     lib/libusb/include/libusb-1.0
+                    lib/assimp/include
                     ${OpenCV_INCLUDE_DIRS}
 )
 
@@ -127,7 +133,6 @@ if (MSVC)
     set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO /NODEFAULTLIB:${CMAKE_SOURCE_DIR}/lib/usb/libusb-1.0.lib")
 endif()           
 
-
 target_link_libraries(MultiCam 
                         Qt5::Widgets
                         Qt5::Core
@@ -136,6 +141,8 @@ target_link_libraries(MultiCam
                         Qt5::OpenGL
                         ${OPENGL_LIBRARIES}
                         ${CMAKE_SOURCE_DIR}/lib/libusb/MinGW64/dll/libusb-1.0.dll.a
+                        ${CMAKE_SOURCE_DIR}/lib/assimp/lib/libIrrXML.a
+                        ${CMAKE_SOURCE_DIR}/lib/assimp/lib/libassimp.dll.a
                         ${OpenCV_LIBS}
                         
 )

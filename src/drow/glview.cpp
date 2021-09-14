@@ -33,6 +33,7 @@ void GLView::initializeGL()
     glDepthFunc( GL_LEQUAL );
     glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
     
+
     cameraInit(10,30,4.0f);
 }
 

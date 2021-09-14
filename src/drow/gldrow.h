@@ -6,9 +6,15 @@
 #include "glview.h"
 #include <QtMath>
 
+
+
+
 class GLDrow
 {
 public:
+
+
+
     GLDrow();
     static void DrowGrid(void);
     static void DrowCube(void);

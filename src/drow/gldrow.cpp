@@ -10,6 +10,7 @@ using namespace Eigen;
 
 GLDrow::GLDrow()
 {
+
 }
 
 //画网格

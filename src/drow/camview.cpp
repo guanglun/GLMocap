@@ -32,6 +32,12 @@ void CamView::initializeGL()
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
     cameraInit(80, 30, 6.0f);
+    
+    shaderProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,"D:/3.code/gl_open_mocap/src/drow/model.vert");
+    shaderProgram.addShaderFromSourceFile(QOpenGLShader::Fragment,"D:/3.code/gl_open_mocap/src/drow/model.frag");
+    shaderProgram.link();
+ 
+    model = Model::createModel("D:/3.code/gl_open_mocap/Table.fbx",context(),&shaderProgram);
 }
 
 void CamView::updateGL()
@@ -47,9 +53,17 @@ void CamView::paintGL()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
+
     gluLookAt(eye[0], eye[1], eye[2],
               center[0], center[1], center[2],
               up[0], up[1], up[2]);
+
+
+    QMatrix4x4 projection;
+    projection.perspective(45.0f,width()/(float)height(),0.1f,500.0f);
+    shaderProgram.setUniformValue("projection",projection);
+    //shaderProgram.setUniformValue("view",camera.getView());
+    model->draw();
 
     //坐标轴显示
     if (cs_show_axis == Qt::CheckState::Checked)

@@ -23,6 +23,8 @@ class GLView : public QOpenGLWidget ,
     Q_OBJECT
 
 public:
+
+
     GLView(QWidget *parent = 0);
     ~GLView();
     void setAngle(float rol, float pit, float yaw);
