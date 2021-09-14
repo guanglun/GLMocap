@@ -121,7 +121,6 @@ include_directories(
 
 link_directories(
                     lib/eigen-3.2.10
-                    lib/opencv
                     )
 
 if (MSVC)
@@ -136,7 +135,7 @@ target_link_libraries(MultiCam
                         Qt5::Network
                         Qt5::OpenGL
                         ${OPENGL_LIBRARIES}
-                        ${CMAKE_SOURCE_DIR}/lib/libusb/MinGW32/dll/libusb-1.0.dll.a
+                        ${CMAKE_SOURCE_DIR}/lib/libusb/MinGW64/dll/libusb-1.0.dll.a
                         ${OpenCV_LIBS}
                         
 )
