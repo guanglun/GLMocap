@@ -7,8 +7,10 @@ Form3DViewWindow::Form3DViewWindow(QWidget *parent) : QWidget(parent),
     ui->setupUi(this);
 
     camview = new CamView(this);
-
     ui->verticalLayout->addWidget(camview, 0, 0);
+
+    // view = new GLWidget(this);
+    // ui->verticalLayout->addWidget(view,0, 0);
 
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
@@ -41,7 +43,9 @@ Form3DViewWindow::~Form3DViewWindow()
 
 void Form3DViewWindow::on_pb_reset_trajectory_clicked()
 {
-    camview->isClearTrajectoryList = true;
+    //view->loadModel("D:\\3.code\\assimp_qt_viewer\\assimp_qt_viewer\\3d\\wooden_model _truck.obj");
+    camview->loadModel("D:\\3.code\\assimp_qt_viewer\\assimp_qt_viewer\\3d\\123.stl");
+    //camview->isClearTrajectoryList = true;
 }
 
 void Form3DViewWindow::onXYZSlot(Vector3d *Xr, Vector3d *pos, int size)

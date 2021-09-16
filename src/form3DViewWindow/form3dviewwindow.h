@@ -10,6 +10,7 @@
 #include "workspace.h"
 
 #include "camview.h"
+#include "glwidget.h"
 
 namespace Ui {
 class Form3DViewWindow;
@@ -21,7 +22,7 @@ class Form3DViewWindow : public QWidget
     
 public:
     CamView *camview;
-    
+    GLWidget* view;
     explicit Form3DViewWindow(QWidget *parent = 0);
     ~Form3DViewWindow();
 private:

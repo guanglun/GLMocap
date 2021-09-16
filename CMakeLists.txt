@@ -89,6 +89,8 @@ add_executable(MultiCam
 
     src/drow/model.cpp
     src/drow/mesh.cpp
+    src/drow/glwidget.cpp
+    src/drow/camera.cpp
 )
 
 include_directories(

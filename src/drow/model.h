@@ -1,35 +1,49 @@
 #ifndef MODEL_H
 #define MODEL_H
- 
-#include "mesh.h"
+
 #include <QDir>
- 
+#include <QVector>
+#include <QString>
+#include <QFileInfo>
+#include <QMatrix4x4>
+#include <QOpenGLFunctions>
+
+#include <assimp/scene.h>
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+
+#include "mesh.h"
+
 class Model
 {
 public:
-    void draw();
-    void destroy();
-    static Model* createModel(QString path,QOpenGLContext* context,QOpenGLShaderProgram* shaderProgram);
- 
-private:
-    Model(QString path,QOpenGLContext* context,QOpenGLShaderProgram* shaderProgram);
+    struct Node
+    {
+        ~Node()
+        {
+            for (int i = 0; i < children.size(); i++)
+            {
+                delete children[i];
+            }
+        }
+        QString name;
+        QVector<Node *> children;
+        QMatrix4x4 transformation;
+        QVector<unsigned int> meshes;
+    };
+
+    Model(QString filename, QOpenGLFunctions *context);
     ~Model();
-    QOpenGLContext* context;          //opengl函数入口
-    QOpenGLShaderProgram* shaderProgram ;   //着色器程序
- 
-    /*  模型数据  */
-    QVector<Texture*>textures_loaded;       //纹理
-    QVector<Mesh*> meshes;                  //网格
-    QDir directory;                         //模型所在路径
- 
-    //递归遍历结点
-    void processNode(aiNode *node, const aiScene *scene,aiMatrix4x4 mat4=aiMatrix4x4());
- 
-    //加载网格
-    Mesh* processMesh(aiMesh *mesh, const aiScene *scene, aiMatrix4x4 model);
- 
-    //加载材质纹理
-    QVector<Texture*> loadMaterialTextures(aiMaterial *mat, aiTextureType type,QString typeName);
- 
+    void draw(QOpenGLFunctions *context);
+
+private:
+    void processNode(QOpenGLFunctions *context, aiNode *source, Node *node, const aiScene *scene);
+    void processMesh(aiMesh *source, Mesh *mesh, const aiScene *scene);
+    void loadTextures(Mesh *mesh, aiMaterial *material, aiTextureType type);
+
+    Node *m_rootNode;
+    QFileInfo m_fileInfo;
+    QVector<Mesh *> m_meshes;
 };
+
 #endif // MODEL_H

@@ -17,6 +17,7 @@
 #include "PlanPoint.h"
 
 #include "model.h"
+#include "camera.h"
 
 class CamView : public QOpenGLWidget ,
                      protected QOpenGLFunctions
@@ -25,8 +26,11 @@ class CamView : public QOpenGLWidget ,
 
 public:
 
-    Model* model;
-    QOpenGLShaderProgram shaderProgram;
+    Model* m_model;
+    QMatrix4x4 m_modelMat;
+    QMatrix4x4 m_projectionMat;
+    Camera m_camera;
+    QOpenGLShaderProgram* m_program;
 
     double eye[3];
     double center[3];
@@ -57,7 +61,7 @@ public:
     void setAngle(float rol, float pit, float yaw);
     void setPosition(Vector3d *Xr,int size);
     void setPlan(QList<PlanPoint *> list);
-    
+    void loadModel(QString filename);
 protected:
     //Three basic override function
     void initializeGL() Q_DECL_OVERRIDE;          //Initialize the OpenGL funciton and send data
