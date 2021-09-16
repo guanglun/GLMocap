@@ -1,0 +1,31 @@
+# 3ds Max Wavefront OBJ Exporter v0.99 - (c)2007 guruware
+# 创建的文件:16.09.2021 22:58:01
+
+newmtl F_15C
+	Kd 0.80 0.80 0.80
+	Ks 0.23 0.23 0.23
+	Tr 0.00
+	d 1.00
+	Tf 0.00 0.00 0.00
+	Pr 0.06
+	Pm 0.00
+	Pc 0.00
+	Pcr 0.00
+	Ni 1.50
+	Ke 0.00 0.00 0.00
+	illum 2
+	map_Kd maps\F 15A.jpg
+
+newmtl Glass
+	Kd 0.80 0.80 0.80
+	Ks 0.50 0.50 0.50
+	Tr 0.74
+	d 0.26
+	Tf 0.00 0.00 0.00
+	Pr 0.06
+	Pm 0.00
+	Pc 0.00
+	Pcr 0.00
+	Ni 1.50
+	Ke 0.00 0.00 0.00
+	illum 2

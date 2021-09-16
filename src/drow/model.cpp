@@ -104,7 +104,7 @@ void Model::loadTextures(Mesh* mesh, aiMaterial* material, aiTextureType type) {
         aiString filename;
 
         material->GetTexture(type, i, &filename);
-        qDebug() << filename.C_Str();
+
         QImage tex(dir.absoluteFilePath(filename.C_Str()));
 
         if (tex.isNull()) {

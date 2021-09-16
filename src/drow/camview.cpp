@@ -35,8 +35,8 @@ void CamView::initializeGL()
 {
     initializeOpenGLFunctions();
     m_program = new QOpenGLShaderProgram(this);
-    m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, "D:/3.code/gl_open_mocap/src/drow/shader.vert");
-    m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, "D:/3.code/gl_open_mocap/src/drow/shader.frag");
+    m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shader/shader.vert");
+    m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shader/shader.frag");
     m_program->link();
 
     // glEnable(GL_TEXTURE_2D);
@@ -47,7 +47,7 @@ void CamView::initializeGL()
     // glDepthFunc(GL_LEQUAL);
     // glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-    //cameraInit(80, 30, 6.0f);
+    cameraInit(80, 30, 6.0f);
     
 
 
@@ -71,6 +71,8 @@ void CamView::paintGL()
 {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 
     QMatrix4x4 view;// = m_camera.view();
     view.lookAt(
@@ -81,17 +83,17 @@ void CamView::paintGL()
     m_program->bind();
     m_program->setUniformValue("view", view);
     m_program->setUniformValue("model", m_modelMat);
-    
     m_program->setUniformValue("projection", m_projectionMat);
 
     if (m_model != 0)
+    {
+
         m_model->draw(this);
+        
+    }
+
+
     m_program->release();
-
-
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
     gluLookAt(eye[0], eye[1], eye[2],
               center[0], center[1], center[2],
               up[0], up[1], up[2]);
@@ -101,157 +103,150 @@ void CamView::paintGL()
     GLDrow::DrowGrid();
     glPopMatrix();
 
+    //坐标轴显示
+    if (cs_show_axis == Qt::CheckState::Checked)
+    {
+        glColor3f(1.0, 0.0, 0.0);
+        GLDrow::DrowArrow(0, 0, 0, 0.8, 0, 0, 0.006);
+        glColor3f(0.0, 1.0, 0.0);
+        GLDrow::DrowArrow(0, 0, 0, 0.0, 0.8, 0, 0.006);
+        glColor3f(0.0, 0.0, 1.0);
+        GLDrow::DrowArrow(0, 0, 0, 0, 0, 0.8, 0.006);
+    }
 
-    
-
-
-
-
-
-    // //坐标轴显示
-    // if (cs_show_axis == Qt::CheckState::Checked)
-    // {
-    //     glColor3f(1.0, 0.0, 0.0);
-    //     GLDrow::DrowArrow(0, 0, 0, 0.8, 0, 0, 0.006);
-    //     glColor3f(0.0, 1.0, 0.0);
-    //     GLDrow::DrowArrow(0, 0, 0, 0.0, 0.8, 0, 0.006);
-    //     glColor3f(0.0, 0.0, 1.0);
-    //     GLDrow::DrowArrow(0, 0, 0, 0, 0, 0.8, 0.006);
-    // }
-
-    // if(isClearTrajectoryList)
-    // {
-    //     isClearTrajectoryList = false;
-    //     trajectoryList.clear();
-    // }
+    if(isClearTrajectoryList)
+    {
+        isClearTrajectoryList = false;
+        trajectoryList.clear();
+    }
 
 
 
-    // for (int pm = 0; pm < size; pm++)
-    // {
-    //     glPushMatrix();
+    for (int pm = 0; pm < size; pm++)
+    {
+        glPushMatrix();
 
-    //     glTranslatef(Xr[pm](0, 0) / TRAN_SIZE, Xr[pm](1, 0) / TRAN_SIZE, Xr[pm](2, 0) / TRAN_SIZE);
-    //     if(pm == 1 && size == 3)
-    //         trajectoryList.append(Vector3d(Xr[pm](0, 0) / TRAN_SIZE, Xr[pm](1, 0) / TRAN_SIZE, Xr[pm](2, 0) / TRAN_SIZE));
-    //     glColor3f(1.0, 0.0, 0.0);
-    //     GLDrow::drawSphere();
-    //     glPopMatrix();
-    // }
+        glTranslatef(Xr[pm](0, 0) / TRAN_SIZE, Xr[pm](1, 0) / TRAN_SIZE, Xr[pm](2, 0) / TRAN_SIZE);
+        if(pm == 1 && size == 3)
+            trajectoryList.append(Vector3d(Xr[pm](0, 0) / TRAN_SIZE, Xr[pm](1, 0) / TRAN_SIZE, Xr[pm](2, 0) / TRAN_SIZE));
+        glColor3f(1.0, 0.0, 0.0);
+        GLDrow::drawSphere();
+        glPopMatrix();
+    }
 
-    // if (cs_show_cam == Qt::CheckState::Checked)
-    //     for (int i = 0; i < vision_param.CamNum; i++)
-    //     {
-    //         /*相机*/
-    //         glPushMatrix();
+    if (cs_show_cam == Qt::CheckState::Checked)
+        for (int i = 0; i < vision_param.CamNum; i++)
+        {
+            /*相机*/
+            glPushMatrix();
 
-    //         //DBG("Drow %d",i);
+            //DBG("Drow %d",i);
 
-    //         //std::cout << vision_param.R[i] << std::endl;
+            //std::cout << vision_param.R[i] << std::endl;
 
-    //         glRotatef(vision_param.eulerAngles[0] * ARC_TO_DEG, 1, 0, 0);
-    //         glRotatef(vision_param.eulerAngles[1] * ARC_TO_DEG, 0, 1, 0);
-    //         glRotatef(vision_param.eulerAngles[2] * ARC_TO_DEG, 0, 0, 1);
-    //         glTranslatef(-vision_param.TGND[0] / TRAN_SIZE, -vision_param.TGND[1] / TRAN_SIZE, -vision_param.TGND[2] / TRAN_SIZE);
+            glRotatef(vision_param.eulerAngles[0] * ARC_TO_DEG, 1, 0, 0);
+            glRotatef(vision_param.eulerAngles[1] * ARC_TO_DEG, 0, 1, 0);
+            glRotatef(vision_param.eulerAngles[2] * ARC_TO_DEG, 0, 0, 1);
+            glTranslatef(-vision_param.TGND[0] / TRAN_SIZE, -vision_param.TGND[1] / TRAN_SIZE, -vision_param.TGND[2] / TRAN_SIZE);
 
-    //         //Vector3d v = vision_param.R[i].transpose().eulerAngles(2, 1, 0);
+            //Vector3d v = vision_param.R[i].transpose().eulerAngles(2, 1, 0);
 
-    //         //////////////////////////////////////////////////////////////////
+            //////////////////////////////////////////////////////////////////
 
-    //         // Vector3d v = vision_param.R[i].eulerAngles(2, 1, 0);
+            // Vector3d v = vision_param.R[i].eulerAngles(2, 1, 0);
 
-    //         // glRotatef(-v(0, 0) * ARC_TO_DEG, 1, 0, 0);
-    //         // glRotatef(-v(1, 0) * ARC_TO_DEG, 0, 1, 0);
-    //         // glRotatef(-v(2, 0) * ARC_TO_DEG, 0, 0, 1);
+            // glRotatef(-v(0, 0) * ARC_TO_DEG, 1, 0, 0);
+            // glRotatef(-v(1, 0) * ARC_TO_DEG, 0, 1, 0);
+            // glRotatef(-v(2, 0) * ARC_TO_DEG, 0, 0, 1);
 
-    //         // std::cout << v << std::endl;
-    //         // glTranslatef(
-    //         //     vision_param.T[i](0, 0) / TRAN_SIZE,
-    //         //     vision_param.T[i](0, 1) / TRAN_SIZE,
-    //         //     vision_param.T[i](0, 2) / TRAN_SIZE);
+            // std::cout << v << std::endl;
+            // glTranslatef(
+            //     vision_param.T[i](0, 0) / TRAN_SIZE,
+            //     vision_param.T[i](0, 1) / TRAN_SIZE,
+            //     vision_param.T[i](0, 2) / TRAN_SIZE);
 
-    //         ///////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////
 
-    //         cv::Mat R_T = (cv::Mat_<double>(4, 4) << vision_param.R[i].row(0)(0), vision_param.R[i].row(0)(1), vision_param.R[i].row(0)(2), vision_param.T[i].row(0)(0),
-    //                        vision_param.R[i].row(1)(0), vision_param.R[i].row(1)(1), vision_param.R[i].row(1)(2), vision_param.T[i].row(0)(1),
-    //                        vision_param.R[i].row(2)(0), vision_param.R[i].row(2)(1), vision_param.R[i].row(2)(2), vision_param.T[i].row(0)(2),
-    //                        0, 0, 0, 1);
+            cv::Mat R_T = (cv::Mat_<double>(4, 4) << vision_param.R[i].row(0)(0), vision_param.R[i].row(0)(1), vision_param.R[i].row(0)(2), vision_param.T[i].row(0)(0),
+                           vision_param.R[i].row(1)(0), vision_param.R[i].row(1)(1), vision_param.R[i].row(1)(2), vision_param.T[i].row(0)(1),
+                           vision_param.R[i].row(2)(0), vision_param.R[i].row(2)(1), vision_param.R[i].row(2)(2), vision_param.T[i].row(0)(2),
+                           0, 0, 0, 1);
 
-    //         R_T = R_T.inv();
+            R_T = R_T.inv();
 
-    //         Matrix33d R_;
-    //         R_ << R_T.at<double>(0, 0), R_T.at<double>(0, 1), R_T.at<double>(0, 2),
-    //             R_T.at<double>(1, 0), R_T.at<double>(1, 1), R_T.at<double>(1, 2),
-    //             R_T.at<double>(2, 0), R_T.at<double>(2, 1), R_T.at<double>(2, 2);
-    //         RowVector3d T_;
-    //         T_ << R_T.at<double>(0, 3), R_T.at<double>(1, 3), R_T.at<double>(2, 3);
+            Matrix33d R_;
+            R_ << R_T.at<double>(0, 0), R_T.at<double>(0, 1), R_T.at<double>(0, 2),
+                R_T.at<double>(1, 0), R_T.at<double>(1, 1), R_T.at<double>(1, 2),
+                R_T.at<double>(2, 0), R_T.at<double>(2, 1), R_T.at<double>(2, 2);
+            RowVector3d T_;
+            T_ << R_T.at<double>(0, 3), R_T.at<double>(1, 3), R_T.at<double>(2, 3);
 
-    //         Vector3d v = R_.eulerAngles(0, 1, 2);
+            Vector3d v = R_.eulerAngles(0, 1, 2);
 
-    //         glRotatef(-v(0, 0) * ARC_TO_DEG, 1, 0, 0);
-    //         glRotatef(-v(1, 0) * ARC_TO_DEG, 0, 1, 0);
-    //         glRotatef(-v(2, 0) * ARC_TO_DEG, 0, 0, 1);
+            glRotatef(-v(0, 0) * ARC_TO_DEG, 1, 0, 0);
+            glRotatef(-v(1, 0) * ARC_TO_DEG, 0, 1, 0);
+            glRotatef(-v(2, 0) * ARC_TO_DEG, 0, 0, 1);
 
-    //         glTranslatef(
-    //             T_(0, 0) / TRAN_SIZE,
-    //             T_(0, 1) / TRAN_SIZE,
-    //             T_(0, 2) / TRAN_SIZE);
+            glTranslatef(
+                T_(0, 0) / TRAN_SIZE,
+                T_(0, 1) / TRAN_SIZE,
+                T_(0, 2) / TRAN_SIZE);
 
-    //         /////////////////////////////////////////////////////
+            /////////////////////////////////////////////////////
 
-    //         // double T[3];
-    //         // T[0] =  -vision_param.T[i](0, 0)*vision_param.R[i].row(0)(0)
-    //         //         -vision_param.T[i](0, 1)*vision_param.R[i].row(0)(1)
-    //         //         -vision_param.T[i](0, 2)*vision_param.R[i].row(0)(2);
-    //         // T[1] =  -vision_param.T[i](0, 0)*vision_param.R[i].row(1)(0)
-    //         //         -vision_param.T[i](0, 1)*vision_param.R[i].row(1)(1)
-    //         //         -vision_param.T[i](0, 2)*vision_param.R[i].row(1)(2);
-    //         // T[2] =  -vision_param.T[i](0, 0)*vision_param.R[i].row(2)(0)
-    //         //         -vision_param.T[i](0, 1)*vision_param.R[i].row(2)(1)
-    //         //         -vision_param.T[i](0, 2)*vision_param.R[i].row(2)(2);
+            // double T[3];
+            // T[0] =  -vision_param.T[i](0, 0)*vision_param.R[i].row(0)(0)
+            //         -vision_param.T[i](0, 1)*vision_param.R[i].row(0)(1)
+            //         -vision_param.T[i](0, 2)*vision_param.R[i].row(0)(2);
+            // T[1] =  -vision_param.T[i](0, 0)*vision_param.R[i].row(1)(0)
+            //         -vision_param.T[i](0, 1)*vision_param.R[i].row(1)(1)
+            //         -vision_param.T[i](0, 2)*vision_param.R[i].row(1)(2);
+            // T[2] =  -vision_param.T[i](0, 0)*vision_param.R[i].row(2)(0)
+            //         -vision_param.T[i](0, 1)*vision_param.R[i].row(2)(1)
+            //         -vision_param.T[i](0, 2)*vision_param.R[i].row(2)(2);
 
-    //         // glTranslatef(T[0] / TRAN_SIZE, T[1] / TRAN_SIZE, T[2] / TRAN_SIZE);
+            // glTranslatef(T[0] / TRAN_SIZE, T[1] / TRAN_SIZE, T[2] / TRAN_SIZE);
 
-    //         // glBegin(GL_LINES);
-    //         // glColor3f(0.0, 0.0, 1.0);
-    //         // glVertex3f(0.0, 0.0, 0.0);
-    //         // glVertex3f(0.0, 0.0, 10.0);
-    //         // glEnd();
+            // glBegin(GL_LINES);
+            // glColor3f(0.0, 0.0, 1.0);
+            // glVertex3f(0.0, 0.0, 0.0);
+            // glVertex3f(0.0, 0.0, 10.0);
+            // glEnd();
 
-    //         GLDrow::DrowCam();
-    //         glPopMatrix();
-    //     }
+            GLDrow::DrowCam();
+            glPopMatrix();
+        }
 
-    // if (cs_show_trajectory == Qt::CheckState::Checked)
-    // {
-    //     glColor3f(1.0, 0.0, 0.0); 
-    //     for (int i = 0; i < trajectoryList.size(); i++)
-    //     {
-    //         glBegin(GL_POINTS);
-    //         glVertex3f(trajectoryList.at(i)[0], trajectoryList.at(i)[1],trajectoryList.at(i)[2]);
-    //         glEnd();
-    //     }
-    // }
+    if (cs_show_trajectory == Qt::CheckState::Checked)
+    {
+        glColor3f(1.0, 0.0, 0.0); 
+        for (int i = 0; i < trajectoryList.size(); i++)
+        {
+            glBegin(GL_POINTS);
+            glVertex3f(trajectoryList.at(i)[0], trajectoryList.at(i)[1],trajectoryList.at(i)[2]);
+            glEnd();
+        }
+    }
 
-    // //Plan
-    // if (cs_show_plan == Qt::CheckState::Checked)
-    //     if (ppList.size() >= 2)
-    //     {
-    //         for (int i = 0; i < ppList.size() - 1; i++)
-    //         {
-    //             if (ppList.at(i + 1)->state == PLAN_POINT_STATE_WAIT)
-    //                 glColor3f(1.0, 1.0, 0.0);
-    //             else if (ppList.at(i + 1)->state == PLAN_POINT_STATE_GOING)
-    //                 glColor3f(0.0, 1.0, 1.0);
-    //             else if (ppList.at(i + 1)->state == PLAN_POINT_STATE_ARRIVE)
-    //                 glColor3f(1.0, 0.0, 1.0);
+    //Plan
+    if (cs_show_plan == Qt::CheckState::Checked)
+        if (ppList.size() >= 2)
+        {
+            for (int i = 0; i < ppList.size() - 1; i++)
+            {
+                if (ppList.at(i + 1)->state == PLAN_POINT_STATE_WAIT)
+                    glColor3f(1.0, 1.0, 0.0);
+                else if (ppList.at(i + 1)->state == PLAN_POINT_STATE_GOING)
+                    glColor3f(0.0, 1.0, 1.0);
+                else if (ppList.at(i + 1)->state == PLAN_POINT_STATE_ARRIVE)
+                    glColor3f(1.0, 0.0, 1.0);
 
-    //             GLDrow::DrowArrow(
-    //                 ppList.at(i)->mpd->x, ppList.at(i)->mpd->y, ppList.at(i)->mpd->z,
-    //                 ppList.at(i + 1)->mpd->x, ppList.at(i + 1)->mpd->y, ppList.at(i + 1)->mpd->z,
-    //                 0.003);
-    //         }
-    //     }
+                GLDrow::DrowArrow(
+                    ppList.at(i)->mpd->x, ppList.at(i)->mpd->y, ppList.at(i)->mpd->z,
+                    ppList.at(i + 1)->mpd->x, ppList.at(i + 1)->mpd->y, ppList.at(i + 1)->mpd->z,
+                    0.003);
+            }
+        }
 
     QMetaObject::invokeMethod(this, "update", Qt::QueuedConnection);
     view_fps_1s++;
@@ -305,10 +300,10 @@ void CamView::cameraInit(double yaw, double pitch, double R_long)
 void CamView::cameraTurn(double yaw, double pitch, double R_long)
 {
 
-    if (pitch > 90)
-        pitch = 90;
-    else if (pitch < -90)
-        pitch = -90;
+    // if (pitch > 90)
+    //     pitch = 90;
+    // else if (pitch < -90)
+    //     pitch = -90;
 
     double angle_yaw = yaw * M_PI / 180;
     double angle_pitch = pitch * M_PI / 180;

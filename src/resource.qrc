@@ -3,4 +3,8 @@
         <file alias="camera.png">../resource/image/camera.png</file>
         <file alias="bl.png">../resource/image/bl.png</file>
     </qresource>
+    <qresource prefix="/shader">
+        <file alias="shader.frag">../resource/shader/shader.frag</file>
+        <file alias="shader.vert">../resource/shader/shader.vert</file>
+    </qresource>    
 </RCC>
