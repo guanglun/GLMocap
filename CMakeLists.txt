@@ -91,6 +91,8 @@ add_executable(MultiCam
     src/drow/mesh.cpp
     src/drow/glwidget.cpp
     src/drow/camera.cpp
+    src/process/CalibrProcess.cpp
+    src/calibration/Calibration.cpp
 )
 
 include_directories(
@@ -102,6 +104,7 @@ include_directories(
                     src/easytool
                     src/drow
                     src/image
+                    src/calibration
                     src/formCameraConfig
                     src/formMainWindow
                     src/formCameraWindow

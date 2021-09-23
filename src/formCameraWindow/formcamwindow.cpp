@@ -70,6 +70,11 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
     formCamConfig = new FormCamConfig(ctrlProcess);
 
     fPx4Window.setPX4Thread(&qwinusb->px4Thread);
+
+    calibrProcess = new CalibrProcess(this);
+    calibrProcess->moveToThread(&calibrProcessThread);
+    calibrProcessThread.start();
+    connect(this, SIGNAL(startCalibrSignal()), calibrProcess, SLOT(startSlot()));
 }
 
 void FormCamWindow::ProvideContextMenu(const QPoint &pos)
@@ -538,4 +543,9 @@ void FormCamWindow::on_actionSet_threshold_triggered()
 
         setting->setThreshold(threshold);
     }
+}
+
+void FormCamWindow::on_pb_calibr_clicked()
+{
+    emit startCalibrSignal();
 }

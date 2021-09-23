@@ -29,6 +29,7 @@ class FormVioWindow;
 #include "formlogwindow.h"
 #include "formpx4window.h"
 #include "CtrlProcess.h"
+#include "CalibrProcess.h"
 
 class MuItemCtrl;
 #include "MuItemCtrl.h"
@@ -43,9 +44,11 @@ class FormCamWindow : public QMainWindow
 private:
     QTimer *timer;
     QThread ctrlProcessThread;
-    
+    QThread calibrProcessThread;
+
 public:
     CtrlProcess *ctrlProcess;
+    CalibrProcess *calibrProcess;
     WinUSBDriver *qwinusb;
     QLabel *status_msg,*status_speed;
     int recv_count_1s;
@@ -68,6 +71,7 @@ private slots:
     void on_pb_init_module_clicked();
     void on_pb_open_all_cam_clicked();
     void on_pb_init_gnd_clicked();
+    void on_pb_calibr_clicked();
     //void on_pb_find_drone_clicked();
 
 
@@ -91,6 +95,7 @@ private:
 signals:
     void ctrlMultemCamStartSignal(void);
     void ctrlMultemCamStopSignal(void);
+    void startCalibrSignal(void);
 protected: 
      void closeEvent(QCloseEvent *event);     
 };
