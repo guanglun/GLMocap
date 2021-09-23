@@ -90,8 +90,8 @@ void CamView::paintGL()
         {
             view.translate(Xr[1](0, 0) / TRAN_SIZE, Xr[1](1, 0) / TRAN_SIZE, Xr[1](2, 0) / TRAN_SIZE);
             view.rotate(-pos[0](0, 0) * ARC_TO_DEG, 1, 0, 0);
-            view.rotate(pos[0](1, 0) * ARC_TO_DEG, 0, 1, 0);
-            view.rotate(pos[0](2, 0) * ARC_TO_DEG, 0, 0, 1);
+            view.rotate(-pos[0](1, 0) * ARC_TO_DEG, 0, 1, 0);
+            view.rotate(-pos[0](2, 0) * ARC_TO_DEG, 0, 0, 1);
         }
 
         m_program->bind();
