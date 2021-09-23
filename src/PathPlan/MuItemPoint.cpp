@@ -55,7 +55,7 @@ void MuItemPoint::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
         QRectF statusRect = QRect(typeRect.left(), typeRect.bottom(), rect.width() - 10 - iconRect.width(), 20);
 
-        painter->drawImage(iconRect, QImage(QString(":/image/camera.png")));
+        painter->drawImage(iconRect, QImage(QString(":/image/position.jpg")));
 
         painter->setPen(QPen(Qt::black));
         painter->setFont(QFont("Microsoft Yahei", 9));

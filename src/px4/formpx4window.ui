@@ -42,7 +42,8 @@
     </font>
    </property>
    <property name="text">
-    <string>init mavlink</string>
+    <string>init
+mavlink</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pb_arm">
@@ -118,13 +119,14 @@
    </property>
    <property name="font">
     <font>
-     <pointsize>30</pointsize>
+     <pointsize>19</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
    </property>
    <property name="text">
-    <string>take off</string>
+    <string>take
+off</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pb_set_position">
@@ -144,7 +146,8 @@
     </font>
    </property>
    <property name="text">
-    <string>set position</string>
+    <string>set
+position</string>
    </property>
   </widget>
   <widget class="QSpinBox" name="sb_y">

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>814</width>
-    <height>351</height>
+    <width>650</width>
+    <height>344</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -30,13 +30,13 @@
     <rect>
      <x>120</x>
      <y>20</y>
-     <width>261</width>
+     <width>171</width>
      <height>101</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <pointsize>60</pointsize>
+     <pointsize>47</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
@@ -50,13 +50,13 @@
     <rect>
      <x>120</x>
      <y>120</y>
-     <width>261</width>
+     <width>171</width>
      <height>101</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <pointsize>60</pointsize>
+     <pointsize>47</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
@@ -70,13 +70,13 @@
     <rect>
      <x>120</x>
      <y>220</y>
-     <width>261</width>
+     <width>171</width>
      <height>101</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <pointsize>60</pointsize>
+     <pointsize>47</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
@@ -96,7 +96,7 @@
    </property>
    <property name="font">
     <font>
-     <pointsize>60</pointsize>
+     <pointsize>47</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
@@ -116,7 +116,7 @@
    </property>
    <property name="font">
     <font>
-     <pointsize>60</pointsize>
+     <pointsize>47</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
@@ -136,7 +136,7 @@
    </property>
    <property name="font">
     <font>
-     <pointsize>60</pointsize>
+     <pointsize>47</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
@@ -148,7 +148,7 @@
   <widget class="QLabel" name="lb_x_5">
    <property name="geometry">
     <rect>
-     <x>410</x>
+     <x>300</x>
      <y>120</y>
      <width>161</width>
      <height>101</height>
@@ -156,7 +156,7 @@
    </property>
    <property name="font">
     <font>
-     <pointsize>60</pointsize>
+     <pointsize>47</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
@@ -168,15 +168,15 @@
   <widget class="QLabel" name="lb_roll">
    <property name="geometry">
     <rect>
-     <x>580</x>
+     <x>470</x>
      <y>20</y>
-     <width>221</width>
+     <width>171</width>
      <height>101</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <pointsize>60</pointsize>
+     <pointsize>47</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
@@ -188,7 +188,7 @@
   <widget class="QLabel" name="lb_x_7">
    <property name="geometry">
     <rect>
-     <x>410</x>
+     <x>300</x>
      <y>20</y>
      <width>161</width>
      <height>101</height>
@@ -196,7 +196,7 @@
    </property>
    <property name="font">
     <font>
-     <pointsize>60</pointsize>
+     <pointsize>47</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
@@ -208,7 +208,7 @@
   <widget class="QLabel" name="lb_x_8">
    <property name="geometry">
     <rect>
-     <x>410</x>
+     <x>300</x>
      <y>220</y>
      <width>161</width>
      <height>101</height>
@@ -216,7 +216,7 @@
    </property>
    <property name="font">
     <font>
-     <pointsize>60</pointsize>
+     <pointsize>47</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
@@ -228,15 +228,15 @@
   <widget class="QLabel" name="lb_pitch">
    <property name="geometry">
     <rect>
-     <x>580</x>
+     <x>470</x>
      <y>120</y>
-     <width>221</width>
+     <width>171</width>
      <height>101</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <pointsize>60</pointsize>
+     <pointsize>47</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
@@ -248,15 +248,15 @@
   <widget class="QLabel" name="lb_yaw">
    <property name="geometry">
     <rect>
-     <x>580</x>
+     <x>470</x>
      <y>220</y>
-     <width>221</width>
+     <width>171</width>
      <height>101</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <pointsize>60</pointsize>
+     <pointsize>47</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>

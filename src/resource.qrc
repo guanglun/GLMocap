@@ -2,6 +2,7 @@
     <qresource prefix="/image">
         <file alias="camera.png">../resource/image/camera.png</file>
         <file alias="bl.png">../resource/image/bl.png</file>
+        <file alias="position.jpg">../resource/image/position.jpg</file>
     </qresource>
     <qresource prefix="/shader">
         <file alias="shader.frag">../resource/shader/shader.frag</file>
