@@ -133,9 +133,9 @@ void GLDrow::DrowArrow(float sx, float sy, float sz, float tx, float ty, float t
 
     
 
-    gluCylinder(objCylinder, radius, radius, axes_len - 0.06, 40, 5);
-    glTranslatef(0, 0, axes_len - 0.06);
-    gluCylinder(objCylinder, 0.014, 0.0, 0.06, 40, 5);
+    gluCylinder(objCylinder, radius, radius, axes_len - 0.03, 40, 5);
+    glTranslatef(0, 0, axes_len - 0.03);
+    gluCylinder(objCylinder, 0.008, 0.0, 0.03, 40, 5);
     glPopMatrix();
 }
 

@@ -138,7 +138,7 @@
    </property>
    <property name="font">
     <font>
-     <pointsize>10</pointsize>
+     <pointsize>8</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
@@ -352,24 +352,24 @@
     </rect>
    </property>
   </widget>
-  <widget class="QPushButton" name="pb_load_plan">
+  <widget class="QPushButton" name="pb_load_plan1">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>240</y>
+     <x>590</x>
+     <y>10</y>
      <width>93</width>
      <height>28</height>
     </rect>
    </property>
    <property name="text">
-    <string>load plan</string>
+    <string>load plan1</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pb_start_plan">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>270</y>
+     <x>590</x>
+     <y>280</y>
      <width>93</width>
      <height>28</height>
     </rect>
@@ -381,14 +381,40 @@
   <widget class="QPushButton" name="pb_stop_plan">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>300</y>
+     <x>590</x>
+     <y>310</y>
      <width>93</width>
      <height>28</height>
     </rect>
    </property>
    <property name="text">
     <string>stop plan</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pb_load_plan2">
+   <property name="geometry">
+    <rect>
+     <x>590</x>
+     <y>40</y>
+     <width>93</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>load plan2</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pb_load_plan3">
+   <property name="geometry">
+    <rect>
+     <x>590</x>
+     <y>70</y>
+     <width>93</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>load plan3</string>
    </property>
   </widget>
  </widget>

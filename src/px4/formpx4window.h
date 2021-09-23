@@ -43,7 +43,9 @@ private slots:
     void on_pb_take_off_clicked();
     void on_pb_land_clicked();
     void on_pb_set_position_clicked();
-    void on_pb_load_plan_clicked();
+    void on_pb_load_plan1_clicked();
+    void on_pb_load_plan2_clicked();
+    void on_pb_load_plan3_clicked();
     void on_pb_start_plan_clicked();
     void on_pb_stop_plan_clicked();
 signals:
