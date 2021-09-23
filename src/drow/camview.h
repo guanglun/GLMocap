@@ -44,6 +44,7 @@ public:
 
     Vector3d *Xr;
     int size = 0;
+    Vector3d *pos;
     bool isClearTrajectoryList = false;
 
     int view_fps_1s = 0;
@@ -51,6 +52,7 @@ public:
     QList<PlanPoint *> ppList;
     QList<Vector3d> trajectoryList;
 
+    enum Qt::CheckState cs_show_model = Qt::CheckState::Unchecked;
     enum Qt::CheckState cs_show_trajectory = Qt::CheckState::Unchecked;
     enum Qt::CheckState cs_show_plan = Qt::CheckState::Unchecked;
     enum Qt::CheckState cs_show_axis = Qt::CheckState::Unchecked;
@@ -59,7 +61,7 @@ public:
     CamView(QWidget *parent = 0);
     ~CamView();
     void setAngle(float rol, float pit, float yaw);
-    void setPosition(Vector3d *Xr,int size);
+    void setPosition(Vector3d *Xr,int size,Vector3d *pos);
     void setPlan(QList<PlanPoint *> list);
     void loadModel(QString filename);
 protected:

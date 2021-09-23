@@ -6,5 +6,7 @@
     <qresource prefix="/shader">
         <file alias="shader.frag">../resource/shader/shader.frag</file>
         <file alias="shader.vert">../resource/shader/shader.vert</file>
-    </qresource>    
+    </qresource>     
+
+    
 </RCC>

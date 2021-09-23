@@ -33,6 +33,7 @@ private slots:
     void onPlanSlot(QList<PlanPoint *> list);
     void onTimeOut();
 
+    void cbShowModelStateChangedSlot(int);
     void cbShowTrajectoryStateChangedSlot(int);
     void cbShowPlanStateChangedSlot(int); 
     void cbShowAxisStateChangedSlot(int); 

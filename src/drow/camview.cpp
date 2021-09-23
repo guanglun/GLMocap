@@ -9,21 +9,18 @@
 #include "MultipleViewTriangulation.h"
 #include <iostream>
 
-
-
 using namespace Eigen;
 
-CamView::CamView(QWidget *parent):
-QOpenGLWidget(parent),
-m_model(0),
-m_camera(20.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
-m_program(0)
+CamView::CamView(QWidget *parent) : QOpenGLWidget(parent),
+                                    m_model(0),
+                                    m_camera(20.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
+                                    m_program(0)
 {
 }
 
 CamView::~CamView()
 {
-        makeCurrent();
+    makeCurrent();
 
     delete m_model;
     delete m_program;
@@ -48,14 +45,16 @@ void CamView::initializeGL()
     // glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
     cameraInit(80, 30, 6.0f);
-    
 
-
+    QString applicationDirPath = QCoreApplication::applicationDirPath();
+    loadModel(applicationDirPath + "/../resource/3d/f15/drone.obj");
 }
 
-void CamView::loadModel(QString filename) {
+void CamView::loadModel(QString filename)
+{
     makeCurrent();
-    if (m_model != 0) {
+    if (m_model != 0)
+    {
         delete m_model;
     }
     m_model = new Model(filename, this);
@@ -74,30 +73,39 @@ void CamView::paintGL()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    QMatrix4x4 view;// = m_camera.view();
-    view.lookAt(
-        QVector3D(eye[0], eye[1], eye[2]), 
-        QVector3D(center[0], center[1], center[2]), 
-        QVector3D(up[0], up[1], up[2]));
-        
-    m_program->bind();
-    m_program->setUniformValue("view", view);
-    m_program->setUniformValue("model", m_modelMat);
-    m_program->setUniformValue("projection", m_projectionMat);
-
-    if (m_model != 0)
-    {
-
-        m_model->draw(this);
-        
-    }
-
-
-    m_program->release();
     gluLookAt(eye[0], eye[1], eye[2],
               center[0], center[1], center[2],
               up[0], up[1], up[2]);
 
+    if (cs_show_model == Qt::CheckState::Checked)
+    {
+        glPushMatrix();
+        QMatrix4x4 view; // = m_camera.view();
+        view.lookAt(
+            QVector3D(eye[0], eye[1], eye[2]),
+            QVector3D(center[0], center[1], center[2]),
+            QVector3D(up[0], up[1], up[2]));
+        QMatrix4x4 model;
+        if (size == 3)
+        {
+            view.translate(Xr[1](0, 0) / TRAN_SIZE, Xr[1](1, 0) / TRAN_SIZE, Xr[1](2, 0) / TRAN_SIZE);
+            view.rotate(-pos[0](0, 0) * ARC_TO_DEG, 1, 0, 0);
+            view.rotate(pos[0](1, 0) * ARC_TO_DEG, 0, 1, 0);
+            view.rotate(pos[0](2, 0) * ARC_TO_DEG, 0, 0, 1);
+        }
+
+        m_program->bind();
+        m_program->setUniformValue("view", view);
+        m_program->setUniformValue("model", m_modelMat);
+        m_program->setUniformValue("projection", m_projectionMat);
+
+        if (m_model != 0)
+        {
+            m_model->draw(this);
+        }
+        m_program->release();
+        glPopMatrix();
+    }
     /*网格*/
     glPushMatrix();
     GLDrow::DrowGrid();
@@ -114,20 +122,18 @@ void CamView::paintGL()
         GLDrow::DrowArrow(0, 0, 0, 0, 0, 0.8, 0.006);
     }
 
-    if(isClearTrajectoryList)
+    if (isClearTrajectoryList)
     {
         isClearTrajectoryList = false;
         trajectoryList.clear();
     }
-
-
 
     for (int pm = 0; pm < size; pm++)
     {
         glPushMatrix();
 
         glTranslatef(Xr[pm](0, 0) / TRAN_SIZE, Xr[pm](1, 0) / TRAN_SIZE, Xr[pm](2, 0) / TRAN_SIZE);
-        if(pm == 1 && size == 3)
+        if (pm == 1 && size == 3)
             trajectoryList.append(Vector3d(Xr[pm](0, 0) / TRAN_SIZE, Xr[pm](1, 0) / TRAN_SIZE, Xr[pm](2, 0) / TRAN_SIZE));
         glColor3f(1.0, 0.0, 0.0);
         GLDrow::drawSphere();
@@ -219,11 +225,11 @@ void CamView::paintGL()
 
     if (cs_show_trajectory == Qt::CheckState::Checked)
     {
-        glColor3f(1.0, 0.0, 0.0); 
+        glColor3f(1.0, 0.0, 0.0);
         for (int i = 0; i < trajectoryList.size(); i++)
         {
             glBegin(GL_POINTS);
-            glVertex3f(trajectoryList.at(i)[0], trajectoryList.at(i)[1],trajectoryList.at(i)[2]);
+            glVertex3f(trajectoryList.at(i)[0], trajectoryList.at(i)[1], trajectoryList.at(i)[2]);
             glEnd();
         }
     }
@@ -279,13 +285,14 @@ void CamView::setPlan(QList<PlanPoint *> list)
     ppList = list;
 }
 
-void CamView::setPosition(Vector3d *Xr, int size)
+void CamView::setPosition(Vector3d *Xr, int size,Vector3d *pos)
 {
     // this->px = x;
     // this->py = y;
     // this->pz = z;
     this->Xr = Xr;
     this->size = size;
+    this->pos = pos;
     point_fps_1s++;
 }
 
