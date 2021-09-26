@@ -37,7 +37,8 @@ private:
 
 public:
     int threshold = 200;
-    QString imagePath;
+    int camNumber = 4;
+    QString imagePath,calibrPath;
     Setting();
     void getIMUOffset(T_int16_xyz *acc,T_int16_xyz *gyro);
     void setAccOffset(T_int16_xyz *acc);
@@ -48,6 +49,9 @@ public:
 
     void setImagePath(QString path);
     QString getImagePath();
+    void setCalibrPath(QString path);
+    QString getCalibrPath();
+
     void setVisionParamPath(QString path);
     QString getVisionParamPath();
     bool loadVisionParam(QString path);
@@ -57,6 +61,9 @@ public:
     int getThreshold();
     void setThreshold(int thr);
     void saveGNDVisionParam(void);
+
+    int getCamNumber();
+    void setCamNumber(int num);
 };
 
 #endif // SETTING_H

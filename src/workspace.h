@@ -5,6 +5,7 @@
 #include <QMap>
 #include "setting.h"
 #include "log.h"
+#include "EasyTool.h"
 
 #ifdef MSVC
     #define QLOG(fmt,...) do{\

@@ -25,7 +25,7 @@ public:
 
     void stop(void);
 public slots:
-    void startSlot(void);
+    void startSlot(QString path);
     
 };
  

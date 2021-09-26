@@ -191,6 +191,8 @@ void FormPx4Window::on_pb_stop_plan_clicked()
 
 FormPx4Window::~FormPx4Window()
 {
+    planFlyProcessThread.quit();
+    planFlyProcessThread.wait();
     delete ui;
 }
 

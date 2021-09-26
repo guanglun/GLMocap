@@ -42,7 +42,7 @@ FormCamConfig::FormCamConfig(CtrlProcess *ctrlProcess,QWidget *parent) : QWidget
 
     ui->le_exposure->setValidator(new QIntValidator(0, 99999999, this));
 
-
+    ui->sp_num_cam->setValue(setting->camNumber);
 
 
     connect(this, SIGNAL(setExposureSignal(int)), ctrlProcess, SLOT(setExposureSlot(int)));
@@ -184,4 +184,9 @@ void FormCamConfig::on_pb_set_config_image_size_clicked()
     int num = ui->comboBoxCamSize->currentIndex();
     DBG("set frame num %d", num);
     //qwinusb->ctrlCamSetFrameSizeNum(num);
+}
+
+void FormCamConfig::on_pb_save_num_cam_clicked()
+{
+    setting->setCamNumber(ui->sp_num_cam->value());
 }

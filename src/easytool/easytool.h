@@ -3,14 +3,15 @@
 
 #include "workspace.h"
 #include <QObject>
+#include <QDir>
 
-class EasyTool : public QObject
+
+namespace EasyTool
 {
-    Q_OBJECT
-public:
-    EasyTool();
     QByteArray HexStringToByteArray(QString HexString);
-    static QString ByteArrayToHexString(QByteArray data);
+    QString ByteArrayToHexString(QByteArray data);
+    bool isDirExist(QString fullPath);
+    bool isFileExist(QString fullPath);
 };
 
 #endif // EASYTOOL_H

@@ -11,9 +11,9 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
 {
     ui->setupUi(this);
 
-    QDesktopWidget* desktopWidget = QApplication::desktop();
-    move(desktopWidget->screenGeometry().width()/2,
-    desktopWidget->screenGeometry().height()/2 - this->height()/2);
+    QDesktopWidget *desktopWidget = QApplication::desktop();
+    move(desktopWidget->screenGeometry().width() / 2,
+         desktopWidget->screenGeometry().height() / 2 - this->height() / 2);
 
     this->setWindowTitle("GLMocap");
 
@@ -74,7 +74,7 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
     calibrProcess = new CalibrProcess(this);
     calibrProcess->moveToThread(&calibrProcessThread);
     calibrProcessThread.start();
-    connect(this, SIGNAL(startCalibrSignal()), calibrProcess, SLOT(startSlot()));
+    connect(this, SIGNAL(startCalibrSignal(QString)), calibrProcess, SLOT(startSlot(QString)));
 }
 
 void FormCamWindow::ProvideContextMenu(const QPoint &pos)
@@ -173,6 +173,12 @@ void FormCamWindow::ProvideContextMenu(const QPoint &pos)
 
 FormCamWindow::~FormCamWindow()
 {
+    ctrlProcessThread.quit();
+    ctrlProcessThread.wait();
+    DBG("ctrlProcessThread exit");
+    calibrProcessThread.quit();
+    calibrProcessThread.wait();
+    DBG("calibrProcessThread exit");
     delete ui;
 }
 
@@ -315,7 +321,7 @@ void FormCamWindow::on_pb_init_gnd_clicked()
 {
     qwinusb->visionProcess->matchState = MATCH_START;
     qwinusb->visionProcess->calGNDstate = CAL_START;
-}   
+}
 
 // void FormCamWindow::on_pb_find_drone_clicked()
 // {
@@ -446,7 +452,7 @@ void FormCamWindow::on_action_position_triggered()
 {
     if (!fVisionWindow.isVisible())
     {
-        connect(qwinusb->visionProcess, SIGNAL(onXYZSignals(Vector3d *,Vector3d *,int)), &fVisionWindow, SLOT(onXYZSlot(Vector3d *,Vector3d *,int)));
+        connect(qwinusb->visionProcess, SIGNAL(onXYZSignals(Vector3d *, Vector3d *, int)), &fVisionWindow, SLOT(onXYZSlot(Vector3d *, Vector3d *, int)));
         fVisionWindow.show();
     }
 }
@@ -455,7 +461,7 @@ void FormCamWindow::on_action3d_view_triggered()
 {
     if (!f3DViewWindow.isVisible())
     {
-        connect(qwinusb->visionProcess, SIGNAL(onXYZSignals(Vector3d *,Vector3d *,int)), &f3DViewWindow, SLOT(onXYZSlot(Vector3d *,Vector3d *,int)));
+        connect(qwinusb->visionProcess, SIGNAL(onXYZSignals(Vector3d *, Vector3d *, int)), &f3DViewWindow, SLOT(onXYZSlot(Vector3d *, Vector3d *, int)));
         connect(&fPx4Window, SIGNAL(onPlanSignals(QList<PlanPoint *>)), &f3DViewWindow, SLOT(onPlanSlot(QList<PlanPoint *>)));
         f3DViewWindow.show();
     }
@@ -547,5 +553,27 @@ void FormCamWindow::on_actionSet_threshold_triggered()
 
 void FormCamWindow::on_pb_calibr_clicked()
 {
-    emit startCalibrSignal();
+    QString path = setting->getCalibrPath();
+    if (path.length() == 0)
+    {
+        path = setting->getImagePath();
+        if (path.length() == 0)
+        {
+            path = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+        }
+    }
+
+    QString srcDirPath = QFileDialog::getExistingDirectory(
+        this, "choose calibr image directory",
+        path);
+
+    if (srcDirPath.isEmpty())
+    {
+        return;
+    }
+    else
+    {
+        setting->setCalibrPath(srcDirPath);
+        emit startCalibrSignal(srcDirPath);
+    }
 }

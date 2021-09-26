@@ -95,7 +95,7 @@ private:
 signals:
     void ctrlMultemCamStartSignal(void);
     void ctrlMultemCamStopSignal(void);
-    void startCalibrSignal(void);
+    void startCalibrSignal(QString path);
 protected: 
      void closeEvent(QCloseEvent *event);     
 };

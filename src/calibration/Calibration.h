@@ -3,6 +3,7 @@
 
 #include "workspace.h"
 
+#include "MultipleViewTriangulation.h"
 
 class Calibration
 {
@@ -11,7 +12,7 @@ private:
 
 public:
     Calibration();
-    void calibrStart(void);
+    void calibrStart(QString path);
 
 };
 

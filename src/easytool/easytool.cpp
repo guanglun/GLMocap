@@ -1,10 +1,5 @@
 ﻿#include "easytool.h"
 
-EasyTool::EasyTool()
-{
-
-}
-
 /*
  * @breif 将16进制字符串转换为对应的字节序列
  */
@@ -44,5 +39,25 @@ QString EasyTool::ByteArrayToHexString(QByteArray data)
     return ret;
 }
 
+bool EasyTool::isDirExist(QString fullPath)
+{
+    QDir dir(fullPath);
+    if(dir.exists())
+    {
+      return true;
+    }
+    return false;
+}
+
+
+bool EasyTool::isFileExist(QString fullPath)
+{
+    QFile file(fullPath);
+    if(file.exists())
+    {
+      return true;
+    }
+    return false;
+}
 
 

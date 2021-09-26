@@ -21,8 +21,10 @@ Setting::Setting()
     }
     set->endGroup();
 
+    getCamNumber();
     getThreshold();
     getImagePath();
+    getCalibrPath();
 }
 
 void Setting::getIMUOffset(T_int16_xyz *acc, T_int16_xyz *gyro)
@@ -141,6 +143,22 @@ QString Setting::getImagePath()
     return imagePath;
 }
 
+void Setting::setCalibrPath(QString path)
+{
+    set->beginGroup("openvio");
+    calibrPath = path;
+    set->setValue("CALIBR_PATH", path);
+    set->endGroup();
+}
+
+QString Setting::getCalibrPath()
+{
+    set->beginGroup("openvio");
+    calibrPath = set->value("CALIBR_PATH").toString();
+    set->endGroup();
+    return calibrPath;
+}
+
 int Setting::getThreshold()
 {
     set->beginGroup("openvio");
@@ -154,6 +172,22 @@ void Setting::setThreshold(int thr)
     set->beginGroup("openvio");
     threshold = thr;
     set->setValue("VISION_THRESHOLD", thr);
+    set->endGroup();
+}
+
+int Setting::getCamNumber()
+{
+    set->beginGroup("openvio");
+    camNumber = set->value("NUMBER_CAMS").toInt();
+    set->endGroup();
+    return camNumber;
+}
+
+void Setting::setCamNumber(int num)
+{
+    set->beginGroup("openvio");
+    camNumber = num;
+    set->setValue("NUMBER_CAMS", num);
     set->endGroup();
 }
 
@@ -263,7 +297,7 @@ bool Setting::loadVisionParam(QString path)
 void Setting::saveGNDVisionParam(void)
 {
     set_vision->setValue("RGND",
-                             QString::number(vision_param.RGND(0, 0)) + "," +
+                         QString::number(vision_param.RGND(0, 0)) + "," +
                              QString::number(vision_param.RGND(0, 1)) + "," +
                              QString::number(vision_param.RGND(0, 2)) + ";" +
                              QString::number(vision_param.RGND(1, 0)) + "," +
