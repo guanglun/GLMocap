@@ -83,12 +83,13 @@ private slots:
     void on_action_position_triggered();
     void on_action3d_view_triggered();
     void on_actionPx4_view_triggered();
-    void on_actionLoad_vision_param_triggered();
+    
     void on_actionLog_view_triggered();
     void on_actionUpgrade_triggered();
     void on_actionConfig_triggered();
     void on_actionSet_threshold_triggered();
-    
+    void on_actionLoad_vision_param_triggered();
+    void on_actionsave_vision_param_triggered();
 private:
     Ui::FormCamWindow *ui;
     

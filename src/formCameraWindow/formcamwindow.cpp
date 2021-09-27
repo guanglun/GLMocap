@@ -508,6 +508,30 @@ void FormCamWindow::on_actionLoad_vision_param_triggered()
     }
 }
 
+void FormCamWindow::on_actionsave_vision_param_triggered()
+{
+    QString path = setting->getSaveVisionParamPath();
+    if (path.length() == 0)
+    {
+        path = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+    }
+
+    QString filePath = QFileDialog::getSaveFileName(
+        this,
+        tr("save param file."),
+        path,
+        tr("param(*.ini);;"));
+    if (filePath.isEmpty())
+    {
+        QMessageBox::warning(this, "Warning!", "Failed to open the file!");
+    }
+    else
+    {
+        setting->setSaveVisionParamPath(filePath);
+        setting->saveVisionParam(filePath);
+    }
+}
+
 void FormCamWindow::on_actionImg_save_path_triggered()
 {
     QString path = setting->getImagePath();

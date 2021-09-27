@@ -34,7 +34,7 @@ private:
     
     QSettings *set;
     QSettings *set_vision;
-
+    QSettings *save_vision;
 public:
     int threshold = 200;
     int camNumber = 4;
@@ -64,6 +64,10 @@ public:
 
     int getCamNumber();
     void setCamNumber(int num);
+
+    void setSaveVisionParamPath(QString path);
+    QString getSaveVisionParamPath();    
+    bool saveVisionParam(QString path);
 };
 
 #endif // SETTING_H

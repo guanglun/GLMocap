@@ -254,7 +254,7 @@ void Calibration::calibrStart(QString path)
                                     intrinsics.at(i+1), distortion_coeffs.at(i+1),
                                     Size(imageWidth, imageHeight), R, T, E, F,
                                     0,
-                                    TermCriteria(TermCriteria::COUNT + TermCriteria::EPS, 10000, 1e-20));
+                                    TermCriteria(TermCriteria::COUNT + TermCriteria::EPS, 100, 1e-5));
 
         cout << "Stereo Calibration done with RMS error = " << rms << endl;
 

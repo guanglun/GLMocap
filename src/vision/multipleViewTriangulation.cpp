@@ -1,8 +1,6 @@
 #include "MultipleViewTriangulation.h"
 #include <iostream>
 
-
-
 // struct VISION_PARAM vision_param = {
 //     .CamNum = 0,
 // };

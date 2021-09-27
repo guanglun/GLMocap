@@ -142,8 +142,9 @@
      <string>setting</string>
     </property>
     <addaction name="actionImg_save_path"/>
-    <addaction name="actionLoad_vision_param"/>
     <addaction name="actionSet_threshold"/>
+    <addaction name="actionLoad_vision_param"/>
+    <addaction name="actionsave_vision_param"/>
    </widget>
    <widget class="QMenu" name="menuWindow">
     <property name="title">
@@ -223,6 +224,11 @@
   <action name="actionPx4_view">
    <property name="text">
     <string>px4 view</string>
+   </property>
+  </action>
+  <action name="actionsave_vision_param">
+   <property name="text">
+    <string>save vision param</string>
    </property>
   </action>
  </widget>

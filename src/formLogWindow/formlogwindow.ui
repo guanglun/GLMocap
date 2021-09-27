@@ -25,16 +25,15 @@
   <property name="windowTitle">
    <string>FormLogWindow</string>
   </property>
-  <widget class="QTextBrowser" name="tb_log">
-   <property name="geometry">
-    <rect>
-     <x>5</x>
-     <y>1</y>
-     <width>571</width>
-     <height>341</height>
-    </rect>
-   </property>
-  </widget>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QTextBrowser" name="tb_log"/>
+     </item>
+    </layout>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>

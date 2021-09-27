@@ -46,9 +46,7 @@ Form3DViewWindow::~Form3DViewWindow()
 
 void Form3DViewWindow::on_pb_reset_trajectory_clicked()
 {
-    //view->loadModel("D:\\3.code\\assimp_qt_viewer\\assimp_qt_viewer\\3d\\wooden_model _truck.obj");
-    //camview->loadModel("F:\\windows\\Desktop\\CODE\\multi_camera\\resource\\3d\\f15\\drone.obj");
-    //camview->isClearTrajectoryList = true;
+    camview->isClearTrajectoryList = true;
 }
 
 void Form3DViewWindow::onXYZSlot(Vector3d *Xr, Vector3d *pos, int size)

@@ -194,7 +194,6 @@ void Setting::setCamNumber(int num)
 void Setting::setVisionParamPath(QString path)
 {
     set->beginGroup("openvio");
-    imagePath = path;
     set->setValue("VISION_PARAM_PATH", path);
     set->endGroup();
 }
@@ -203,6 +202,21 @@ QString Setting::getVisionParamPath()
 {
     set->beginGroup("openvio");
     QString path = set->value("VISION_PARAM_PATH").toString();
+    set->endGroup();
+    return path;
+}
+
+void Setting::setSaveVisionParamPath(QString path)
+{
+    set->beginGroup("openvio");
+    set->setValue("VISION_SAVE_PARAM_PATH", path);
+    set->endGroup();
+}
+
+QString Setting::getSaveVisionParamPath()
+{
+    set->beginGroup("openvio");
+    QString path = set->value("VISION_SAVE_PARAM_PATH").toString();
     set->endGroup();
     return path;
 }
@@ -221,6 +235,65 @@ QString Setting::getFirmwarePath()
     QString path = set->value("FIRMWARE_PATH").toString();
     set->endGroup();
     return path;
+}
+
+bool Setting::saveVisionParam(QString path)
+{
+    char buffer[2048];
+    save_vision = new QSettings(path, QSettings::IniFormat);
+
+    save_vision->setValue("CamNum", vision_param.CamNum);
+    for (int i = 0; i < vision_param.CamNum; i++)
+    {
+        save_vision->setValue(QString("P" + QString::number(i)),
+                              QString::number(vision_param.P[i].row(0)(0), 'f', 15) + "," +
+                                  QString::number(vision_param.P[i].row(0)(1), 'f', 15) + "," +
+                                  QString::number(vision_param.P[i].row(0)(2), 'f', 15) + "," +
+                                  QString::number(vision_param.P[i].row(0)(3), 'f', 15) + ";" +
+                                  QString::number(vision_param.P[i].row(1)(0), 'f', 15) + "," +
+                                  QString::number(vision_param.P[i].row(1)(1), 'f', 15) + "," +
+                                  QString::number(vision_param.P[i].row(1)(2), 'f', 15) + "," +
+                                  QString::number(vision_param.P[i].row(1)(3), 'f', 15) + ";" +
+                                  QString::number(vision_param.P[i].row(2)(0), 'f', 15) + "," +
+                                  QString::number(vision_param.P[i].row(2)(1), 'f', 15) + "," +
+                                  QString::number(vision_param.P[i].row(2)(2), 'f', 15) + "," +
+                                  QString::number(vision_param.P[i].row(2)(3), 'f', 15));
+
+        save_vision->setValue(QString("R" + QString::number(i)),
+                              QString::number(vision_param.R[i].row(0)(0), 'f', 15) + "," +
+                                  QString::number(vision_param.R[i].row(0)(1), 'f', 15) + "," +
+                                  QString::number(vision_param.R[i].row(0)(2), 'f', 15) + ";" +
+                                  QString::number(vision_param.R[i].row(1)(0), 'f', 15) + "," +
+                                  QString::number(vision_param.R[i].row(1)(1), 'f', 15) + "," +
+                                  QString::number(vision_param.R[i].row(1)(2), 'f', 15) + ";" +
+                                  QString::number(vision_param.R[i].row(2)(0), 'f', 15) + "," +
+                                  QString::number(vision_param.R[i].row(2)(1), 'f', 15) + "," +
+                                  QString::number(vision_param.R[i].row(2)(2), 'f', 15));
+
+        save_vision->setValue(QString("T" + QString::number(i)),
+                              QString::number(vision_param.T[i].row(0)(0), 'f', 15) + "," +
+                                  QString::number(vision_param.T[i].row(0)(1), 'f', 15) + "," +
+                                  QString::number(vision_param.T[i].row(0)(2), 'f', 15));
+        // sprintf(buffer, "%lf,%lf,%lf,%lf;%lf,%lf,%lf,%lf;%lf,%lf,%lf,%lf",
+        //          &p11, &p12, &p13, &p14,
+        //          &p21, &p22, &p23, &p24,
+        //          &p31, &p32, &p33, &p34);
+    }
+
+    save_vision->setValue("RGND",
+                          QString::number(vision_param.RGND(0, 0)) + "," +
+                              QString::number(vision_param.RGND(0, 1), 'f', 15) + "," +
+                              QString::number(vision_param.RGND(0, 2), 'f', 15) + ";" +
+                              QString::number(vision_param.RGND(1, 0), 'f', 15) + "," +
+                              QString::number(vision_param.RGND(1, 1), 'f', 15) + "," +
+                              QString::number(vision_param.RGND(1, 2), 'f', 15) + ";" +
+                              QString::number(vision_param.RGND(2, 0), 'f', 15) + "," +
+                              QString::number(vision_param.RGND(2, 1), 'f', 15) + "," +
+                              QString::number(vision_param.RGND(2, 2), 'f', 15));
+
+    save_vision->setValue("TGND", QString::number(vision_param.TGND(0, 0), 'f', 15) + "," +
+                                      QString::number(vision_param.TGND(0, 1), 'f', 15) + "," +
+                                      QString::number(vision_param.TGND(0, 2), 'f', 15));
 }
 
 bool Setting::loadVisionParam(QString path)
@@ -253,7 +326,7 @@ bool Setting::loadVisionParam(QString path)
                  &p31, &p32, &p33);
         Matrix33d R_;
         R_ << p11, p12, p13, p21, p22, p23, p31, p32, p33;
-        vision_param.R[i] = R_.transpose();
+        vision_param.R[i] = R_;
         std::cout << "R" << i << ":\n"
                   << vision_param.R[i] << std::endl;
 
@@ -263,7 +336,7 @@ bool Setting::loadVisionParam(QString path)
                  &p11, &p12, &p13);
         RowVector3d T_;
         T_ << p11, p12, p13;
-        vision_param.T[i] = -T_;
+        vision_param.T[i] = T_;
         std::cout << "T" << i << ":\n"
                   << vision_param.T[i] << std::endl;
     }
@@ -297,17 +370,17 @@ bool Setting::loadVisionParam(QString path)
 void Setting::saveGNDVisionParam(void)
 {
     set_vision->setValue("RGND",
-                         QString::number(vision_param.RGND(0, 0)) + "," +
-                             QString::number(vision_param.RGND(0, 1)) + "," +
-                             QString::number(vision_param.RGND(0, 2)) + ";" +
-                             QString::number(vision_param.RGND(1, 0)) + "," +
-                             QString::number(vision_param.RGND(1, 1)) + "," +
-                             QString::number(vision_param.RGND(1, 2)) + ";" +
-                             QString::number(vision_param.RGND(2, 0)) + "," +
-                             QString::number(vision_param.RGND(2, 1)) + "," +
-                             QString::number(vision_param.RGND(2, 2)));
+                         QString::number(vision_param.RGND(0, 0), 'f', 15) + "," +
+                             QString::number(vision_param.RGND(0, 1), 'f', 15) + "," +
+                             QString::number(vision_param.RGND(0, 2), 'f', 15) + ";" +
+                             QString::number(vision_param.RGND(1, 0), 'f', 15) + "," +
+                             QString::number(vision_param.RGND(1, 1), 'f', 15) + "," +
+                             QString::number(vision_param.RGND(1, 2), 'f', 15) + ";" +
+                             QString::number(vision_param.RGND(2, 0), 'f', 15) + "," +
+                             QString::number(vision_param.RGND(2, 1), 'f', 15) + "," +
+                             QString::number(vision_param.RGND(2, 2), 'f', 15));
 
-    set_vision->setValue("TGND", QString::number(vision_param.TGND(0, 0)) + "," +
-                                     QString::number(vision_param.TGND(0, 1)) + "," +
-                                     QString::number(vision_param.TGND(0, 2)));
+    set_vision->setValue("TGND", QString::number(vision_param.TGND(0, 0), 'f', 15) + "," +
+                                     QString::number(vision_param.TGND(0, 1), 'f', 15) + "," +
+                                     QString::number(vision_param.TGND(0, 2), 'f', 15));
 }
