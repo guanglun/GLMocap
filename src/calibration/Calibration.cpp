@@ -214,7 +214,7 @@ void Calibration::calibrStart(QString path)
         Mat intrinsic,distortion_coeff;
         vector<Mat> rvecs;               //旋转向量
         vector<Mat> tvecs;               //平移向量
-        calibrateCamera(objRealPoint, corners, Size(boardWidth, boardHeight), intrinsic, distortion_coeff, rvecs, tvecs, 0); 
+        //calibrateCamera(objRealPoint, corners, Size(boardWidth, boardHeight), intrinsic, distortion_coeff, rvecs, tvecs, 0); 
         intrinsics.push_back(intrinsic);
         distortion_coeffs.push_back(distortion_coeff);
     }
@@ -225,9 +225,9 @@ void Calibration::calibrStart(QString path)
         cornersR.clear();
         for (int ii = 0; ii < files.size(); ii++)
         {
-            if (camcorners.at(i).contains(ii) && camcorners.at(i + 1).contains(ii))
+            if (camcorners.at(0).contains(ii) && camcorners.at(i + 1).contains(ii))
             {
-                cornersL.push_back(camcorners.at(i).find(ii).value());
+                cornersL.push_back(camcorners.at(0).find(ii).value());
                 cornersR.push_back(camcorners.at(i + 1).find(ii).value());
             }
         }
@@ -243,11 +243,17 @@ void Calibration::calibrStart(QString path)
         // calibrateCamera(objRealPoint, cornersR, Size(boardWidth, boardHeight), intrinsicR, distortion_coeffR, rvecsR, tvecsR, 0);
 
         //标定摄像头
+        // float rms = stereoCalibrate(objRealPoint, cornersL, cornersR,
+        //                             intrinsics.at(i), distortion_coeffs.at(i),
+        //                             intrinsics.at(i+1), distortion_coeffs.at(i+1),
+        //                             Size(imageWidth, imageHeight), R, T, E, F,
+        //                             CALIB_USE_INTRINSIC_GUESS,
+        //                             TermCriteria(TermCriteria::COUNT + TermCriteria::EPS, 10000, 1e-20));
         float rms = stereoCalibrate(objRealPoint, cornersL, cornersR,
                                     intrinsics.at(i), distortion_coeffs.at(i),
                                     intrinsics.at(i+1), distortion_coeffs.at(i+1),
                                     Size(imageWidth, imageHeight), R, T, E, F,
-                                    CALIB_USE_INTRINSIC_GUESS,
+                                    0,
                                     TermCriteria(TermCriteria::COUNT + TermCriteria::EPS, 10000, 1e-20));
 
         cout << "Stereo Calibration done with RMS error = " << rms << endl;
@@ -290,11 +296,11 @@ void Calibration::calibrStart(QString path)
         cv2eigen(-T.t(), TS[i + 1]);
         //cv2eigen(Pr, PS[i+1]);
 
-        if (i > 0)
-        {
-            RS[i + 1] = RS[i] * RS[i + 1];
-            TS[i + 1] = TS[i] + TS[i + 1];
-        }
+        // if (i > 0)
+        // {
+        //     RS[i + 1] = RS[i] * RS[i + 1];
+        //     TS[i + 1] = TS[i] + TS[i + 1];
+        // }
 
         Matrix<double, 1, 4> TMP;
         TMP << 0, 0, 0, 1;
@@ -313,13 +319,16 @@ void Calibration::calibrStart(QString path)
     for (int i = 0; i < camcorners.size(); i++)
     {
         DBG("====>>>");
-        cout << std::setprecision(16) << "P" << i << ": " << PS[i] << endl;
-        
-        // cout << std::setprecision(16) << "R" << i << ": " << RS[i] << endl;
-        // cout << std::setprecision(16) << "T" << i << ": " << TS[i] << endl;
+        cout << std::setprecision(16) << "P" << i << ": " << vision_param.P[i] << endl;
+        cout << std::setprecision(16) << "R" << i << ": " << vision_param.R[i] << endl;
+        cout << std::setprecision(16) << "T" << i << ": " << vision_param.T[i] << endl;
 
         vision_param.R[i] << RS[i].transpose();
         vision_param.T[i] << -TS[i];
         vision_param.P[i] << PS[i];
+
+        cout << std::setprecision(16) << "P" << i << ": " << vision_param.P[i] << endl;
+        cout << std::setprecision(16) << "R" << i << ": " << vision_param.R[i] << endl;
+        cout << std::setprecision(16) << "T" << i << ": " << vision_param.T[i] << endl;
     }
 }
