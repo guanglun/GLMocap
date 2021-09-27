@@ -8,6 +8,7 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <QDir>
+#include <QTime>
 
 using namespace std;
 using namespace cv;
@@ -232,7 +233,7 @@ void Calibration::calibrStart(QString path)
             }
         }
 
-        mlog->show("cailbr : camera" + QString::number(i) + " to camera" + QString::number(i + 1));
+        mlog->show("cailbr : camera" + QString::number(i) + " to camera" + QString::number(i + 1) + " start");
         goodFrameCount = cornersL.size();
 
         /*计算实际的校正点的三维坐标*/
@@ -249,14 +250,18 @@ void Calibration::calibrStart(QString path)
         //                             Size(imageWidth, imageHeight), R, T, E, F,
         //                             CALIB_USE_INTRINSIC_GUESS,
         //                             TermCriteria(TermCriteria::COUNT + TermCriteria::EPS, 10000, 1e-20));
+
+        QTime time;
+        time.start();
         float rms = stereoCalibrate(objRealPoint, cornersL, cornersR,
                                     intrinsics.at(i), distortion_coeffs.at(i),
                                     intrinsics.at(i+1), distortion_coeffs.at(i+1),
                                     Size(imageWidth, imageHeight), R, T, E, F,
                                     0,
-                                    TermCriteria(TermCriteria::COUNT + TermCriteria::EPS, 100, 1e-5));
+                                    TermCriteria(TermCriteria::COUNT + TermCriteria::EPS, 10, 1e-2));
+        mlog->show("take time " + QString::number(time.elapsed()/1000.0) + "s");
 
-        cout << "Stereo Calibration done with RMS error = " << rms << endl;
+        mlog->show("Stereo Calibration done with RMS error = " + QString::number(rms,'f',6));
 
         //立体校正的时候需要两幅图像共面并且行对准 以使得立体匹配更加的可靠
         //使得两幅图像共面的方法就是把两个摄像头的图像投影到一个公共成像面上，这样每幅图像从本图像平面投影到公共图像平面都需要一个旋转矩阵R
@@ -313,15 +318,14 @@ void Calibration::calibrStart(QString path)
         PS[i + 1] = cameraMatrix * RTTMP;
         // PS[i+1] = PS[i+1]*RT;
 
-        cout << std::setprecision(16) << "RT" << i + 1 << ": " << RT << endl;
+        //cout << std::setprecision(16) << "RT" << i + 1 << ": " << RT << endl;
     }
 
     for (int i = 0; i < camcorners.size(); i++)
     {
-        DBG("====>>>");
-        cout << std::setprecision(16) << "P" << i << ": " << vision_param.P[i] << endl;
-        cout << std::setprecision(16) << "R" << i << ": " << vision_param.R[i] << endl;
-        cout << std::setprecision(16) << "T" << i << ": " << vision_param.T[i] << endl;
+        // cout << std::setprecision(16) << "P" << i << ": " << vision_param.P[i] << endl;
+        // cout << std::setprecision(16) << "R" << i << ": " << vision_param.R[i] << endl;
+        // cout << std::setprecision(16) << "T" << i << ": " << vision_param.T[i] << endl;
 
         vision_param.R[i] << RS[i].transpose();
         vision_param.T[i] << -TS[i];
