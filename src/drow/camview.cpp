@@ -146,12 +146,9 @@ void CamView::paintGL()
         {
             /*相机*/
             glPushMatrix();
-
-            // glRotatef(vision_param.eulerAngles[0] * ARC_TO_DEG, 1, 0, 0);
-            // glRotatef(vision_param.eulerAngles[1] * ARC_TO_DEG, 0, 1, 0);
-            // glRotatef(vision_param.eulerAngles[2] * ARC_TO_DEG, 0, 0, 1);
-            // glTranslatef(-vision_param.TGND[0] / TRAN_SIZE, -vision_param.TGND[1] / TRAN_SIZE, -vision_param.TGND[2] / TRAN_SIZE);
-
+            Matrix33d RR = vision_param.RGND;//.transpose();
+            Vector3d  TT = -vision_param.TGND;
+            vision_param.RTGND = EasyTool::getRT44d(RR,TT);
             Matrix44d R_T = EasyTool::getRT44d(vision_param.R[i], vision_param.T[i]);
             //R_T = R_T.inverse();
             //vision_param.RTGND = vision_param.RTGND.inverse();

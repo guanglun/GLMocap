@@ -80,7 +80,7 @@
      <item>
       <widget class="QSpinBox" name="sp_threshold">
        <property name="minimum">
-        <number>100</number>
+        <number>0</number>
        </property>
        <property name="maximum">
         <number>255</number>

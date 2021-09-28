@@ -55,6 +55,7 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
     QString path = setting->getVisionParamPath();
     if (path.length() != 0)
     {
+        mlog->show("vision param path :" + path);
         setting->loadVisionParam(path);
     }
 

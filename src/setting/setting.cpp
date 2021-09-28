@@ -239,8 +239,12 @@ QString Setting::getFirmwarePath()
 
 bool Setting::saveVisionParam(QString path)
 {
-    char buffer[2048];
-    save_vision = new QSettings(path, QSettings::IniFormat);
+    if(path.compare(loadVisionParamPath) == 0)
+    {
+        save_vision = set_vision;
+    }else{
+        save_vision = new QSettings(path, QSettings::IniFormat);
+    }
 
     save_vision->setValue("CamNum", vision_param.CamNum);
     for (int i = 0; i < vision_param.CamNum; i++)
@@ -280,25 +284,13 @@ bool Setting::saveVisionParam(QString path)
         //          &p31, &p32, &p33, &p34);
     }
 
-    save_vision->setValue("RGND",
-                          QString::number(vision_param.RGND(0, 0)) + "," +
-                              QString::number(vision_param.RGND(0, 1), 'f', 15) + "," +
-                              QString::number(vision_param.RGND(0, 2), 'f', 15) + ";" +
-                              QString::number(vision_param.RGND(1, 0), 'f', 15) + "," +
-                              QString::number(vision_param.RGND(1, 1), 'f', 15) + "," +
-                              QString::number(vision_param.RGND(1, 2), 'f', 15) + ";" +
-                              QString::number(vision_param.RGND(2, 0), 'f', 15) + "," +
-                              QString::number(vision_param.RGND(2, 1), 'f', 15) + "," +
-                              QString::number(vision_param.RGND(2, 2), 'f', 15));
-
-    save_vision->setValue("TGND", QString::number(vision_param.TGND(0, 0), 'f', 15) + "," +
-                                      QString::number(vision_param.TGND(0, 1), 'f', 15) + "," +
-                                      QString::number(vision_param.TGND(0, 2), 'f', 15));
+    saveGNDVisionParam(save_vision);
 }
 
 bool Setting::loadVisionParam(QString path)
 {
     double p11, p12, p13, p14, p21, p22, p23, p24, p31, p32, p33, p34;
+    loadVisionParamPath = path;
     set_vision = new QSettings(path, QSettings::IniFormat);
 
     vision_param.CamNum = set_vision->value("CamNum").toInt();
@@ -349,14 +341,14 @@ bool Setting::loadVisionParam(QString path)
     vision_param.RGND << p11, p12, p13, p21, p22, p23, p31, p32, p33;
 
     QString TGND = set_vision->value("TGND").toString();
-    sscanf_s(TGND.toStdString().data(), "%lf,%lf,%lf",
+    sscanf_s(TGND.toStdString().data(), "%lf;%lf;%lf",
              &p11, &p12, &p13);
     vision_param.TGND << p11, p12, p13;
 
     Matrix44d RTGND;
     RTGND << vision_param.RGND(0, 0), vision_param.RGND(1, 0), vision_param.RGND(2, 0), vision_param.TGND(0, 0),
-        vision_param.RGND(0, 1), vision_param.RGND(1, 1), vision_param.RGND(2, 1), vision_param.TGND(0, 1),
-        vision_param.RGND(0, 2), vision_param.RGND(1, 2), vision_param.RGND(2, 2), vision_param.TGND(0, 2),
+        vision_param.RGND(0, 1), vision_param.RGND(1, 1), vision_param.RGND(2, 1), vision_param.TGND(1, 0),
+        vision_param.RGND(0, 2), vision_param.RGND(1, 2), vision_param.RGND(2, 2), vision_param.TGND(2, 0),
         0, 0, 0, 1;
 
     Matrix33d RR = vision_param.RGND;//.transpose();
@@ -367,12 +359,21 @@ bool Setting::loadVisionParam(QString path)
 
     vision_param.xy[0].resize(2, vision_param.CamNum);
     vision_param.idx.resize(PT_NUM_MAX, CAM_NUM_MAX);
+
     return true;
 }
 
-void Setting::saveGNDVisionParam(void)
+void Setting::saveGNDVisionParam(QSettings *setting)
 {
-    set_vision->setValue("RGND",
+    QSettings *tar_setting;
+    if(setting == nullptr)
+    {   
+       tar_setting = set_vision;
+    }else{
+        tar_setting = setting;
+    }
+
+    tar_setting->setValue("RGND",
                          QString::number(vision_param.RGND(0, 0), 'f', 15) + "," +
                              QString::number(vision_param.RGND(0, 1), 'f', 15) + "," +
                              QString::number(vision_param.RGND(0, 2), 'f', 15) + ";" +
@@ -383,7 +384,8 @@ void Setting::saveGNDVisionParam(void)
                              QString::number(vision_param.RGND(2, 1), 'f', 15) + "," +
                              QString::number(vision_param.RGND(2, 2), 'f', 15));
 
-    set_vision->setValue("TGND", QString::number(vision_param.TGND(0, 0), 'f', 15) + "," +
-                                     QString::number(vision_param.TGND(0, 1), 'f', 15) + "," +
-                                     QString::number(vision_param.TGND(0, 2), 'f', 15));
+    tar_setting->setValue("TGND", QString::number(vision_param.TGND(0, 0), 'f', 15) + ";" +
+                                     QString::number(vision_param.TGND(1, 0), 'f', 15) + ";" +
+                                     QString::number(vision_param.TGND(2, 0), 'f', 15));
+
 }

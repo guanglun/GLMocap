@@ -415,8 +415,8 @@ int VisionProcess::calibrateGND(vector<GLPoint *> *vPoint)
     Matrix44d RTGND;
     RTGND << 
         vision_param.RGND(0, 0), vision_param.RGND(1, 0), vision_param.RGND(2, 0),vision_param.TGND(0, 0),
-        vision_param.RGND(0, 1), vision_param.RGND(1, 1), vision_param.RGND(2, 1),vision_param.TGND(0, 1),
-        vision_param.RGND(0, 2), vision_param.RGND(1, 2), vision_param.RGND(2, 2),vision_param.TGND(0, 2),
+        vision_param.RGND(0, 1), vision_param.RGND(1, 1), vision_param.RGND(2, 1),vision_param.TGND(1, 0),
+        vision_param.RGND(0, 2), vision_param.RGND(1, 2), vision_param.RGND(2, 2),vision_param.TGND(2, 0),
         0,0,0,1;
 
     vision_param.RTGNDINV = RTGND.inverse();
@@ -431,6 +431,7 @@ int VisionProcess::calibrateGND(vector<GLPoint *> *vPoint)
     setting->saveGNDVisionParam();
 
     dis.clear();
+
     return 0;
 }
 
