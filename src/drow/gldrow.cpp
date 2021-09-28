@@ -139,6 +139,50 @@ void GLDrow::DrowArrow(float sx, float sy, float sz, float tx, float ty, float t
     glPopMatrix();
 }
 
+void GLDrow::DrowCube(float size)
+{
+    float s = size / 2;
+    glBegin(GL_LINES);
+    glVertex3f(s,s,s);
+    glVertex3f(s,s,-s);
+
+    glVertex3f(s,s,s);
+    glVertex3f(s,-s,s);
+
+    glVertex3f(s,s,s);
+    glVertex3f(-s,s,s);
+
+    glVertex3f(-s,s,s);
+    glVertex3f(-s,-s,s);
+
+    glVertex3f(-s,s,s);
+    glVertex3f(-s,s,-s);
+
+    glVertex3f(s,-s,s);
+    glVertex3f(-s,-s,s);
+
+    glVertex3f(s,-s,s);
+    glVertex3f(s,-s,-s);
+
+    glVertex3f(s,s,-s);
+    glVertex3f(s,-s,-s);
+
+    glVertex3f(s,s,-s);
+    glVertex3f(-s,s,-s);
+
+    glVertex3f(-s,-s,s);
+    glVertex3f(-s,-s,-s);
+
+    glVertex3f(s,-s,-s);
+    glVertex3f(-s,-s,-s);
+
+    glVertex3f(-s,s,-s);
+    glVertex3f(-s,-s,-s);
+
+    glEnd();
+
+}
+
 void GLDrow::DrowCam(float size)
 {
     // glRotatef(90, 1, 0, 0);
@@ -146,8 +190,8 @@ void GLDrow::DrowCam(float size)
     // glRotatef(-90, 0, 1, 0);
 
     glColor3f(1.0, 0.0, 0.0);
-    //DrowCube();
-
+    DrowCube(size);
+    //glColor3f(1.0, 0.0, 0.0);
     glBegin(GL_LINES);
     glVertex3f(size / 2, size / 2, size / 2);
     glVertex3f(size / 2 * 2, size / 2 * 2, size / 2 * 3);

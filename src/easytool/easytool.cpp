@@ -1,5 +1,6 @@
 ﻿#include "easytool.h"
 
+
 /*
  * @breif 将16进制字符串转换为对应的字节序列
  */
@@ -60,4 +61,37 @@ bool EasyTool::isFileExist(QString fullPath)
     return false;
 }
 
+Eigen::Matrix<double, 4, 4> EasyTool::getRT44d(Eigen::Matrix<double, 3, 3> &R,Eigen::Matrix<double, 3, 1> &T)
+{
 
+    Eigen::Matrix<double, 4, 4> RT;
+    RT << 
+    R(0, 0),R(0, 1),R(0, 2),T(0,0),
+    R(1, 0),R(1, 1),R(1, 2),T(1,0),
+    R(2, 0),R(2, 1),R(2, 2),T(2,0),
+    0,0,0,1;
+
+    return RT;
+}
+
+Eigen::Matrix<double, 3, 4> EasyTool::getRT34d(Eigen::Matrix<double, 3, 3> &R,Eigen::Matrix<double, 3, 1> &T)
+{
+
+    Eigen::Matrix<double, 3, 4> RT;
+    RT << 
+    R(0, 0),R(0, 1),R(0, 2),T(0,0),
+    R(1, 0),R(1, 1),R(1, 2),T(1,0),
+    R(2, 0),R(2, 1),R(2, 2),T(2,0);
+
+    return RT;
+}
+
+void EasyTool::RT44d(Eigen::Matrix<double, 4, 4> &RT,Eigen::Matrix<double, 3, 3> &R,Eigen::Matrix<double, 3, 1> &T)
+{
+
+    R << 
+    RT(0, 0),RT(0, 1),RT(0, 2),
+    RT(1, 0),RT(1, 1),RT(1, 2),
+    RT(2, 0),RT(2, 1),RT(2, 2);
+    T << RT(0,3),RT(1,3),RT(2,3);
+}

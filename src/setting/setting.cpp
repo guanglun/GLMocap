@@ -271,9 +271,9 @@ bool Setting::saveVisionParam(QString path)
                                   QString::number(vision_param.R[i].row(2)(2), 'f', 15));
 
         save_vision->setValue(QString("T" + QString::number(i)),
-                              QString::number(vision_param.T[i].row(0)(0), 'f', 15) + "," +
-                                  QString::number(vision_param.T[i].row(0)(1), 'f', 15) + "," +
-                                  QString::number(vision_param.T[i].row(0)(2), 'f', 15));
+                              QString::number(vision_param.T[i].row(0)(0), 'f', 15) + ";" +
+                                  QString::number(vision_param.T[i].row(1)(0), 'f', 15) + ";" +
+                                  QString::number(vision_param.T[i].row(2)(0), 'f', 15));
         // sprintf(buffer, "%lf,%lf,%lf,%lf;%lf,%lf,%lf,%lf;%lf,%lf,%lf,%lf",
         //          &p11, &p12, &p13, &p14,
         //          &p21, &p22, &p23, &p24,
@@ -332,7 +332,7 @@ bool Setting::loadVisionParam(QString path)
 
         QString T = set_vision->value(QString("T" + QString::number(i))).toString();
         //mlog->show(T);
-        sscanf_s(T.toStdString().data(), "%lf,%lf,%lf",
+        sscanf_s(T.toStdString().data(), "%lf;%lf;%lf",
                  &p11, &p12, &p13);
         RowVector3d T_;
         T_ << p11, p12, p13;
@@ -359,6 +359,9 @@ bool Setting::loadVisionParam(QString path)
         vision_param.RGND(0, 2), vision_param.RGND(1, 2), vision_param.RGND(2, 2), vision_param.TGND(0, 2),
         0, 0, 0, 1;
 
+    Matrix33d RR = vision_param.RGND;//.transpose();
+    Vector3d  TT = -vision_param.TGND;
+    vision_param.RTGND = EasyTool::getRT44d(RR,TT);
     vision_param.RTGNDINV = RTGND.inverse();
     vision_param.eulerAngles = vision_param.RGND.transpose().eulerAngles(0, 1, 2);
 

@@ -27,7 +27,7 @@ Form3DViewWindow::Form3DViewWindow(QWidget *parent) : QWidget(parent),
     ui->cb_show_trajectory->setCheckState(Qt::CheckState::Checked);
     ui->cb_show_plan->setCheckState(Qt::CheckState::Checked);
     ui->cb_show_axis->setCheckState(Qt::CheckState::Checked);
-    ui->cb_show_cam->setCheckState(Qt::CheckState::Unchecked);
+    ui->cb_show_cam->setCheckState(Qt::CheckState::Checked);
 
 
     camview->cs_show_model = ui->cb_show_model->checkState();

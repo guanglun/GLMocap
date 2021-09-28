@@ -18,6 +18,7 @@ public:
     GLDrow();
     static void DrowGrid(void);
     static void DrowCube(void);
+    static void DrowCube(float size);
     static void DrowCam(float size = 0.1);
     // 绘制立方体
     static void drawCube();

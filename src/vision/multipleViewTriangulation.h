@@ -43,12 +43,13 @@ struct VISION_PARAM
     int ptNum;
     Matrix34d P[CAM_NUM_MAX];
     Matrix33d R[CAM_NUM_MAX];
-    RowVector3d T[CAM_NUM_MAX];
+    Vector3d T[CAM_NUM_MAX];
     MatrixXd xy[PT_NUM_MAX];
 
     Matrix44d RTGNDINV;
-    Matrix3d   RGND;
-    RowVector3d TGND;
+    Matrix44d RTGND;
+    Matrix3d  RGND;
+    Vector3d  TGND;
 
     Vector3d eulerAngles;
     // Matrix<double, PT_NUM_MAX, CAM_NUM_MAX> idx;

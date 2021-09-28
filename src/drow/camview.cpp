@@ -8,6 +8,7 @@
 #include <Eigen/Dense>
 #include "MultipleViewTriangulation.h"
 #include <iostream>
+#include "easytool.h"
 
 using namespace Eigen;
 
@@ -146,78 +147,39 @@ void CamView::paintGL()
             /*相机*/
             glPushMatrix();
 
-            //DBG("Drow %d",i);
+            // glRotatef(vision_param.eulerAngles[0] * ARC_TO_DEG, 1, 0, 0);
+            // glRotatef(vision_param.eulerAngles[1] * ARC_TO_DEG, 0, 1, 0);
+            // glRotatef(vision_param.eulerAngles[2] * ARC_TO_DEG, 0, 0, 1);
+            // glTranslatef(-vision_param.TGND[0] / TRAN_SIZE, -vision_param.TGND[1] / TRAN_SIZE, -vision_param.TGND[2] / TRAN_SIZE);
 
-            //std::cout << vision_param.R[i] << std::endl;
+            Matrix44d R_T = EasyTool::getRT44d(vision_param.R[i], vision_param.T[i]);
+            //R_T = R_T.inverse();
+            //vision_param.RTGND = vision_param.RTGND.inverse();
 
-            glRotatef(vision_param.eulerAngles[0] * ARC_TO_DEG, 1, 0, 0);
-            glRotatef(vision_param.eulerAngles[1] * ARC_TO_DEG, 0, 1, 0);
-            glRotatef(vision_param.eulerAngles[2] * ARC_TO_DEG, 0, 0, 1);
-            glTranslatef(-vision_param.TGND[0] / TRAN_SIZE, -vision_param.TGND[1] / TRAN_SIZE, -vision_param.TGND[2] / TRAN_SIZE);
-
-            //Vector3d v = vision_param.R[i].transpose().eulerAngles(2, 1, 0);
-
-            //////////////////////////////////////////////////////////////////
-
-            // Vector3d v = vision_param.R[i].eulerAngles(2, 1, 0);
-
-            // glRotatef(-v(0, 0) * ARC_TO_DEG, 1, 0, 0);
-            // glRotatef(-v(1, 0) * ARC_TO_DEG, 0, 1, 0);
-            // glRotatef(-v(2, 0) * ARC_TO_DEG, 0, 0, 1);
-
-            // std::cout << v << std::endl;
-            // glTranslatef(
-            //     vision_param.T[i](0, 0) / TRAN_SIZE,
-            //     vision_param.T[i](0, 1) / TRAN_SIZE,
-            //     vision_param.T[i](0, 2) / TRAN_SIZE);
-
-            ///////////////////////////////////////////////////////////////////
-
-            cv::Mat R_T = (cv::Mat_<double>(4, 4) << vision_param.R[i].row(0)(0), vision_param.R[i].row(0)(1), vision_param.R[i].row(0)(2), vision_param.T[i].row(0)(0),
-                           vision_param.R[i].row(1)(0), vision_param.R[i].row(1)(1), vision_param.R[i].row(1)(2), vision_param.T[i].row(0)(1),
-                           vision_param.R[i].row(2)(0), vision_param.R[i].row(2)(1), vision_param.R[i].row(2)(2), vision_param.T[i].row(0)(2),
-                           0, 0, 0, 1);
-
-            R_T = R_T.inv();
+            //R_T = R_T * vision_param.RTGND;
+            R_T = vision_param.RTGND * R_T;
+            //R_T = R_T.inverse();
 
             Matrix33d R_;
-            R_ << R_T.at<double>(0, 0), R_T.at<double>(0, 1), R_T.at<double>(0, 2),
-                R_T.at<double>(1, 0), R_T.at<double>(1, 1), R_T.at<double>(1, 2),
-                R_T.at<double>(2, 0), R_T.at<double>(2, 1), R_T.at<double>(2, 2);
-            RowVector3d T_;
-            T_ << R_T.at<double>(0, 3), R_T.at<double>(1, 3), R_T.at<double>(2, 3);
+            Vector3d T_;
+            EasyTool::RT44d(R_T, R_, T_);
 
             Vector3d v = R_.eulerAngles(0, 1, 2);
 
-            glRotatef(-v(0, 0) * ARC_TO_DEG, 1, 0, 0);
-            glRotatef(-v(1, 0) * ARC_TO_DEG, 0, 1, 0);
-            glRotatef(-v(2, 0) * ARC_TO_DEG, 0, 0, 1);
+            glRotatef(v(0, 0) * ARC_TO_DEG, 1, 0, 0);
+            glRotatef(v(1, 0) * ARC_TO_DEG, 0, 1, 0);
+            glRotatef(v(2, 0) * ARC_TO_DEG, 0, 0, 1);
 
             glTranslatef(
                 T_(0, 0) / TRAN_SIZE,
-                T_(0, 1) / TRAN_SIZE,
-                T_(0, 2) / TRAN_SIZE);
+                T_(1, 0) / TRAN_SIZE,
+                T_(2, 0) / TRAN_SIZE);
 
-            /////////////////////////////////////////////////////
-
-            // double T[3];
-            // T[0] =  -vision_param.T[i](0, 0)*vision_param.R[i].row(0)(0)
-            //         -vision_param.T[i](0, 1)*vision_param.R[i].row(0)(1)
-            //         -vision_param.T[i](0, 2)*vision_param.R[i].row(0)(2);
-            // T[1] =  -vision_param.T[i](0, 0)*vision_param.R[i].row(1)(0)
-            //         -vision_param.T[i](0, 1)*vision_param.R[i].row(1)(1)
-            //         -vision_param.T[i](0, 2)*vision_param.R[i].row(1)(2);
-            // T[2] =  -vision_param.T[i](0, 0)*vision_param.R[i].row(2)(0)
-            //         -vision_param.T[i](0, 1)*vision_param.R[i].row(2)(1)
-            //         -vision_param.T[i](0, 2)*vision_param.R[i].row(2)(2);
-
-            // glTranslatef(T[0] / TRAN_SIZE, T[1] / TRAN_SIZE, T[2] / TRAN_SIZE);
-
-            // glBegin(GL_LINES);
-            // glColor3f(0.0, 0.0, 1.0);
-            // glVertex3f(0.0, 0.0, 0.0);
-            // glVertex3f(0.0, 0.0, 10.0);
-            // glEnd();
+            glBegin(GL_LINES);
+            glColor3f(0.0, 0.0, 1.0);
+            glVertex3f(0.0, 0.0, 0.0);
+            glVertex3f(0.0, 0.0, 10.0);
+            glEnd();
 
             GLDrow::DrowCam();
             glPopMatrix();
@@ -285,7 +247,7 @@ void CamView::setPlan(QList<PlanPoint *> list)
     ppList = list;
 }
 
-void CamView::setPosition(Vector3d *Xr, int size,Vector3d *pos)
+void CamView::setPosition(Vector3d *Xr, int size, Vector3d *pos)
 {
     // this->px = x;
     // this->py = y;
