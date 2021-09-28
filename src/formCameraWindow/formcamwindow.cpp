@@ -71,10 +71,7 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
 
     fPx4Window.setPX4Thread(&qwinusb->px4Thread);
 
-    calibrProcess = new CalibrProcess(this);
-    calibrProcess->moveToThread(&calibrProcessThread);
-    calibrProcessThread.start();
-    connect(this, SIGNAL(startCalibrSignal(QString)), calibrProcess, SLOT(startSlot(QString)));
+
 }
 
 void FormCamWindow::ProvideContextMenu(const QPoint &pos)
@@ -176,20 +173,18 @@ FormCamWindow::~FormCamWindow()
     ctrlProcessThread.quit();
     ctrlProcessThread.wait();
     DBG("ctrlProcessThread exit");
-    calibrProcessThread.quit();
-    calibrProcessThread.wait();
-    DBG("calibrProcessThread exit");
+
     delete ui;
 }
 
-void FormCamWindow::on_pb_start_clicked()
+void FormCamWindow::on_actionstart_triggered()
 {
     ctrlProcess->setVio(&qwinusb->vioMap, nullptr);
     qwinusb->visionProcess->init(qwinusb->vioMap.size());
     emit ctrlMultemCamStartSignal();
 }
 
-void FormCamWindow::on_pb_stop_clicked()
+void FormCamWindow::on_actionstop_triggered()
 {
     ctrlProcess->setVio(&qwinusb->vioMap, nullptr);
     emit ctrlMultemCamStopSignal();
@@ -213,6 +208,11 @@ void FormCamWindow::closeEvent(QCloseEvent *event)
         formCamConfig->close();
     if (fPx4Window.isEnabled())
         fPx4Window.close();
+    if (fConfig.isEnabled())
+        fConfig.close();
+    if (fCalibrWindow.isEnabled())
+        fCalibrWindow.close();
+        
     qwinusb->closeDevice();
 }
 
@@ -317,10 +317,10 @@ void FormCamWindow::on_pb_init_module_clicked()
     qwinusb->visionProcess->findDroneState = FIND_MODULE_START;
 }
 
-void FormCamWindow::on_pb_init_gnd_clicked()
+void FormCamWindow::on_actioninit_gnd_triggered()
 {
     qwinusb->visionProcess->matchState = MATCH_START;
-    qwinusb->visionProcess->calGNDstate = CAL_START;
+    qwinusb->visionProcess->calGNDstate = CAL_START;    
 }
 
 // void FormCamWindow::on_pb_find_drone_clicked()
@@ -369,7 +369,7 @@ void FormCamWindow::doubleClickedSlot(const QModelIndex &index)
     }
 }
 
-void FormCamWindow::on_pb_open_all_cam_clicked()
+void FormCamWindow::on_actionopen_all_view_triggered()
 {
     for (QMap<uint8_t, OPENVIO *>::Iterator it = qwinusb->vioMap.begin();
          it != qwinusb->vioMap.end(); it++)
@@ -476,6 +476,22 @@ void FormCamWindow::on_actionPx4_view_triggered()
     }
 }
 
+void FormCamWindow::on_actionsettings_triggered()
+{
+    if (!fConfig.isVisible())
+    {
+        fConfig.show();
+    }
+}
+
+void FormCamWindow::on_actioncalibration_triggered()
+{
+    if (!fCalibrWindow.isVisible())
+    {
+        fCalibrWindow.show();
+    }
+}
+
 void FormCamWindow::on_actionLog_view_triggered()
 {
     if (!fLogWindow.isVisible())
@@ -529,75 +545,5 @@ void FormCamWindow::on_actionsave_vision_param_triggered()
     {
         setting->setSaveVisionParamPath(filePath);
         setting->saveVisionParam(filePath);
-    }
-}
-
-void FormCamWindow::on_actionImg_save_path_triggered()
-{
-    QString path = setting->getImagePath();
-    if (path.length() == 0)
-    {
-        path = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-    }
-
-    QString srcDirPath = QFileDialog::getExistingDirectory(
-        this, "choose image save directory",
-        path);
-
-    if (srcDirPath.isEmpty())
-    {
-        return;
-    }
-    else
-    {
-        setting->setImagePath(srcDirPath);
-        //qDebug() << "srcDirPath=" << srcDirPath;
-    }
-}
-
-void FormCamWindow::on_actionSet_threshold_triggered()
-{
-    int thr = setting->getThreshold();
-    bool bOk = false;
-    int threshold = QInputDialog::getInt(this,
-                                         "change threshold",
-                                         "input new threshold",
-                                         thr, //默认值
-                                         0,   //最小值
-                                         255, //最大值
-                                         1,   //步进
-                                         &bOk);
-
-    if (bOk && threshold >= 0 && threshold <= 255)
-    {
-
-        setting->setThreshold(threshold);
-    }
-}
-
-void FormCamWindow::on_pb_calibr_clicked()
-{
-    QString path = setting->getCalibrPath();
-    if (path.length() == 0)
-    {
-        path = setting->getImagePath();
-        if (path.length() == 0)
-        {
-            path = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-        }
-    }
-
-    QString srcDirPath = QFileDialog::getExistingDirectory(
-        this, "choose calibr image directory",
-        path);
-
-    if (srcDirPath.isEmpty())
-    {
-        return;
-    }
-    else
-    {
-        setting->setCalibrPath(srcDirPath);
-        emit startCalibrSignal(srcDirPath);
     }
 }

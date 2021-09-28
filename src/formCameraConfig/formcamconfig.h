@@ -41,7 +41,7 @@ private slots:
     void on_pb_set_config_sync_start_clicked();
     void on_pb_set_config_sync_stop_clicked();
     void on_pb_set_config_pwm_clicked();
-    void on_pb_save_num_cam_clicked();
+    
 private:
     Ui::FormCamConfig *ui;
 

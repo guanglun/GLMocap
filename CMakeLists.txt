@@ -29,6 +29,8 @@ QT5_WRAP_UI( UI_HEADERS
     ${CMAKE_SOURCE_DIR}/src/form3DViewWindow/form3dviewwindow.ui
     ${CMAKE_SOURCE_DIR}/src/formLogWindow/formlogwindow.ui
     ${CMAKE_SOURCE_DIR}/src/px4/formpx4window.ui
+    ${CMAKE_SOURCE_DIR}/src/formConfig/formconfig.ui
+    ${CMAKE_SOURCE_DIR}/src/formCalibrWindow/formcalibrwindow.ui
 )
 
 add_executable(MultiCam 
@@ -93,6 +95,8 @@ add_executable(MultiCam
     src/drow/camera.cpp
     src/process/CalibrProcess.cpp
     src/calibration/Calibration.cpp
+    src/formConfig/formconfig.cpp
+    src/formCalibrWindow/formcalibrwindow.cpp
 )
 
 include_directories(
@@ -124,6 +128,8 @@ include_directories(
                     src/px4/PX4Thread
                     src/px4
                     src/PathPlan
+                    src/formConfig
+                    src/formCalibrWindow
                     lib/eigen-3.2.10
                     lib/libusb/include/libusb-1.0
                     lib/assimp/include

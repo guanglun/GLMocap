@@ -7,13 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>314</width>
-    <height>560</height>
+    <height>448</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>314</width>
-    <height>560</height>
+    <height>0</height>
    </size>
   </property>
   <property name="maximumSize">
@@ -32,41 +32,15 @@
       <x>5</x>
       <y>0</y>
       <width>301</width>
-      <height>401</height>
+      <height>341</height>
      </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pb_start">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>410</y>
-      <width>91</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Start</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pb_stop">
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>410</y>
-      <width>91</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Stop</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pb_capture">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>410</y>
+      <x>110</x>
+      <y>350</y>
       <width>91</width>
       <height>23</height>
      </rect>
@@ -78,53 +52,14 @@
    <widget class="QPushButton" name="pb_init_module">
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>440</y>
+      <x>10</x>
+      <y>350</y>
       <width>91</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
      <string>InitModule</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pb_open_all_cam">
-    <property name="geometry">
-     <rect>
-      <x>210</x>
-      <y>440</y>
-      <width>91</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>OpenAllCam</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pb_init_gnd">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>440</y>
-      <width>91</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>InitGND</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pb_calibr">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>470</y>
-      <width>91</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>CalibrStart</string>
     </property>
    </widget>
   </widget>
@@ -134,21 +69,25 @@
      <x>0</x>
      <y>0</y>
      <width>314</width>
-     <height>23</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
     <property name="title">
-     <string>setting</string>
+     <string>file</string>
     </property>
-    <addaction name="actionImg_save_path"/>
-    <addaction name="actionSet_threshold"/>
+    <addaction name="actionsettings"/>
+    <addaction name="actioncalibration"/>
+    <addaction name="separator"/>
     <addaction name="actionLoad_vision_param"/>
     <addaction name="actionsave_vision_param"/>
+    <addaction name="separator"/>
+    <addaction name="actioninit_gnd"/>
+    <addaction name="actioninit_module"/>
    </widget>
    <widget class="QMenu" name="menuWindow">
     <property name="title">
-     <string>window</string>
+     <string>view</string>
     </property>
     <addaction name="action_position"/>
     <addaction name="action3d_view"/>
@@ -157,20 +96,26 @@
    </widget>
    <widget class="QMenu" name="menuOperations">
     <property name="title">
-     <string>operations </string>
+     <string>cameras</string>
     </property>
-    <widget class="QMenu" name="menuAll">
-     <property name="title">
-      <string>All</string>
-     </property>
-     <addaction name="actionUpgrade"/>
-     <addaction name="actionConfig"/>
-    </widget>
-    <addaction name="menuAll"/>
+    <addaction name="actionConfig"/>
+    <addaction name="actionUpgrade"/>
+    <addaction name="separator"/>
+    <addaction name="actionstart"/>
+    <addaction name="actionstop"/>
+    <addaction name="separator"/>
+    <addaction name="actionopen_all_view"/>
+   </widget>
+   <widget class="QMenu" name="menuabout">
+    <property name="title">
+     <string>about</string>
+    </property>
+    <addaction name="actionversion"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menuWindow"/>
    <addaction name="menuOperations"/>
+   <addaction name="menuabout"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -229,6 +174,46 @@
   <action name="actionsave_vision_param">
    <property name="text">
     <string>save vision param</string>
+   </property>
+  </action>
+  <action name="actionsettings">
+   <property name="text">
+    <string>settings</string>
+   </property>
+  </action>
+  <action name="actioncalibration">
+   <property name="text">
+    <string>calibration</string>
+   </property>
+  </action>
+  <action name="actionversion">
+   <property name="text">
+    <string>version</string>
+   </property>
+  </action>
+  <action name="actioninit_gnd">
+   <property name="text">
+    <string>init gnd</string>
+   </property>
+  </action>
+  <action name="actioninit_module">
+   <property name="text">
+    <string>init module</string>
+   </property>
+  </action>
+  <action name="actionstart">
+   <property name="text">
+    <string>start</string>
+   </property>
+  </action>
+  <action name="actionstop">
+   <property name="text">
+    <string>stop</string>
+   </property>
+  </action>
+  <action name="actionopen_all_view">
+   <property name="text">
+    <string>open all view</string>
    </property>
   </action>
  </widget>
