@@ -95,3 +95,9 @@ void EasyTool::RT44d(Eigen::Matrix<double, 4, 4> &RT,Eigen::Matrix<double, 3, 3>
     RT(2, 0),RT(2, 1),RT(2, 2);
     T << RT(0,3),RT(1,3),RT(2,3);
 }
+
+QString EasyTool::MatToString(const Eigen::MatrixXd& mat){
+    std::stringstream ss;
+    ss << mat;
+    return QString::fromStdString(ss.str());
+}

@@ -18,9 +18,9 @@ private:
 
     bool isRuning = false;
     bool isStop = false;
-    Calibration calibr;
-public:
     
+public:
+    Calibration calibr;
     CalibrProcess(QObject* parent = nullptr);
 
     void stop(void);

@@ -34,6 +34,9 @@ protected:
 
 signals:
     void startCalibrSignal(QString path);
+
+private slots:
+    void logSlot(QString msg);
 };
 
 #endif // FORMCALIBRWINDOW_H

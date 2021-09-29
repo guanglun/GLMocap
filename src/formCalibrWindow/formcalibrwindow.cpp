@@ -14,8 +14,7 @@ FormCalibrWindow::FormCalibrWindow(QWidget *parent) : QWidget(parent),
     calibrProcess->moveToThread(&calibrProcessThread);
     calibrProcessThread.start();
     connect(this, SIGNAL(startCalibrSignal(QString)), calibrProcess, SLOT(startSlot(QString)));
-
-    
+    connect(&(calibrProcess->calibr), SIGNAL(logSignal(QString)), this, SLOT(logSlot(QString)));   
 }
 
 FormCalibrWindow::~FormCalibrWindow()
@@ -69,3 +68,8 @@ void FormCalibrWindow::on_pb_calibration_clicked()
     emit startCalibrSignal(ui->le_floder_path->text());
 }
 
+void FormCalibrWindow::logSlot(QString msg)
+{
+    this->ui->tb_log->append(msg);
+    this->ui->tb_log->moveCursor(QTextCursor::End);
+}

@@ -60,6 +60,7 @@ Vector3d TS[CAM_NUM_MAX];
 Matrix34d RTS34d[CAM_NUM_MAX];
 Matrix44d RTS44d[CAM_NUM_MAX];
 vector<vector<Point2f>> corners; //各个图像找到的角点的集合 和objRealPoint 一一对应
+vector<float> vrms;
 
 Calibration::Calibration()
 {
@@ -84,7 +85,7 @@ static void calRealPoint(vector<vector<Point3f>> &obj, int boardwidth, int board
     }
 }
 
-static QStringList checkFile(QString path)
+QStringList Calibration::checkFile(QString path)
 {
     char buff[100];
     QString dirPath;
@@ -96,7 +97,7 @@ static QStringList checkFile(QString path)
         dirPath = path + "/camera" + QString::number(i);
         if (EasyTool::isDirExist(dirPath) == false)
         {
-            mlog->show("calibr check not found " + dirPath + ",exit");
+            msg("calibr check not found " + dirPath + ",exit");
             return files;
         }
         else
@@ -107,7 +108,7 @@ static QStringList checkFile(QString path)
                 files = dir.entryList(nameFilters, QDir::Files | QDir::Readable, QDir::Name);
                 if (files.size() < 1)
                 {
-                    mlog->show("calibr check error,files.size < 1,exit");
+                    msg("calibr check error,files.size < 1,exit");
                 }
             }
             else
@@ -116,7 +117,7 @@ static QStringList checkFile(QString path)
                 {
                     if (EasyTool::isFileExist(dirPath + "/" + files.at(ii)) == false)
                     {
-                        mlog->show("calibr check not found " + dirPath + "/" + files.at(ii) + ",exit");
+                        msg("calibr check not found " + dirPath + "/" + files.at(ii) + ",exit");
                         return files;
                     }
                 }
@@ -157,7 +158,7 @@ void Calibration::calibrStart(QString path)
             QString imgPath = path + "/camera" + QString::number(i) + "/" + files.at(ii);
             if (EasyTool::isFileExist(imgPath) == false)
             {
-                mlog->show("calibr not not found " + imgPath + ",exit");
+                msg("calibr not not found " + imgPath + ",exit");
                 return;
             }
             img = imread(string((const char *)imgPath.toLocal8Bit()), IMREAD_GRAYSCALE);
@@ -173,20 +174,20 @@ void Calibration::calibrStart(QString path)
                     //在图像上画出角点
                     //drawChessboardCorners(img, boardSize, corner, isFind);
                     corners.insert(ii, corner);
-                    mlog->show("findChessboardCorners " + imgPath + " success " + QString::number(corner.size()));
+                    msg("findChessboardCorners " + imgPath + " success " + QString::number(corner.size()));
                     // namedWindow(string((const char *)imgPath.toLocal8Bit()));
                     // imshow(string((const char *)imgPath.toLocal8Bit()), img);
                 }
                 else
                 {
-                    mlog->show("findChessboardCorners " + imgPath + " fail");
+                    msg("findChessboardCorners " + imgPath + " fail");
                 }
             }
         }
         camcorners.push_back(corners);
     }
 
-    mlog->show("camcorners size " + QString::number(camcorners.size()));
+    msg("camcorners size " + QString::number(camcorners.size()));
 
     if (camcorners.size() != setting->camNumber)
     {
@@ -195,7 +196,7 @@ void Calibration::calibrStart(QString path)
 
     for (int i = 0; i < camcorners.size(); i++)
     {
-        mlog->show("corners " + QString::number(i) + " : " + QString::number(camcorners.at(i).size()));
+        msg("corners " + QString::number(i) + " : " + QString::number(camcorners.at(i).size()));
     }
 
     intrinsics.clear();
@@ -235,7 +236,7 @@ void Calibration::calibrStart(QString path)
             }
         }
 
-        mlog->show("cailbr : camera" + QString::number(i) + " to camera" + QString::number(i + 1) + " start");
+        msg("cailbr : camera" + QString::number(i) + " to camera" + QString::number(i + 1) + " start");
         goodFrameCount = cornersL.size();
 
         /*计算实际的校正点的三维坐标*/
@@ -261,9 +262,11 @@ void Calibration::calibrStart(QString path)
                                     Size(imageWidth, imageHeight), R, T, E, F,
                                     0,
                                     TermCriteria(TermCriteria::COUNT + TermCriteria::EPS, 10, 1e-2));
-        mlog->show("take time " + QString::number(time.elapsed() / 1000.0) + "s");
 
-        mlog->show("Stereo Calibration done with RMS error = " + QString::number(rms, 'f', 6));
+        vrms.push_back(rms);
+        msg("take time " + QString::number(time.elapsed() / 1000.0) + "s");
+
+        msg("Stereo Calibration done with RMS error = " + QString::number(rms, 'f', 6));
 
         //立体校正的时候需要两幅图像共面并且行对准 以使得立体匹配更加的可靠
         //使得两幅图像共面的方法就是把两个摄像头的图像投影到一个公共成像面上，这样每幅图像从本图像平面投影到公共图像平面都需要一个旋转矩阵R
@@ -315,17 +318,36 @@ void Calibration::calibrStart(QString path)
             vision_param.T[i] << TS[i];
             vision_param.P[i] << PS[i];
 
-            cout << std::setprecision(16) << "P" << i << ": " << vision_param.P[i] << endl;
-            cout << std::setprecision(16) << "R" << i << ": " << vision_param.R[i] << endl;
-            cout << std::setprecision(16) << "T" << i << ": " << vision_param.T[i] << endl;
+            msg("P" + QString::number(i) + ": " + EasyTool::MatToString(vision_param.P[i]));
+            msg("R" + QString::number(i) + ": " + EasyTool::MatToString(vision_param.R[i]));
+            msg("T" + QString::number(i) + ": " + EasyTool::MatToString(vision_param.T[i]));
+
+            // cout << std::setprecision(16) << "P" << i << ": " << vision_param.P[i] << endl;
+            // cout << std::setprecision(16) << "R" << i << ": " << vision_param.R[i] << endl;
+            // cout << std::setprecision(16) << "T" << i << ": " << vision_param.T[i] << endl;
         }
 
         vision_param.R[i + 1] << RS[i + 1].transpose();
         vision_param.T[i + 1] << TS[i + 1];
         vision_param.P[i + 1] << PS[i + 1];
 
-        cout << std::setprecision(16) << "P" << i + 1 << ": " << vision_param.P[i + 1] << endl;
-        cout << std::setprecision(16) << "R" << i + 1 << ": " << vision_param.R[i + 1] << endl;
-        cout << std::setprecision(16) << "T" << i + 1 << ": " << vision_param.T[i + 1] << endl;
+        msg("P" + QString::number(i + 1) + ": " + EasyTool::MatToString(vision_param.P[i + 1]));
+        msg("R" + QString::number(i + 1) + ": " + EasyTool::MatToString(vision_param.R[i + 1]));
+        msg("T" + QString::number(i + 1) + ": " + EasyTool::MatToString(vision_param.T[i + 1]));
+
+        // cout << std::setprecision(16) << "P" << i + 1 << ": " << vision_param.P[i + 1] << endl;
+        // cout << std::setprecision(16) << "R" << i + 1 << ": " << vision_param.R[i + 1] << endl;
+        // cout << std::setprecision(16) << "T" << i + 1 << ": " << vision_param.T[i + 1] << endl;
     }
+
+    for (int i = 0; i < camcorners.size() - 1; i++)
+    {
+        msg(QString::number(i) + " to " + QString::number(i+1) + "rms error = " + QString::number(vrms.at(i), 'f', 6));
+    }
+}
+
+void Calibration::msg(QString msg)
+{
+    mlog->show(msg);
+    emit logSignal(msg);
 }
