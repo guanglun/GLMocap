@@ -1,6 +1,5 @@
 # 开源视觉运动捕捉GLMocap
 [DOC](http://guanglundz.com/mocap)  
-<br />  
 ![GLMocap](http://guanglundz.com/mocap/img/mocap4.jpg) 
 ## 简介
 
