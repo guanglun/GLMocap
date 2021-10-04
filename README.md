@@ -1,6 +1,7 @@
 # 开源视觉运动捕捉GLMocap
 [DOC](http://guanglundz.com/mocap)  
-![GLMocap](http://guanglundz.com/mocap/img/mocap4.jpg "GLMocap")
+![GLMocap](https://images.gitee.com/uploads/images/2021/1004/161950_5ba1cc96_683968.jpeg "GLMocap")  
+
 ## 简介
 
 运动捕捉系统GLMocap包括多相机硬件开源方案和上位机软件算法方案的低成本运动捕捉系统。目前设计指标为低成本实现毫米级空间定位，辅助无人机等有室内定位需求的装置和设备。  
