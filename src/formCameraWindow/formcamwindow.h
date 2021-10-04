@@ -28,6 +28,7 @@ class FormVioWindow;
 #include "form3dviewwindow.h"
 #include "formlogwindow.h"
 #include "formconfig.h"
+#include "formabout.h"
 #include "formcalibrwindow.h"
 #include "formpx4window.h"
 #include "CtrlProcess.h"
@@ -60,6 +61,7 @@ public:
     FormLogWindow fLogWindow;
     FormPx4Window fPx4Window;
     FormConfig fConfig;
+    FormAbout fAbout;
     FormCalibrWindow fCalibrWindow;
     MuItemCtrl *muItemCtrl;
     FormCamConfig *formCamConfig;
@@ -90,6 +92,7 @@ private slots:
     void on_actionstart_triggered();
     void on_actionstop_triggered();
     void on_actionopen_all_view_triggered();
+    void on_actionabout_triggered();
 private:
     Ui::FormCamWindow *ui;
     

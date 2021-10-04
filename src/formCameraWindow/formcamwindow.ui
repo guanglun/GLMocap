@@ -69,7 +69,7 @@
      <x>0</x>
      <y>0</y>
      <width>314</width>
-     <height>26</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -110,7 +110,7 @@
     <property name="title">
      <string>about</string>
     </property>
-    <addaction name="actionversion"/>
+    <addaction name="actionabout"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menuWindow"/>
@@ -186,9 +186,9 @@
     <string>calibration</string>
    </property>
   </action>
-  <action name="actionversion">
+  <action name="actionabout">
    <property name="text">
-    <string>version</string>
+    <string>about</string>
    </property>
   </action>
   <action name="actioninit_gnd">

@@ -172,11 +172,11 @@ void CamView::paintGL()
                 T_(1, 0) / TRAN_SIZE,
                 T_(2, 0) / TRAN_SIZE);
 
-            glBegin(GL_LINES);
-            glColor3f(0.0, 0.0, 1.0);
-            glVertex3f(0.0, 0.0, 0.0);
-            glVertex3f(0.0, 0.0, 10.0);
-            glEnd();
+            // glBegin(GL_LINES);
+            // glColor3f(0.0, 0.0, 1.0);
+            // glVertex3f(0.0, 0.0, 0.0);
+            // glVertex3f(0.0, 0.0, 10.0);
+            // glEnd();
 
             GLDrow::DrowCam();
             glPopMatrix();

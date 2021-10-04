@@ -31,6 +31,7 @@ QT5_WRAP_UI( UI_HEADERS
     ${CMAKE_SOURCE_DIR}/src/px4/formpx4window.ui
     ${CMAKE_SOURCE_DIR}/src/formConfig/formconfig.ui
     ${CMAKE_SOURCE_DIR}/src/formCalibrWindow/formcalibrwindow.ui
+    ${CMAKE_SOURCE_DIR}/src/formAbout/formabout.ui
 )
 
 add_executable(MultiCam 
@@ -60,7 +61,7 @@ add_executable(MultiCam
     src/px4/formpx4window.cpp
     src/PathPlan/PlanPoint.cpp
     src/PathPlan/MuItemPoint.cpp
-
+    src/formAbout/formabout.cpp
     src/vision/GLPoint.cpp
 
     src/main.cpp
@@ -128,6 +129,7 @@ include_directories(
                     src/px4/PX4Thread
                     src/px4
                     src/PathPlan
+                    src/formAbout
                     src/formConfig
                     src/formCalibrWindow
                     lib/eigen-3.2.10

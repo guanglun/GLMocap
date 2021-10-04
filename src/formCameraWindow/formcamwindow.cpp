@@ -213,7 +213,8 @@ void FormCamWindow::closeEvent(QCloseEvent *event)
         fConfig.close();
     if (fCalibrWindow.isEnabled())
         fCalibrWindow.close();
-        
+    if (fAbout.isEnabled())
+        fAbout.close();        
     qwinusb->closeDevice();
 }
 
@@ -501,6 +502,14 @@ void FormCamWindow::on_actionLog_view_triggered()
     }
 }
 
+void FormCamWindow::on_actionabout_triggered()
+{
+    if (!fAbout.isVisible())
+    {
+        fAbout.show();
+    }
+}
+
 void FormCamWindow::on_actionLoad_vision_param_triggered()
 {
     QString path = setting->getVisionParamPath();
@@ -548,3 +557,4 @@ void FormCamWindow::on_actionsave_vision_param_triggered()
         setting->saveVisionParam(filePath);
     }
 }
+

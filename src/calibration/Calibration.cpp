@@ -143,6 +143,8 @@ void Calibration::calibrStart(QString path)
         40,
         0.01);
 
+    msg("calibr start.");
+
     QStringList files = checkFile(path);
     if (files.size() == 0)
     {
@@ -264,6 +266,7 @@ void Calibration::calibrStart(QString path)
                                     TermCriteria(TermCriteria::COUNT + TermCriteria::EPS, 10, 1e-2));
 
         vrms.push_back(rms);
+        
         msg("take time " + QString::number(time.elapsed() / 1000.0) + "s");
 
         msg("Stereo Calibration done with RMS error = " + QString::number(rms, 'f', 6));
@@ -342,7 +345,7 @@ void Calibration::calibrStart(QString path)
 
     for (int i = 0; i < camcorners.size() - 1; i++)
     {
-        msg(QString::number(i) + " to " + QString::number(i+1) + "rms error = " + QString::number(vrms.at(i), 'f', 6));
+        msg(QString::number(i) + " to " + QString::number(i+1) + " rms error = " + QString::number(vrms.at(i), 'f', 6));
     }
 }
 
