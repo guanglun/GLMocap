@@ -16,6 +16,7 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
          desktopWidget->screenGeometry().height() / 2 - this->height() / 2);
 
     this->setWindowTitle("GLMocap");
+    setWindowIcon(QIcon(":/image/logo.ico"));
 
     setting = new Setting();
 

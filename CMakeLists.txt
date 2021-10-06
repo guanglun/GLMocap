@@ -34,8 +34,10 @@ QT5_WRAP_UI( UI_HEADERS
     ${CMAKE_SOURCE_DIR}/src/formAbout/formabout.ui
 )
 
-add_executable(MultiCam 
+set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/resource/image/logo.rc")
 
+add_executable(MultiCam 
+    WIN32
     ${UI_HEADERS}
     src/resource.qrc
     
@@ -98,6 +100,8 @@ add_executable(MultiCam
     src/calibration/Calibration.cpp
     src/formConfig/formconfig.cpp
     src/formCalibrWindow/formcalibrwindow.cpp
+
+    ${APP_ICON_RESOURCE_WINDOWS}
 )
 
 include_directories(
@@ -159,3 +163,5 @@ target_link_libraries(MultiCam
                         ${OpenCV_LIBS}
                         
 )
+
+

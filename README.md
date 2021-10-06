@@ -1,5 +1,7 @@
-# 开源视觉运动捕捉GLMocap
-[DOC](http://guanglundz.com/mocap)  
+# 开源视觉运动捕捉GLMocap  
+
+[文档地址DOC](http://guanglundz.com/mocap)  
+
 ![GLMocap](https://images.gitee.com/uploads/images/2021/1004/161950_5ba1cc96_683968.jpeg "GLMocap")  
 
 ## 简介
