@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(MultiCam LANGUAGES C CXX)
+project(GLMocap LANGUAGES C CXX)
 
 find_package(Qt5 COMPONENTS Core Widgets Gui OpenGL Network REQUIRED)
 find_package(OpenCV 4.5.3 REQUIRED)
@@ -36,7 +36,7 @@ QT5_WRAP_UI( UI_HEADERS
 
 set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/resource/image/logo.rc")
 
-add_executable(MultiCam 
+add_executable(GLMocap 
     WIN32
     ${UI_HEADERS}
     src/resource.qrc
@@ -150,7 +150,7 @@ if (MSVC)
     set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO /NODEFAULTLIB:${CMAKE_SOURCE_DIR}/lib/usb/libusb-1.0.lib")
 endif()           
 
-target_link_libraries(MultiCam 
+target_link_libraries(GLMocap 
                         Qt5::Widgets
                         Qt5::Core
                         Qt5::Gui
