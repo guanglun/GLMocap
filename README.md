@@ -76,6 +76,9 @@
 [GLMocap开源视觉运动捕捉系统PX4空间定位](https://www.bilibili.com/video/BV1WM4y1G7vQ/)  
 [开源视觉运动捕捉GLMocap项目最新进展(2021-8-17)](https://www.bilibili.com/video/BV16L411J7ir/)  
 
+## 感谢
+[https://github.com/gwjensen/SnakeStrike](https://github.com/gwjensen/SnakeStrike)
+
 </br>  
 
 ## 欢迎加入 光流电子交流群  558343678  
