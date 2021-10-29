@@ -71,4 +71,15 @@
 * 定位点初始化后一旦丢失或者重合，数据点将永远丢失或者错乱，此处程序需要优化
 * 摄像头本身分辨率和帧率限制
 
+## 视频展示
+[GLMocap开源视觉运动捕捉系统V0.1.0软件基本介绍](https://www.bilibili.com/video/BV1eg411F7gY/)  
+[GLMocap开源视觉运动捕捉系统轨迹飞行演示](https://www.bilibili.com/video/BV1f44y1t7sN/)  
+[GLMocap开源视觉运动捕捉系统PX4空间定位](https://www.bilibili.com/video/BV1WM4y1G7vQ/)  
+[开源视觉运动捕捉GLMocap项目最新进展(2021-8-17)](https://www.bilibili.com/video/BV16L411J7ir/)  
+
+## 感谢
+[https://github.com/gwjensen/SnakeStrike](https://github.com/gwjensen/SnakeStrike)
+
+</br>  
+
 ## 欢迎加入 光流电子交流群  558343678  
