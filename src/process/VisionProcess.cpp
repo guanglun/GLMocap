@@ -1,7 +1,7 @@
 #include "VisionProcess.h"
 #include "CameraPointMap.h"
 
-VisionProcess::VisionProcess(PX4Thread *px4,QObject *parent)
+VisionProcess::VisionProcess(PX4Thread *px4, QObject *parent)
 {
     this->px4 = px4;
 }
@@ -116,11 +116,11 @@ int VisionProcess::matchPoint(void)
                                                      xyc,
                                                      idx,
                                                      rerr, map.rows());
-    //std::cout << "===>>>result1:\r\n";
+    std::cout << "===>>>result1:\r\n";
     for (int i = 0; i < map.rows(); i++)
     {
-        //std::cout << i << " : " << map.row(i) << " ";
-        //mlog->show(QString::number(rerr[i]));
+        std::cout << i << " : " << map.row(i) << " ";
+        mlog->show(QString::number(rerr[i]));
         if (rerr[i] != -1)
         {
             rerrSort.push_back(rerr[i]);
@@ -128,7 +128,7 @@ int VisionProcess::matchPoint(void)
     }
     if (rerrSort.size() < pointNum)
     {
-        //DBG("rerrSort size Error, Return");
+        DBG("rerrSort size Error, Return");
         return -1;
     }
 
@@ -161,8 +161,25 @@ int VisionProcess::matchPoint(void)
                 camResult[cm].vPoint[map.row(index)(cm)]->x,
                 camResult[cm].vPoint[map.row(index)(cm)]->y,
                 pm));
+            
+            std::cout << "\t" << camResult[cm].vPoint[map.row(index)(cm)]->x << "\t" << camResult[cm].vPoint[map.row(index)(cm)]->y << "\r\n";
         }
     }
+
+    // for (int cm = 0; cm < camNum; cm++)
+    // {
+    //     camResult[cm].vPoint.clear();
+    //     for (int pm = 0; pm < pointNum; pm++)
+    //     {
+
+    //         camResult[cm].vPoint.push_back(new GLPoint(
+    //             vPoint[cm][pm]->state,
+    //             vPoint[cm][pm]->imageIndex,
+    //             vPoint[cm][pm]->x,
+    //             vPoint[cm][pm]->y,
+    //             pm));
+    //     }
+    // }
 
     if (calGNDstate == CAL_START)
     {
@@ -177,6 +194,7 @@ int VisionProcess::matchPoint(void)
     }
     else if (findDroneState == FIND_MODULE_START)
     {
+
         if (findDroneModule(vPoint) < 0)
         {
             return -1;
@@ -405,22 +423,19 @@ int VisionProcess::calibrateGND(vector<GLPoint *> *vPoint)
 
     cv::Mat RT = MultipleViewTriangulation::Get3DR_TransMatrix(srcPoints, dstPoints).inv();
 
-    vision_param.RGND << 
-        RT.at<double>(0, 0), RT.at<double>(0, 1), RT.at<double>(0, 2),
+    vision_param.RGND << RT.at<double>(0, 0), RT.at<double>(0, 1), RT.at<double>(0, 2),
         RT.at<double>(1, 0), RT.at<double>(1, 1), RT.at<double>(1, 2),
         RT.at<double>(2, 0), RT.at<double>(2, 1), RT.at<double>(2, 2);
 
     vision_param.TGND << Xr[1](0, 0), Xr[1](1, 0), Xr[1](2, 0); //RT.at<double>(0, 3),RT.at<double>(1, 3),RT.at<double>(2, 3);
 
     Matrix44d RTGND;
-    RTGND << 
-        vision_param.RGND(0, 0), vision_param.RGND(1, 0), vision_param.RGND(2, 0),vision_param.TGND(0, 0),
-        vision_param.RGND(0, 1), vision_param.RGND(1, 1), vision_param.RGND(2, 1),vision_param.TGND(1, 0),
-        vision_param.RGND(0, 2), vision_param.RGND(1, 2), vision_param.RGND(2, 2),vision_param.TGND(2, 0),
-        0,0,0,1;
+    RTGND << vision_param.RGND(0, 0), vision_param.RGND(1, 0), vision_param.RGND(2, 0), vision_param.TGND(0, 0),
+        vision_param.RGND(0, 1), vision_param.RGND(1, 1), vision_param.RGND(2, 1), vision_param.TGND(1, 0),
+        vision_param.RGND(0, 2), vision_param.RGND(1, 2), vision_param.RGND(2, 2), vision_param.TGND(2, 0),
+        0, 0, 0, 1;
 
     vision_param.RTGNDINV = RTGND.inverse();
-
 
     // std::cout << vision_param.RGND << endl;
     // std::cout << vision_param.TGND << endl;
@@ -467,14 +482,14 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
 
         if (isCapImage == true)
         {
-            if (camResult[0].time - saveLastTime >= 500)
+            if (camResult[0].time - saveLastTime >= 2000)
             {
                 for (int i = 0; i < camNum; i++)
                 {
                     QString filePath = camResult[i].path + "/" + QString::number(camResult[0].time) + ".png";
-                    
+
                     camResult[i].image.save(filePath);
-                    mlog->show("save "+filePath);
+                    mlog->show("save " + filePath);
                 }
                 saveLastTime = camResult[0].time;
             }
@@ -524,25 +539,26 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
                     for (int pm = 0; pm < vision_param.ptNum; pm++)
                     {
                         Matrix<double, 4, 1> PT;
-                        PT << Xr[pm](0,0),Xr[pm](1,0),Xr[pm](2,0),1;
+                        PT << Xr[pm](0, 0), Xr[pm](1, 0), Xr[pm](2, 0), 1;
                         PT = vision_param.RTGNDINV * PT;
-                        Xr[pm] << PT(0,0),PT(1,0),PT(2,0);
+                        Xr[pm] << PT(0, 0), PT(1, 0), PT(2, 0);
                     }
                     // mlog->show("pos : " +
                     //            QString::number(Xr[0](0, 0)) + " " +
                     //            QString::number(Xr[0](1, 0)) + " " +
                     //            QString::number(Xr[0](2, 0)));
-                    
-                    emit onXYZSignals(Xr,&eulerAnglesDrone, vision_param.ptNum);
-                }else if (findDroneState == FIND_MODULE_OK)
+
+                    emit onXYZSignals(Xr, &eulerAnglesDrone, vision_param.ptNum);
+                }
+                else if (findDroneState == FIND_MODULE_OK)
                 {
                     Vector3d *Xr = triangulation();
                     for (int pm = 0; pm < vision_param.ptNum; pm++)
                     {
                         Matrix<double, 4, 1> PT;
-                        PT << Xr[pm](0,0),Xr[pm](1,0),Xr[pm](2,0),1;
+                        PT << Xr[pm](0, 0), Xr[pm](1, 0), Xr[pm](2, 0), 1;
                         PT = vision_param.RTGNDINV * PT;
-                        Xr[pm] << PT(0,0),PT(1,0),PT(2,0);
+                        Xr[pm] << PT(0, 0), PT(1, 0), PT(2, 0);
                     }
 
                     // mlog->show("pis : " +
@@ -559,32 +575,32 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
                     std::vector<cv::Point3f> srcPoints;
                     std::vector<cv::Point3f> dstPoints;
 
-                    srcPoints.push_back(cv::Point3f(110, 0, 0));
+                    srcPoints.push_back(cv::Point3f(60, 0, 0));
                     srcPoints.push_back(cv::Point3f(0, 0, 0));
-                    srcPoints.push_back(cv::Point3f(0, -70, 0));
+                    srcPoints.push_back(cv::Point3f(0, -40, 0));
 
                     for (int cm = 0; cm < pointNum; cm++)
                     {
                         dstPoints.push_back(cv::Point3f(Xr[cm](0, 0), Xr[cm](1, 0), Xr[cm](2, 0)));
                     }
 
-                    cv::Mat RT = MultipleViewTriangulation::Get3DR_TransMatrix(srcPoints, dstPoints);//.inv();
+                    cv::Mat RT = MultipleViewTriangulation::Get3DR_TransMatrix(srcPoints, dstPoints); //.inv();
 
                     Matrix3d R_Drone;
                     Vector3d T_Drone;
 
-                    R_Drone <<  RT.at<double>(0, 0), RT.at<double>(0, 1), RT.at<double>(0, 2),
-                                RT.at<double>(1, 0), RT.at<double>(1, 1), RT.at<double>(1, 2),
-                                RT.at<double>(2, 0), RT.at<double>(2, 1), RT.at<double>(2, 2);
-                    R_Drone = R_Drone.transpose();
+                    R_Drone << RT.at<double>(0, 0), RT.at<double>(0, 1), RT.at<double>(0, 2),
+                        RT.at<double>(1, 0), RT.at<double>(1, 1), RT.at<double>(1, 2),
+                        RT.at<double>(2, 0), RT.at<double>(2, 1), RT.at<double>(2, 2);
+                    R_Drone = R_Drone.transpose().eval();
                     //eulerAnglesDrone = R_Drone.eulerAngles(2, 1, 0);// * 180 / M_PI;
 
                     eulerAnglesDrone = MultipleViewTriangulation::rotationMatrixToEulerAngles(R_Drone);
 
                     T_Drone << Xr[1](0, 0), Xr[1](1, 0), Xr[1](2, 0);
 
-                    px4->setPos(Xr[1](0, 0)/1000, -Xr[1](1, 0)/1000, -Xr[1](2, 0)/1000,
-                                -eulerAnglesDrone[0],eulerAnglesDrone[1],eulerAnglesDrone[2]);
+                    px4->setPos(Xr[1](0, 0) / 1000, -Xr[1](1, 0) / 1000, -Xr[1](2, 0) / 1000,
+                                -eulerAnglesDrone[0], eulerAnglesDrone[1], eulerAnglesDrone[2]);
 
                     // mlog->show("pos : " +
                     //            QString::number(T_Drone(0, 0), 'f', 2) + "\t" +
@@ -594,7 +610,7 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
                     //            QString::number(eulerAnglesDrone[1], 'f', 2) + "\t" +
                     //            QString::number(eulerAnglesDrone[2], 'f', 2));
 
-                    emit onXYZSignals(Xr,&eulerAnglesDrone, vision_param.ptNum);
+                    emit onXYZSignals(Xr, &eulerAnglesDrone, vision_param.ptNum);
                 }
             }
         }

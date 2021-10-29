@@ -37,7 +37,7 @@ QT5_WRAP_UI( UI_HEADERS
 set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/resource/image/logo.rc")
 
 add_executable(GLMocap 
-    WIN32
+    # WIN32
     ${UI_HEADERS}
     src/resource.qrc
     
@@ -161,7 +161,6 @@ target_link_libraries(GLMocap
                         ${CMAKE_SOURCE_DIR}/lib/assimp/lib/libIrrXML.a
                         ${CMAKE_SOURCE_DIR}/lib/assimp/lib/libassimp.dll.a
                         ${OpenCV_LIBS}
-                        
 )
 
 

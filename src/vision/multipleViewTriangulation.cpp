@@ -104,7 +104,7 @@ MultipleViewTriangulation::triangulation(
         p(2*cm+1) = f0 * Prj[cm](1,3) - xy[cm](1) * Prj[cm](2,3);
     }
 
-    M = T.transpose() * T;
+    M = T.transpose().eval() * T;
     b = - T.transpose() * p;
 
     // solve using LU decomp.
@@ -157,7 +157,7 @@ MultipleViewTriangulation::triangulation_all(
             }
         }
 
-        M = T.transpose() * T;
+        M = T.transpose().eval() * T;
         b = - T.transpose() * p;
 
         // solve using LU decomp.
@@ -204,14 +204,36 @@ Vector3d *MultipleViewTriangulation::triangulation(void)
 {
     double rerr[vision_param.ptNum];
 
+    // DBG("optimal_correction_all");
+    // std::cout << vision_param.CamNum << endl;
+    // std::cout << vision_param.xy << endl;
+    // std::cout << vision_param.idx << endl;
+    // std::cout << vision_param.ptNum << endl;
+
+    MatrixXd xy[vision_param.ptNum];
+    MatrixXi idx(vision_param.ptNum, vision_param.CamNum);
+    MatrixXi iidx(vision_param.CamNum,vision_param.ptNum);
+    for (int i = 0; i < vision_param.ptNum; i++)
+    {
+        for (int cm = 0; cm < vision_param.CamNum; cm++)
+        {
+
+            xy[i].resize(2, vision_param.CamNum);
+            xy[i].col(cm)(0) = vision_param.xy[i].col(cm)(0);
+            xy[i].col(cm)(1) = vision_param.xy[i].col(cm)(1);
+            idx.row(i)(cm) = 1;
+            //idx.row(cm)(i) = 1;
+        }
+    }    
     optimal_correction_all(vision_param.P,
                             vision_param.CamNum,
-                            vision_param.xy,
-                            vision_param.xy,
-                            vision_param.idx,
+                            xy,
+                            xy,
+                            idx,
                             rerr,vision_param.ptNum);
 
-    triangulation_all(vision_param.P,vision_param.CamNum,vision_param.xy,Xr,vision_param.ptNum,vision_param.idx);
+
+    triangulation_all(vision_param.P,vision_param.CamNum,xy,Xr,vision_param.ptNum,idx);
 
     // for(int pm = 0;pm<vision_param.ptNum;pm++)
     // {
