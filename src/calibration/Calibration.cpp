@@ -220,11 +220,14 @@ void Calibration::calibrStart(QString path)
         Mat intrinsic, distortion_coeff;
         vector<Mat> rvecs; //旋转向量
         vector<Mat> tvecs; //平移向量
+
         //calibrateCamera(objRealPoint, corners, Size(boardWidth, boardHeight), intrinsic, distortion_coeff, rvecs, tvecs, 0);
+
         intrinsics.push_back(intrinsic);
         distortion_coeffs.push_back(distortion_coeff);
     }
 
+    vrms.clear();
     for (int i = 0; i < camcorners.size() - 1; i++)
     {
         cornersL.clear();
@@ -245,10 +248,14 @@ void Calibration::calibrStart(QString path)
         objRealPoint.clear();
         calRealPoint(objRealPoint, boardWidth, boardHeight, goodFrameCount, squareSize);
 
+        QTime time;
+        time.start();
+
         // calibrateCamera(objRealPoint, cornersL, Size(boardWidth, boardHeight), intrinsicL, distortion_coeffL, rvecsL, tvecsL, 0);
         // calibrateCamera(objRealPoint, cornersR, Size(boardWidth, boardHeight), intrinsicR, distortion_coeffR, rvecsR, tvecsR, 0);
 
-        //标定摄像头
+
+        // //标定摄像头
         // float rms = stereoCalibrate(objRealPoint, cornersL, cornersR,
         //                             intrinsics.at(i), distortion_coeffs.at(i),
         //                             intrinsics.at(i+1), distortion_coeffs.at(i+1),
@@ -256,14 +263,13 @@ void Calibration::calibrStart(QString path)
         //                             CALIB_USE_INTRINSIC_GUESS,
         //                             TermCriteria(TermCriteria::COUNT + TermCriteria::EPS, 10000, 1e-20));
 
-        QTime time;
-        time.start();
+
         float rms = stereoCalibrate(objRealPoint, cornersL, cornersR,
                                     intrinsics.at(i), distortion_coeffs.at(i),
                                     intrinsics.at(i + 1), distortion_coeffs.at(i + 1),
                                     Size(imageWidth, imageHeight), R, T, E, F,
                                     0,
-                                    TermCriteria(TermCriteria::COUNT + TermCriteria::EPS, 10, 1e-2));
+                                    TermCriteria(TermCriteria::COUNT + TermCriteria::EPS, 1000, 1e-20));
 
         vrms.push_back(rms);
         

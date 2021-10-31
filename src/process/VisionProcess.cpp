@@ -136,7 +136,7 @@ int VisionProcess::matchPoint(void)
     for (int pm; pm < pointNum; pm++)
     {
         indexResult[pm] = getIndex(rerr, map.rows(), rerrSort[pm]);
-        DBG("\r\nindex pm : %d", indexResult[pm]);
+        DBG("index pm : %d", indexResult[pm]);
         if (indexResult[pm] == -1)
         {
             DBG("Error Return, indexResult[%d] == -1", pm);
@@ -149,7 +149,7 @@ int VisionProcess::matchPoint(void)
     for (int pm = 0; pm < pointNum; pm++)
     {
         int index = getIndex(rerr, map.rows(), rerrSort[pm]);
-        std::cout << index << " : " << map.row(index) << " ";
+        std::cout << index << " : " << map.row(index) << " " ;
         mlog->show(QString::number(rerr[index]));
 
         for (int cm = 0; cm < camNum; cm++)
@@ -162,7 +162,7 @@ int VisionProcess::matchPoint(void)
                 camResult[cm].vPoint[map.row(index)(cm)]->y,
                 pm));
             
-            std::cout << "\t" << camResult[cm].vPoint[map.row(index)(cm)]->x << "\t" << camResult[cm].vPoint[map.row(index)(cm)]->y << "\r\n";
+            std::cout << "\r\n\t" << camResult[cm].vPoint[map.row(index)(cm)]->x << "\t" << camResult[cm].vPoint[map.row(index)(cm)]->y << "\r\n";
         }
     }
 

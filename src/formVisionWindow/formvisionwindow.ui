@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>650</width>
-    <height>344</height>
+    <width>591</width>
+    <height>190</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>476</width>
-    <height>344</height>
+    <width>220</width>
+    <height>100</height>
    </size>
   </property>
   <property name="maximumSize">
@@ -28,10 +28,10 @@
   <widget class="QLabel" name="lb_x">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>20</y>
+     <x>90</x>
+     <y>10</y>
      <width>171</width>
-     <height>101</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="font">
@@ -48,10 +48,10 @@
   <widget class="QLabel" name="lb_y">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>120</y>
+     <x>90</x>
+     <y>70</y>
      <width>171</width>
-     <height>101</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="font">
@@ -68,10 +68,10 @@
   <widget class="QLabel" name="lb_z">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>220</y>
+     <x>90</x>
+     <y>130</y>
      <width>171</width>
-     <height>101</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="font">
@@ -88,10 +88,10 @@
   <widget class="QLabel" name="lb_x_2">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>20</y>
+     <x>10</x>
+     <y>10</y>
      <width>71</width>
-     <height>101</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="font">
@@ -108,10 +108,10 @@
   <widget class="QLabel" name="lb_x_3">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>120</y>
+     <x>10</x>
+     <y>70</y>
      <width>71</width>
-     <height>101</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="font">
@@ -128,10 +128,10 @@
   <widget class="QLabel" name="lb_x_4">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>220</y>
+     <x>10</x>
+     <y>130</y>
      <width>71</width>
-     <height>101</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="font">
@@ -148,10 +148,10 @@
   <widget class="QLabel" name="lb_x_5">
    <property name="geometry">
     <rect>
-     <x>300</x>
-     <y>120</y>
+     <x>290</x>
+     <y>70</y>
      <width>161</width>
-     <height>101</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="font">
@@ -168,10 +168,10 @@
   <widget class="QLabel" name="lb_roll">
    <property name="geometry">
     <rect>
-     <x>470</x>
-     <y>20</y>
+     <x>450</x>
+     <y>10</y>
      <width>171</width>
-     <height>101</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="font">
@@ -188,10 +188,10 @@
   <widget class="QLabel" name="lb_x_7">
    <property name="geometry">
     <rect>
-     <x>300</x>
-     <y>20</y>
+     <x>290</x>
+     <y>10</y>
      <width>161</width>
-     <height>101</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="font">
@@ -208,10 +208,10 @@
   <widget class="QLabel" name="lb_x_8">
    <property name="geometry">
     <rect>
-     <x>300</x>
-     <y>220</y>
+     <x>290</x>
+     <y>130</y>
      <width>161</width>
-     <height>101</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="font">
@@ -228,10 +228,10 @@
   <widget class="QLabel" name="lb_pitch">
    <property name="geometry">
     <rect>
-     <x>470</x>
-     <y>120</y>
+     <x>450</x>
+     <y>70</y>
      <width>171</width>
-     <height>101</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="font">
@@ -248,10 +248,10 @@
   <widget class="QLabel" name="lb_yaw">
    <property name="geometry">
     <rect>
-     <x>470</x>
-     <y>220</y>
+     <x>450</x>
+     <y>130</y>
      <width>171</width>
-     <height>101</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="font">
