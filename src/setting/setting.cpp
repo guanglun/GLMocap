@@ -1,6 +1,7 @@
 #include "setting.h"
 #include "MultipleViewTriangulation.h"
 #include <iostream>
+#include <opencv2/core/eigen.hpp>
 
 Setting::Setting()
 {
@@ -249,6 +250,24 @@ bool Setting::saveVisionParam(QString path)
     save_vision->setValue("CamNum", vision_param.CamNum);
     for (int i = 0; i < vision_param.CamNum; i++)
     {
+        save_vision->setValue(QString("I" + QString::number(i)),
+                            QString::number(vision_param.intrinsics[i].row(0)(0), 'f', 15) + "," +
+                            QString::number(vision_param.intrinsics[i].row(0)(1), 'f', 15) + "," +
+                            QString::number(vision_param.intrinsics[i].row(0)(2), 'f', 15) + ";" +
+                            QString::number(vision_param.intrinsics[i].row(1)(0), 'f', 15) + "," +
+                            QString::number(vision_param.intrinsics[i].row(1)(1), 'f', 15) + "," +
+                            QString::number(vision_param.intrinsics[i].row(1)(2), 'f', 15) + ";" +
+                            QString::number(vision_param.intrinsics[i].row(2)(0), 'f', 15) + "," +
+                            QString::number(vision_param.intrinsics[i].row(2)(1), 'f', 15) + "," +
+                            QString::number(vision_param.intrinsics[i].row(2)(2), 'f', 15));      
+
+        save_vision->setValue(QString("K" + QString::number(i)),
+                                QString::number(vision_param.distortion_coeffs[i].row(0)(0), 'f', 15) + "," +
+                                QString::number(vision_param.distortion_coeffs[i].row(0)(1), 'f', 15) + "," +
+                                QString::number(vision_param.distortion_coeffs[i].row(0)(2), 'f', 15) + "," +
+                                QString::number(vision_param.distortion_coeffs[i].row(0)(3), 'f', 15) + "," +
+                                QString::number(vision_param.distortion_coeffs[i].row(0)(4), 'f', 15));
+
         save_vision->setValue(QString("P" + QString::number(i)),
                               QString::number(vision_param.P[i].row(0)(0), 'f', 15) + "," +
                                   QString::number(vision_param.P[i].row(0)(1), 'f', 15) + "," +
@@ -289,7 +308,7 @@ bool Setting::saveVisionParam(QString path)
 
 bool Setting::loadVisionParam(QString path)
 {
-    double p11, p12, p13, p14, p21, p22, p23, p24, p31, p32, p33, p34;
+    double p11, p12, p13, p14, p15,p21, p22, p23, p24, p31, p32, p33, p34;
     loadVisionParamPath = path;
     set_vision = new QSettings(path, QSettings::IniFormat);
 
@@ -299,6 +318,35 @@ bool Setting::loadVisionParam(QString path)
 
     for (int i = 0; i < vision_param.CamNum; i++)
     {
+        QString I = set_vision->value(QString("I" + QString::number(i))).toString();
+        sscanf_s(I.toStdString().data(), "%lf,%lf,%lf;%lf,%lf,%lf;%lf,%lf,%lf",
+                 &p11, &p12, &p13,
+                 &p21, &p22, &p23,
+                 &p31, &p32, &p33);
+        vision_param.intrinsics[i] << p11, p12, p13, p21, p22, p23, p31, p32, p33;
+        std::cout << "I" << i << ":\n"
+                  << vision_param.intrinsics[i] << std::endl;
+
+        QString K = set_vision->value(QString("K" + QString::number(i))).toString();
+        sscanf_s(K.toStdString().data(), "%lf,%lf,%lf,%lf,%lf",
+                &p11, &p12, &p13, &p14, &p15);
+        vision_param.distortion_coeffs[i] << p11, p12, p13, p14, p15;
+        std::cout << "K" << i << ":\n"
+                  << vision_param.distortion_coeffs[i] << std::endl;
+
+    cv::Mat cameraMatrix = cv::Mat::zeros(3, 3, CV_64F);
+    cv::Mat distCoeffs = cv::Mat::zeros(1, 5, CV_64F);
+    cv::eigen2cv(vision_param.intrinsics[i],cameraMatrix);   
+    cv::eigen2cv(vision_param.distortion_coeffs[i],distCoeffs);  
+
+    std::cout << "I" << i << ":\n"
+                  << cameraMatrix << std::endl;
+
+    std::cout << "K" << i << ":\n"
+                  << distCoeffs << std::endl;
+
+        vision_param.P[i] << p11, p12, p13, p14, p21, p22, p23, p24, p31, p32, p33, p34;
+
         QString P = set_vision->value(QString("P" + QString::number(i))).toString();
         //qDebug() << QString("P"+QString::number(i)) << " = " << P;
 
@@ -308,7 +356,8 @@ bool Setting::loadVisionParam(QString path)
                  &p31, &p32, &p33, &p34);
 
         vision_param.P[i] << p11, p12, p13, p14, p21, p22, p23, p24, p31, p32, p33, p34;
-        //std::cout << "P" <<i<<":\n"<< vision_param.P[i] << std::endl;
+        std::cout << "P" << i << ":\n"
+                  << vision_param.P[i] << std::endl;
 
         QString R = set_vision->value(QString("R" + QString::number(i))).toString();
         //mlog->show(R);

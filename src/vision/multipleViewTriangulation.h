@@ -45,6 +45,9 @@ struct VISION_PARAM
     Matrix33d R[CAM_NUM_MAX];
     Vector3d T[CAM_NUM_MAX];
     MatrixXd xy[PT_NUM_MAX];
+    Matrix33d intrinsics[PT_NUM_MAX];
+    Matrix<double, 1, 5>distortion_coeffs[PT_NUM_MAX];
+    
 
     Matrix44d RTGNDINV;
     Matrix44d RTGND;

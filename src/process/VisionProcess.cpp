@@ -482,7 +482,7 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
 
         if (isCapImage == true)
         {
-            if (camResult[0].time - saveLastTime >= 2000)
+            if (camResult[0].time - saveLastTime >= 1000)
             {
                 for (int i = 0; i < camNum; i++)
                 {

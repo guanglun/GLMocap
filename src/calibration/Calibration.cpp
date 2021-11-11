@@ -201,8 +201,8 @@ void Calibration::calibrStart(QString path)
         msg("corners " + QString::number(i) + " : " + QString::number(camcorners.at(i).size()));
     }
 
-    intrinsics.clear();
-    distortion_coeffs.clear();
+    // intrinsics.clear();
+    // distortion_coeffs.clear();
     for (int i = 0; i < camcorners.size(); i++)
     {
         goodFrameCount = camcorners.at(i).size();
@@ -218,8 +218,8 @@ void Calibration::calibrStart(QString path)
             }
         }
         Mat intrinsic, distortion_coeff;
-        vector<Mat> rvecs; //旋转向量
-        vector<Mat> tvecs; //平移向量
+        // vector<Mat> rvecs; //旋转向量
+        // vector<Mat> tvecs; //平移向量
 
         //calibrateCamera(objRealPoint, corners, Size(boardWidth, boardHeight), intrinsic, distortion_coeff, rvecs, tvecs, 0);
 
@@ -284,13 +284,17 @@ void Calibration::calibrStart(QString path)
         //其中Pl,Pr为两个相机的投影矩阵，其作用是将3D点的坐标转换到图像的2D点的坐标:P*[X Y Z 1]' =[x y w]
         //Q矩阵为重投影矩阵，即矩阵Q可以把2维平面(图像平面)上的点投影到3维空间的点:Q*[x y d 1] = [X Y Z W]。其中d为左右两幅图像的时差
 
-        stereoRectify(intrinsics.at(i), distortion_coeffs.at(i), intrinsics.at(i + 1), distortion_coeffs.at(i + 1), imageSize, R, T, Rl, Rr, Pl, Pr, Q,
+        stereoRectify(
+        intrinsics.at(i), distortion_coeffs.at(i), 
+        intrinsics.at(i + 1), distortion_coeffs.at(i + 1), imageSize, R, T, Rl, Rr, Pl, Pr, Q,
                       CALIB_ZERO_DISPARITY, -1, imageSize, &validROIL, &validROIR);
 
         // cout << "R: " << R << endl;
         // cout << "T: " << T << endl;
         // cout << "Pl: " << Pl << endl;
         // cout << "Pr: " << Pr << endl;
+        // cout << "intrinsics: " << intrinsics.at(i) << endl;
+        // cout << "distortion_coeffs: " << distortion_coeffs.at(i) << endl;
 
         if (i == 0)
         {
@@ -303,11 +307,14 @@ void Calibration::calibrStart(QString path)
 
             Matrix33d cameraMatrix;
             cv2eigen(intrinsics.at(i), cameraMatrix);
+            cv2eigen(intrinsics.at(i), vision_param.intrinsics[i]);
+            cv2eigen(distortion_coeffs.at(i), vision_param.distortion_coeffs[i]);
             PS[i] = cameraMatrix * RTS34d[0];
         }
 
         cv2eigen(R, RS[i + 1]);
         cv2eigen(T, TS[i + 1]);
+        
         //cv2eigen(Pr, PS[i+1]);
 
         {
@@ -319,6 +326,8 @@ void Calibration::calibrStart(QString path)
         RTS34d[i + 1] = EasyTool::getRT34d(RS[i + 1], TS[i + 1]);
         Matrix33d cameraMatrix;
         cv2eigen(intrinsics.at(i + 1), cameraMatrix);
+        cv2eigen(intrinsics.at(i + 1), vision_param.intrinsics[i + 1]);
+        cv2eigen(distortion_coeffs.at(i + 1), vision_param.distortion_coeffs[i + 1]);        
         PS[i + 1] = cameraMatrix * RTS34d[i + 1];
 
         if (i == 0)
