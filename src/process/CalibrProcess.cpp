@@ -7,7 +7,7 @@ CalibrProcess::CalibrProcess(QObject *parent)
 void CalibrProcess::startSlot(QString path)
 {
     int pc = 0;
-    
+    emit processSignal(PROCESS_CODE_START);
 
 
     mlog->show("calibr process start, " + path);
@@ -26,6 +26,7 @@ end:
     isRuning = false;
     isStop = false;
     mlog->show("calibr process end");
+    emit processSignal(PROCESS_CODE_END);
 }
 
 void CalibrProcess::stop(void)

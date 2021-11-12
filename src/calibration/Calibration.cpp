@@ -145,7 +145,7 @@ void Calibration::calibrStart(QString path)
         40,
         0.01);
 
-    msg("calibr start.");
+    msg("Calibration Start");
 
     QStringList files = checkFile(path);
     if (files.size() == 0)
@@ -350,6 +350,8 @@ void Calibration::calibrStart(QString path)
     {
         msg(QString::number(0) + " to " + QString::number(i+1) + " rms error = " + QString::number(vrms.at(i), 'f', 6));
     }
+
+    msg("Calibration Exit");
 }
 
 void Calibration::msg(QString msg)

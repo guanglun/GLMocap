@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>243</width>
-    <height>376</height>
+    <width>314</width>
+    <height>438</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -31,16 +31,16 @@
      <rect>
       <x>5</x>
       <y>0</y>
-      <width>231</width>
-      <height>281</height>
+      <width>301</width>
+      <height>331</height>
      </rect>
     </property>
    </widget>
    <widget class="QPushButton" name="pb_capture">
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>290</y>
+      <x>210</x>
+      <y>340</y>
       <width>91</width>
       <height>23</height>
      </rect>
@@ -52,8 +52,8 @@
    <widget class="QPushButton" name="pb_init_module">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>290</y>
+      <x>110</x>
+      <y>340</y>
       <width>91</width>
       <height>23</height>
      </rect>
@@ -62,14 +62,27 @@
      <string>InitModule</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="pb_quick_start">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>340</y>
+      <width>91</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>QuickStart</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>243</width>
-     <height>23</height>
+     <width>314</width>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">

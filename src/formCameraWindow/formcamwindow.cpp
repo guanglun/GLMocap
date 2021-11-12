@@ -314,6 +314,13 @@ void FormCamWindow::on_pb_capture_clicked()
     }
 }
 
+
+void FormCamWindow::on_pb_quick_start_clicked()
+{
+    on_actionopen_all_view_triggered();
+    on_actionstart_triggered();
+}
+
 void FormCamWindow::on_pb_init_module_clicked()
 {
     qwinusb->visionProcess->matchState = MATCH_START;

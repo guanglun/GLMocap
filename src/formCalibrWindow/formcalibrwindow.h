@@ -10,6 +10,7 @@ namespace Ui {
 class FormCalibrWindow;
 }
 
+
 class FormCalibrWindow : public QWidget
 {
     Q_OBJECT
@@ -23,7 +24,6 @@ public:
     ~FormCalibrWindow();
 
 private slots:
-    void on_pb_exit_clicked();
     void on_pb_select_floder_clicked();
     void on_pb_calibration_clicked();
 private:
@@ -37,6 +37,7 @@ signals:
 
 private slots:
     void logSlot(QString msg);
+    void processSlot(int code);
 };
 
 #endif // FORMCALIBRWINDOW_H

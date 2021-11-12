@@ -11,6 +11,11 @@
 
 #include "Calibration.h"
 
+enum PROCESS_CODE{
+    PROCESS_CODE_START,
+    PROCESS_CODE_END,
+};
+
 class CalibrProcess:public QObject        
 {
     Q_OBJECT
@@ -26,7 +31,8 @@ public:
     void stop(void);
 public slots:
     void startSlot(QString path);
-    
+signals:
+    void processSignal(int code);
 };
  
 #endif // CALIBRPROCESS_H
