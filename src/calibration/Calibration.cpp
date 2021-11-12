@@ -54,11 +54,11 @@ Mat distCoeffL;
 Mat cameraMatrixR;
 Mat distCoeffR;
 
+
 Matrix34d PS[CAM_NUM_MAX];
 Matrix33d RS[CAM_NUM_MAX];
 Vector3d TS[CAM_NUM_MAX];
-Matrix34d RTS34d[CAM_NUM_MAX];
-Matrix44d RTS44d[CAM_NUM_MAX];
+
 vector<vector<Point2f>> corners; //各个图像找到的角点的集合 和objRealPoint 一一对应
 vector<float> vrms;
 
@@ -132,8 +132,10 @@ void Calibration::calibrStart(QString path)
     int goodFrameCount = 0;
     Mat imgL, boardimgL;
     Mat imgR, boardimgR;
-
+    Matrix33d cameraMatrix;
     Mat img;
+    Matrix43d PSTMP;
+    Matrix43d RTS43d;
 
     vector<QMap<uint8_t, vector<Point2f>>> camcorners;
 
@@ -218,8 +220,8 @@ void Calibration::calibrStart(QString path)
             }
         }
         Mat intrinsic, distortion_coeff;
-        // vector<Mat> rvecs; //旋转向量
-        // vector<Mat> tvecs; //平移向量
+        vector<Mat> rvecs; //旋转向量
+        vector<Mat> tvecs; //平移向量
 
         //calibrateCamera(objRealPoint, corners, Size(boardWidth, boardHeight), intrinsic, distortion_coeff, rvecs, tvecs, 0);
 
@@ -234,14 +236,14 @@ void Calibration::calibrStart(QString path)
         cornersR.clear();
         for (int ii = 0; ii < files.size(); ii++)
         {
-            if (camcorners.at(i).contains(ii) && camcorners.at(i + 1).contains(ii))
+            if (camcorners.at(0).contains(ii) && camcorners.at(i + 1).contains(ii))
             {
-                cornersL.push_back(camcorners.at(i).find(ii).value());
+                cornersL.push_back(camcorners.at(0).find(ii).value());
                 cornersR.push_back(camcorners.at(i + 1).find(ii).value());
             }
         }
 
-        msg("cailbr : camera" + QString::number(i) + " to camera" + QString::number(i + 1) + " start");
+        msg("cailbr : camera" + QString::number(0) + " to camera" + QString::number(i + 1) + " start");
         goodFrameCount = cornersL.size();
 
         /*计算实际的校正点的三维坐标*/
@@ -255,7 +257,7 @@ void Calibration::calibrStart(QString path)
         // calibrateCamera(objRealPoint, cornersR, Size(boardWidth, boardHeight), intrinsicR, distortion_coeffR, rvecsR, tvecsR, 0);
 
 
-        // //标定摄像头
+        //标定摄像头
         // float rms = stereoCalibrate(objRealPoint, cornersL, cornersR,
         //                             intrinsics.at(i), distortion_coeffs.at(i),
         //                             intrinsics.at(i+1), distortion_coeffs.at(i+1),
@@ -265,7 +267,7 @@ void Calibration::calibrStart(QString path)
 
 
         float rms = stereoCalibrate(objRealPoint, cornersL, cornersR,
-                                    intrinsics.at(i), distortion_coeffs.at(i),
+                                    intrinsics.at(0), distortion_coeffs.at(0),
                                     intrinsics.at(i + 1), distortion_coeffs.at(i + 1),
                                     Size(imageWidth, imageHeight), R, T, E, F,
                                     0,
@@ -285,7 +287,7 @@ void Calibration::calibrStart(QString path)
         //Q矩阵为重投影矩阵，即矩阵Q可以把2维平面(图像平面)上的点投影到3维空间的点:Q*[x y d 1] = [X Y Z W]。其中d为左右两幅图像的时差
 
         stereoRectify(
-        intrinsics.at(i), distortion_coeffs.at(i), 
+        intrinsics.at(0), distortion_coeffs.at(0), 
         intrinsics.at(i + 1), distortion_coeffs.at(i + 1), imageSize, R, T, Rl, Rr, Pl, Pr, Q,
                       CALIB_ZERO_DISPARITY, -1, imageSize, &validROIL, &validROIR);
 
@@ -302,56 +304,42 @@ void Calibration::calibrStart(QString path)
                 0, 1, 0,
                 0, 0, 1;
             TS[0] << (double)0.0, (double)0.0, (double)0.0;
-            RTS34d[0] = EasyTool::getRT34d(RS[0], TS[0]);
-            RTS44d[0] = EasyTool::getRT44d(RS[0], TS[0]);
-
-            Matrix33d cameraMatrix;
-            cv2eigen(intrinsics.at(i), cameraMatrix);
-            cv2eigen(intrinsics.at(i), vision_param.intrinsics[i]);
-            cv2eigen(distortion_coeffs.at(i), vision_param.distortion_coeffs[i]);
-            PS[i] = cameraMatrix * RTS34d[0];
+            RS[0].transposeInPlace();
+            RTS43d = EasyTool::getRT43d(RS[0], TS[0]);
+            cv2eigen(intrinsics.at(0), cameraMatrix);
+            PS[0] = (RTS43d*cameraMatrix.transpose()).transpose();
         }
 
         cv2eigen(R, RS[i + 1]);
         cv2eigen(T, TS[i + 1]);
-        
-        //cv2eigen(Pr, PS[i+1]);
+        RS[i + 1].transposeInPlace();
 
-        {
-            RTS44d[i + 1] = EasyTool::getRT44d(RS[i + 1], TS[i + 1]) * RTS44d[i];
-            EasyTool::RT44d(RTS44d[i + 1], RS[i + 1], TS[i + 1]);
-        }
-
-        //Vector3d TMPT = TS[i + 1];
-        RTS34d[i + 1] = EasyTool::getRT34d(RS[i + 1], TS[i + 1]);
-        Matrix33d cameraMatrix;
-        cv2eigen(intrinsics.at(i + 1), cameraMatrix);
-        cv2eigen(intrinsics.at(i + 1), vision_param.intrinsics[i + 1]);
-        cv2eigen(distortion_coeffs.at(i + 1), vision_param.distortion_coeffs[i + 1]);        
-        PS[i + 1] = cameraMatrix * RTS34d[i + 1];
+        RTS43d = EasyTool::getRT43d(RS[i + 1], TS[i + 1]);
+        cv2eigen(intrinsics.at(i + 1), cameraMatrix);     
+        PS[i + 1] = (RTS43d*cameraMatrix.transpose()).transpose();
 
         if (i == 0)
         {
-            vision_param.R[i] << RS[i].transpose();
+            vision_param.R[i] << RS[i];
             vision_param.T[i] << TS[i];
             vision_param.P[i] << PS[i];
 
-            msg("P" + QString::number(i) + ": " + EasyTool::MatToString(vision_param.P[i]));
-            msg("R" + QString::number(i) + ": " + EasyTool::MatToString(vision_param.R[i]));
-            msg("T" + QString::number(i) + ": " + EasyTool::MatToString(vision_param.T[i]));
+            msg("P" + QString::number(i) + ": \r\n" + EasyTool::MatToString(vision_param.P[i]));
+            msg("R" + QString::number(i) + ": \r\n" + EasyTool::MatToString(vision_param.R[i]));
+            msg("T" + QString::number(i) + ": \r\n" + EasyTool::MatToString(vision_param.T[i]));
 
             // cout << std::setprecision(16) << "P" << i << ": " << vision_param.P[i] << endl;
             // cout << std::setprecision(16) << "R" << i << ": " << vision_param.R[i] << endl;
             // cout << std::setprecision(16) << "T" << i << ": " << vision_param.T[i] << endl;
         }
 
-        vision_param.R[i + 1] << RS[i + 1].transpose();
+        vision_param.R[i + 1] << RS[i + 1];
         vision_param.T[i + 1] << TS[i + 1];
         vision_param.P[i + 1] << PS[i + 1];
 
-        msg("P" + QString::number(i + 1) + ": " + EasyTool::MatToString(vision_param.P[i + 1]));
-        msg("R" + QString::number(i + 1) + ": " + EasyTool::MatToString(vision_param.R[i + 1]));
-        msg("T" + QString::number(i + 1) + ": " + EasyTool::MatToString(vision_param.T[i + 1]));
+        msg("P" + QString::number(i + 1) + ": \r\n" + EasyTool::MatToString(vision_param.P[i + 1]));
+        msg("R" + QString::number(i + 1) + ": \r\n" + EasyTool::MatToString(vision_param.R[i + 1]));
+        msg("T" + QString::number(i + 1) + ": \r\n" + EasyTool::MatToString(vision_param.T[i + 1]));
 
         // cout << std::setprecision(16) << "P" << i + 1 << ": " << vision_param.P[i + 1] << endl;
         // cout << std::setprecision(16) << "R" << i + 1 << ": " << vision_param.R[i + 1] << endl;
@@ -360,7 +348,7 @@ void Calibration::calibrStart(QString path)
 
     for (int i = 0; i < camcorners.size() - 1; i++)
     {
-        msg(QString::number(i) + " to " + QString::number(i+1) + " rms error = " + QString::number(vrms.at(i), 'f', 6));
+        msg(QString::number(0) + " to " + QString::number(i+1) + " rms error = " + QString::number(vrms.at(i), 'f', 6));
     }
 }
 

@@ -12,6 +12,7 @@ using namespace Eigen;
 
 typedef Matrix<double, 3, 3> Matrix33d;
 typedef Matrix<double, 3, 4> Matrix34d;
+typedef Matrix<double, 4, 3> Matrix43d;
 typedef Matrix<double, 4, 4> Matrix44d;
 typedef Matrix<double, 3, 9> Matrix39d;
 typedef Matrix<double, 6, 1> Vector6d;

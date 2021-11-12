@@ -138,21 +138,19 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
     // qint64 t1,t2;
     // t1 = QDateTime::currentDateTime().toMSecsSinceEpoch();
 
-
+    Mat image;
 
     Mat sourceImg = cv::Mat(qImage.height(), qImage.width(), CV_8UC1, qImage.bits());
-    Mat image = Mat::zeros(sourceImg.size(), CV_8UC1);
-    Mat img = Mat::zeros(sourceImg.size(), CV_8UC1);
     
 
-    cv::Mat cameraMatrix = cv::Mat::zeros(3, 3, CV_64F);
-    cv::Mat distCoeffs = cv::Mat::zeros(1, 5, CV_64F);
-    cv::eigen2cv(vision_param.intrinsics[vio->number],cameraMatrix);   
-    cv::eigen2cv(vision_param.distortion_coeffs[vio->number],distCoeffs);  
+    // Mat img = Mat::zeros(sourceImg.size(), CV_8UC1);
+    // cv::Mat cameraMatrix = cv::Mat::zeros(3, 3, CV_64F);
+    // cv::Mat distCoeffs = cv::Mat::zeros(1, 5, CV_64F);
+    // cv::eigen2cv(vision_param.intrinsics[vio->number],cameraMatrix);   
+    // cv::eigen2cv(vision_param.distortion_coeffs[vio->number],distCoeffs);  
+    // undistort(sourceImg, img, cameraMatrix, distCoeffs,cameraMatrix);
 
-    undistort(sourceImg, img, cameraMatrix, distCoeffs,cameraMatrix);
-
-    threshold(img, image, setting->threshold, 255.0, THRESH_BINARY);
+    threshold(sourceImg, image, setting->threshold, 255.0, THRESH_BINARY);
 
     vector<vector<Point>> contours;
     vector<Vec4i> hierarchy;

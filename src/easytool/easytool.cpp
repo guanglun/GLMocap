@@ -86,6 +86,19 @@ Eigen::Matrix<double, 3, 4> EasyTool::getRT34d(Eigen::Matrix<double, 3, 3> &R,Ei
     return RT;
 }
 
+Eigen::Matrix<double, 4, 3> EasyTool::getRT43d(Eigen::Matrix<double, 3, 3> &R,Eigen::Matrix<double, 3, 1> &T)
+{
+
+    Eigen::Matrix<double, 4, 3> RT;
+    RT << 
+    R(0, 0),R(0, 1),R(0, 2),
+    R(1, 0),R(1, 1),R(1, 2),
+    R(2, 0),R(2, 1),R(2, 2),
+    T(0,0),T(1,0),T(2,0);
+
+    return RT;
+}
+
 void EasyTool::RT44d(Eigen::Matrix<double, 4, 4> &RT,Eigen::Matrix<double, 3, 3> &R,Eigen::Matrix<double, 3, 1> &T)
 {
 
