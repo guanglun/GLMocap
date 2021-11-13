@@ -54,7 +54,6 @@ Mat distCoeffL;
 Mat cameraMatrixR;
 Mat distCoeffR;
 
-
 Matrix34d PS[CAM_NUM_MAX];
 Matrix33d RS[CAM_NUM_MAX];
 Vector3d TS[CAM_NUM_MAX];
@@ -75,8 +74,7 @@ static void calRealPoint(vector<vector<Point3f>> &obj, int boardwidth, int board
     {
         for (int colIndex = 0; colIndex < boardwidth; colIndex++)
         {
-            //  imgpoint.at<Vec3f>(rowIndex, colIndex) = Vec3f(rowIndex * squaresize, colIndex*squaresize, 0);
-            imgpoint.push_back(Point3f(rowIndex * squaresize, colIndex * squaresize, 0));
+            imgpoint.push_back(Point3f(colIndex * squaresize, rowIndex * squaresize, 0));
         }
     }
     for (int imgIndex = 0; imgIndex < imgNumber; imgIndex++)
@@ -142,8 +140,7 @@ void Calibration::calibrStart(QString path)
     //指定亚像素计算迭代标注
     cv::TermCriteria criteria = cv::TermCriteria(
         cv::TermCriteria::MAX_ITER + cv::TermCriteria::EPS,
-        40,
-        0.01);
+        300, 0.01);
 
     msg("Calibration Start");
 
@@ -169,18 +166,21 @@ void Calibration::calibrStart(QString path)
             if (img.data)
             {
                 vector<Point2f> corner;
-
                 bool isFind = findChessboardCornersSB(img, boardSize, corner,
                                                       CALIB_CB_NORMALIZE_IMAGE | CALIB_CB_EXHAUSTIVE | CALIB_CB_ACCURACY);
+
                 if (isFind)
                 {
-                    //cornerSubPix(img, corner, Size(5, 5), Size(-1, -1), criteria);
-                    //在图像上画出角点
-                    //drawChessboardCorners(img, boardSize, corner, isFind);
+
                     corners.insert(ii, corner);
                     msg("findChessboardCorners " + imgPath + " success " + QString::number(corner.size()));
-                    // namedWindow(string((const char *)imgPath.toLocal8Bit()));
-                    // imshow(string((const char *)imgPath.toLocal8Bit()), img);
+
+                    // if(i == 0)
+                    // {
+                    //     drawChessboardCorners(img, boardSize, corner, isFind);
+                    //     namedWindow(string((const char *)imgPath.toLocal8Bit()));
+                    //     imshow(string((const char *)imgPath.toLocal8Bit()), img);
+                    // }
                 }
                 else
                 {
@@ -203,8 +203,9 @@ void Calibration::calibrStart(QString path)
         msg("corners " + QString::number(i) + " : " + QString::number(camcorners.at(i).size()));
     }
 
-    // intrinsics.clear();
-    // distortion_coeffs.clear();
+    intrinsics.clear();
+    distortion_coeffs.clear();
+
     for (int i = 0; i < camcorners.size(); i++)
     {
         goodFrameCount = camcorners.at(i).size();
@@ -222,8 +223,17 @@ void Calibration::calibrStart(QString path)
         Mat intrinsic, distortion_coeff;
         vector<Mat> rvecs; //旋转向量
         vector<Mat> tvecs; //平移向量
+        Matrix33d cami;
+        Matrix<double, 1, 5> camk;
 
-        //calibrateCamera(objRealPoint, corners, Size(boardWidth, boardHeight), intrinsic, distortion_coeff, rvecs, tvecs, 0);
+        double err = calibrateCamera(objRealPoint, corners, imageSize, intrinsic, distortion_coeff, rvecs, tvecs);
+
+        cv2eigen(intrinsic, cami);
+        cv2eigen(distortion_coeff, camk);
+        //msg("corners size" + QString::number(i) + ": \r\n" + QString::number(corners.size()));
+        msg("intrinsic" + QString::number(i) + ": \r\n" + EasyTool::MatToString(cami));
+        msg("distortion_coeff" + QString::number(i) + ": \r\n" + EasyTool::MatToString(camk));
+        msg("cailbr : camera" + QString::number(i) + " error : " + QString::number(err));
 
         intrinsics.push_back(intrinsic);
         distortion_coeffs.push_back(distortion_coeff);
@@ -256,28 +266,22 @@ void Calibration::calibrStart(QString path)
         // calibrateCamera(objRealPoint, cornersL, Size(boardWidth, boardHeight), intrinsicL, distortion_coeffL, rvecsL, tvecsL, 0);
         // calibrateCamera(objRealPoint, cornersR, Size(boardWidth, boardHeight), intrinsicR, distortion_coeffR, rvecsR, tvecsR, 0);
 
-
         //标定摄像头
-        // float rms = stereoCalibrate(objRealPoint, cornersL, cornersR,
-        //                             intrinsics.at(i), distortion_coeffs.at(i),
-        //                             intrinsics.at(i+1), distortion_coeffs.at(i+1),
-        //                             Size(imageWidth, imageHeight), R, T, E, F,
-        //                             CALIB_USE_INTRINSIC_GUESS,
-        //                             TermCriteria(TermCriteria::COUNT + TermCriteria::EPS, 10000, 1e-20));
-
-
         float rms = stereoCalibrate(objRealPoint, cornersL, cornersR,
                                     intrinsics.at(0), distortion_coeffs.at(0),
                                     intrinsics.at(i + 1), distortion_coeffs.at(i + 1),
-                                    Size(imageWidth, imageHeight), R, T, E, F,
-                                    0,
+                                    imageSize, R, T, E, F,
+                                    CALIB_FIX_INTRINSIC,
                                     TermCriteria(TermCriteria::COUNT + TermCriteria::EPS, 1000, 1e-20));
 
-        vrms.push_back(rms);
-        
-        msg("take time " + QString::number(time.elapsed() / 1000.0) + "s");
+        // float rms = stereoCalibrate(objRealPoint, cornersL, cornersR,
+        //                             intrinsics.at(0), distortion_coeffs.at(0),
+        //                             intrinsics.at(i + 1), distortion_coeffs.at(i + 1),
+        //                             Size(imageWidth, imageHeight), R, T, E, F,
+        //                             0,
+        //                             TermCriteria(TermCriteria::COUNT + TermCriteria::EPS, 1000, 1e-20));
 
-        msg("Stereo Calibration done with RMS error = " + QString::number(rms, 'f', 6));
+        vrms.push_back(rms);
 
         //立体校正的时候需要两幅图像共面并且行对准 以使得立体匹配更加的可靠
         //使得两幅图像共面的方法就是把两个摄像头的图像投影到一个公共成像面上，这样每幅图像从本图像平面投影到公共图像平面都需要一个旋转矩阵R
@@ -286,10 +290,10 @@ void Calibration::calibrStart(QString path)
         //其中Pl,Pr为两个相机的投影矩阵，其作用是将3D点的坐标转换到图像的2D点的坐标:P*[X Y Z 1]' =[x y w]
         //Q矩阵为重投影矩阵，即矩阵Q可以把2维平面(图像平面)上的点投影到3维空间的点:Q*[x y d 1] = [X Y Z W]。其中d为左右两幅图像的时差
 
-        stereoRectify(
-        intrinsics.at(0), distortion_coeffs.at(0), 
-        intrinsics.at(i + 1), distortion_coeffs.at(i + 1), imageSize, R, T, Rl, Rr, Pl, Pr, Q,
-                      CALIB_ZERO_DISPARITY, -1, imageSize, &validROIL, &validROIR);
+        // stereoRectify(
+        // intrinsics.at(0), distortion_coeffs.at(0),
+        // intrinsics.at(i + 1), distortion_coeffs.at(i + 1), imageSize, R, T, Rl, Rr, Pl, Pr, Q,
+        //               CALIB_ZERO_DISPARITY, -1, imageSize, &validROIL, &validROIR);
 
         // cout << "R: " << R << endl;
         // cout << "T: " << T << endl;
@@ -307,7 +311,7 @@ void Calibration::calibrStart(QString path)
             RS[0].transposeInPlace();
             RTS43d = EasyTool::getRT43d(RS[0], TS[0]);
             cv2eigen(intrinsics.at(0), cameraMatrix);
-            PS[0] = (RTS43d*cameraMatrix.transpose()).transpose();
+            PS[0] = (RTS43d * cameraMatrix.transpose()).transpose();
         }
 
         cv2eigen(R, RS[i + 1]);
@@ -315,8 +319,8 @@ void Calibration::calibrStart(QString path)
         RS[i + 1].transposeInPlace();
 
         RTS43d = EasyTool::getRT43d(RS[i + 1], TS[i + 1]);
-        cv2eigen(intrinsics.at(i + 1), cameraMatrix);     
-        PS[i + 1] = (RTS43d*cameraMatrix.transpose()).transpose();
+        cv2eigen(intrinsics.at(i + 1), cameraMatrix);
+        PS[i + 1] = (RTS43d * cameraMatrix.transpose()).transpose();
 
         if (i == 0)
         {
@@ -344,11 +348,14 @@ void Calibration::calibrStart(QString path)
         // cout << std::setprecision(16) << "P" << i + 1 << ": " << vision_param.P[i + 1] << endl;
         // cout << std::setprecision(16) << "R" << i + 1 << ": " << vision_param.R[i + 1] << endl;
         // cout << std::setprecision(16) << "T" << i + 1 << ": " << vision_param.T[i + 1] << endl;
+
+        msg("take time " + QString::number(time.elapsed() / 1000.0) + "s");
+        msg("Stereo Calibration done with RMS error = " + QString::number(rms, 'f', 6));
     }
 
     for (int i = 0; i < camcorners.size() - 1; i++)
     {
-        msg(QString::number(0) + " to " + QString::number(i+1) + " rms error = " + QString::number(vrms.at(i), 'f', 6));
+        msg(QString::number(0) + " to " + QString::number(i + 1) + " rms error = " + QString::number(vrms.at(i), 'f', 6));
     }
 
     msg("Calibration Exit");
