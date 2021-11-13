@@ -133,6 +133,62 @@ void CamProcess::camSlot(int index)
     //QImage myImage = QImage(vio->img.img,vio->img.width,vio->img.high,QImage::Format_);
 }
 
+void CamProcess::searchMarks(Mat image, vector<Point2f> &points)
+{
+    vector<vector<Point>> contours;
+    vector<Vec4i> hierarchy;
+    findContours(image, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point());
+
+    Point2f pt;
+    vector<Point2f> centers(contours.size()); //圆心
+    vector<float> radius(contours.size());    //半径
+
+    int size = contours.size();
+    if(size > PT_NUM_MAX)
+        size = PT_NUM_MAX;
+
+    for (int i = 0; i < size; i++)
+    {
+        pt.x = 0;
+        pt.y = 0;
+
+        //contours[i]代表的是第i个轮廓，contours[i].size()代表的是第i个轮廓上所有的像素点数
+        for (int j = 0; j < contours[i].size(); j++)
+        {
+            //绘制出contours向量内所有的像素点
+            pt.x += contours[i][j].x;
+            pt.y += contours[i][j].y;
+        }
+
+        pt.x /= contours[i].size();
+        pt.y /= contours[i].size();
+
+        points.push_back(pt);
+    }
+}
+
+void CamProcess::searchMarks2(Mat image, vector<Point2f> &points)
+{
+    Point2f pt;
+    Mat src, src_color,g_src, labels, stats, centroids;
+    int size = connectedComponentsWithStats(image, labels, stats, centroids) - 1;
+
+    // if(vio->number == 0)
+    //     cout << "centroids: " << centroids << endl;
+
+    if(size > PT_NUM_MAX)
+        size = PT_NUM_MAX;
+
+    for (int i = 0; i < size; i++)
+    {
+
+        pt.x = centroids.at<double>(i+1, 0);
+        pt.y = centroids.at<double>(i+1, 1);
+
+        points.push_back(pt);
+    }
+}
+
 void CamProcess::cvProcess(QImage qImage, QDateTime time)
 {
     // qint64 t1,t2;
@@ -141,28 +197,12 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
     Mat image;
 
     Mat sourceImg = cv::Mat(qImage.height(), qImage.width(), CV_8UC1, qImage.bits());
-    
-
-    // Mat img = Mat::zeros(sourceImg.size(), CV_8UC1);
-    // cv::Mat cameraMatrix = cv::Mat::zeros(3, 3, CV_64F);
-    // cv::Mat distCoeffs = cv::Mat::zeros(1, 5, CV_64F);
-    // cv::eigen2cv(vision_param.intrinsics[vio->number],cameraMatrix);   
-    // cv::eigen2cv(vision_param.distortion_coeffs[vio->number],distCoeffs);  
-    // undistort(sourceImg, img, cameraMatrix, distCoeffs,cameraMatrix);
 
     threshold(sourceImg, image, setting->threshold, 255.0, THRESH_BINARY);
 
-    vector<vector<Point>> contours;
-    vector<Vec4i> hierarchy;
-    findContours(image, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point());
-    Mat imageContours = Mat::zeros(image.size(), CV_8UC1);
-    Mat Contours = Mat::zeros(image.size(), CV_8UC1); //绘制
+    vector<Point2f> points;
 
-    //DBG("found number %d",contours.size());
-
-    vector<Point2f> points(contours.size());  //位置
-    vector<Point2f> centers(contours.size()); //圆心
-    vector<float> radius(contours.size());    //半径
+    searchMarks2(image,points);
 
     result.camIndex = vio->number;
     result.pointNum = (int)0;
@@ -170,45 +210,12 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
     result.path = vio->saveImagePath;
     result.image = qImage;
     result.hPoint = hPoint;
+    result.pointNum = points.size();
 
-    if (contours.size() >= 36)
+    for (int i = 0; i < points.size(); i++)
     {
-        result.pointNum = 36;
-    }
-    else
-    {
-        result.pointNum = contours.size();
-    }
-
-    for (int i = 0; i < contours.size(); i++)
-    {
-
-        //contours[i]代表的是第i个轮廓，contours[i].size()代表的是第i个轮廓上所有的像素点数
-        for (int j = 0; j < contours[i].size(); j++)
-        {
-            //绘制出contours向量内所有的像素点
-            points[i].x += contours[i][j].x;
-            points[i].y += contours[i][j].y;
-
-            Point P = Point(contours[i][j].x, contours[i][j].y);
-            Contours.at<uchar>(P) = 255;
-        }
-
-        points[i].x /= contours[i].size();
-        points[i].y /= contours[i].size();
-
-        //绘制轮廓
-        //drawContours(imageContours,contours,i,Scalar(255),1,1,hierarchy);
-
-        //寻找并绘制最小圆
-        minEnclosingCircle(contours[i], centers[i], radius[i]);
-        circle(imageContours, centers[i], radius[i], Scalar(255), 1);
-
-        if (i < PT_NUM_MAX)
-        {
-            result.x[i] = points[i].x;
-            result.y[i] = points[i].y;
-        }
+        result.x[i] = points[i].x;
+        result.y[i] = points[i].y;
     }
 
     match(points);
@@ -224,20 +231,28 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
 
             drawMarker(sourceImg, Point2f(vPoint[i]->x, vPoint[i]->y), Scalar(255, 0, 0), MarkerTypes::MARKER_CROSS, 20, 1, 8);
         }
-    }
 
-    cv::cvtColor(imageContours, image, cv::COLOR_BGR2RGB);
-    QImage qImg = QImage((const unsigned char *)(image.data), image.cols, image.rows, image.step, QImage::Format_RGB888);
-
-    if (showFlag == Qt::CheckState::PartiallyChecked)
-    {
         cv::cvtColor(sourceImg, sourceImg, cv::COLOR_BGR2RGB);
         QImage qSourceImg = QImage((const unsigned char *)(sourceImg.data), sourceImg.cols, sourceImg.rows, sourceImg.step, QImage::Format_RGB888);
         emit visionImageSignals(QPixmap::fromImage(qSourceImg));
-    }
 
-    else if (showFlag == Qt::CheckState::Checked)
-        emit visionImageSignals(QPixmap::fromImage(qImg));
+    }else if (showFlag == Qt::CheckState::Checked)
+    {
+        for (int i = 0; i < vPoint.size(); i++)
+        {
+            if (vio->visionProcess->matchState == MATCH_OK)
+            {
+                putText(image, std::to_string(vPoint[i]->id), Point(vPoint[i]->x, vPoint[i]->y - 15), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255, 0, 0), 2);
+            }
+
+            drawMarker(image, Point2f(vPoint[i]->x, vPoint[i]->y), Scalar(255, 0, 0), MarkerTypes::MARKER_CROSS, 20, 1, 8);
+        }
+
+        cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
+        QImage qImage = QImage((const unsigned char *)(image.data), image.cols, image.rows, image.step, QImage::Format_RGB888);
+        emit visionImageSignals(QPixmap::fromImage(qImage));
+    }
+        
 
     // t2 = QDateTime::currentDateTime().toMSecsSinceEpoch();
     // mlog->show(QString::number(vio->number) + " diff " + QString::number(t2-time.toMSecsSinceEpoch()));

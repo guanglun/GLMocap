@@ -151,7 +151,6 @@ void Calibration::calibrStart(QString path)
     }
 
     for (int i = 0; i < setting->camNumber; i++)
-    //for (int i = 0; i < 1; i++)
     {
         QMap<uint8_t, vector<Point2f>> corners;
         for (int ii = 0; ii < files.size(); ii++)

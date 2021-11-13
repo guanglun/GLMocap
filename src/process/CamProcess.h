@@ -43,6 +43,8 @@ public:
     CamProcess(OPENVIO *vio,QObject* parent = nullptr);
     void cvProcess(QImage qImage,QDateTime time);
     void setShowFlag(Qt::CheckState flag);
+    void searchMarks(Mat image, vector<Point2f> &points);
+    void searchMarks2(Mat image, vector<Point2f> &points);
 public slots:
     void camSlot(int index);
 
