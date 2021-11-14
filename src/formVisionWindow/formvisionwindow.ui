@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>591</width>
+    <width>704</width>
     <height>190</height>
    </rect>
   </property>
@@ -30,7 +30,7 @@
     <rect>
      <x>90</x>
      <y>10</y>
-     <width>171</width>
+     <width>201</width>
      <height>51</height>
     </rect>
    </property>
@@ -50,7 +50,7 @@
     <rect>
      <x>90</x>
      <y>70</y>
-     <width>171</width>
+     <width>201</width>
      <height>51</height>
     </rect>
    </property>
@@ -70,7 +70,7 @@
     <rect>
      <x>90</x>
      <y>130</y>
-     <width>171</width>
+     <width>201</width>
      <height>51</height>
     </rect>
    </property>
@@ -148,7 +148,7 @@
   <widget class="QLabel" name="lb_x_5">
    <property name="geometry">
     <rect>
-     <x>290</x>
+     <x>330</x>
      <y>70</y>
      <width>161</width>
      <height>51</height>
@@ -168,9 +168,9 @@
   <widget class="QLabel" name="lb_roll">
    <property name="geometry">
     <rect>
-     <x>450</x>
+     <x>490</x>
      <y>10</y>
-     <width>171</width>
+     <width>201</width>
      <height>51</height>
     </rect>
    </property>
@@ -188,7 +188,7 @@
   <widget class="QLabel" name="lb_x_7">
    <property name="geometry">
     <rect>
-     <x>290</x>
+     <x>330</x>
      <y>10</y>
      <width>161</width>
      <height>51</height>
@@ -208,7 +208,7 @@
   <widget class="QLabel" name="lb_x_8">
    <property name="geometry">
     <rect>
-     <x>290</x>
+     <x>330</x>
      <y>130</y>
      <width>161</width>
      <height>51</height>
@@ -228,9 +228,9 @@
   <widget class="QLabel" name="lb_pitch">
    <property name="geometry">
     <rect>
-     <x>450</x>
+     <x>490</x>
      <y>70</y>
-     <width>171</width>
+     <width>201</width>
      <height>51</height>
     </rect>
    </property>
@@ -248,9 +248,9 @@
   <widget class="QLabel" name="lb_yaw">
    <property name="geometry">
     <rect>
-     <x>450</x>
+     <x>490</x>
      <y>130</y>
-     <width>171</width>
+     <width>201</width>
      <height>51</height>
     </rect>
    </property>
