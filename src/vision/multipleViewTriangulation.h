@@ -101,6 +101,7 @@ public:
         const Matrix34d Prj[],
         int CamNumAll,
         MatrixXd xy[],
+        Vector3d Xr[],        
         int ptNum,
         double rms[]);
 

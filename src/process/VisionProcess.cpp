@@ -1,6 +1,8 @@
 #include "VisionProcess.h"
 #include "CameraPointMap.h"
 
+#include <QElapsedTimer>
+
 VisionProcess::VisionProcess(PX4Thread *px4, QObject *parent)
 {
     this->px4 = px4;
@@ -90,6 +92,7 @@ int VisionProcess::matchPoint(void)
 
     MatrixXd xy[map.rows()];
     MatrixXd xyc[map.rows()];
+    Vector3d Xr[map.rows()];
     double rerr[map.rows()];
     vector<double> rerrSort;
 
@@ -110,16 +113,23 @@ int VisionProcess::matchPoint(void)
         }
     }
 
+    QElapsedTimer mstimer; // 定义对象
+    mstimer.start();       // 调用函数
+
     multipleViewTriangulation.getRMS(vision_param.P,
                                      camNum,
                                      xy,
+                                     Xr,
                                      map.rows(),
                                      rerr);
+
+    mlog->show("get rms take time " + QString::number((double)mstimer.nsecsElapsed() / (double)1000) + "us");
+
     std::cout << "===>>>result rms :\r\n";
     for (int i = 0; i < map.rows(); i++)
     {
         std::cout << i << " : " << map.row(i) << " " << rerr[i] << endl;
-        rerrSort.push_back(rerr[i]);      
+        rerrSort.push_back(rerr[i]);
     }
 
     // multipleViewTriangulation.optimal_correction_all(vision_param.P,
@@ -149,7 +159,7 @@ int VisionProcess::matchPoint(void)
     //for debug
     for (int pm; pm < rerrSort.size(); pm++)
     {
-        DBG("sort index pm : %d \t%f", getIndex(rerr, map.rows(), rerrSort[pm]),rerrSort[pm]);
+        DBG("sort index pm : %d \t%f", getIndex(rerr, map.rows(), rerrSort[pm]), rerrSort[pm]);
     }
 
     for (int pm; pm < pointNum; pm++)
@@ -168,7 +178,7 @@ int VisionProcess::matchPoint(void)
     for (int pm = 0; pm < pointNum; pm++)
     {
         int index = getIndex(rerr, map.rows(), rerrSort[pm]);
-        std::cout << index << " : " << map.row(index) << " " ;
+        std::cout << index << " : " << map.row(index) << " ";
         mlog->show(QString::number(rerr[index]));
 
         for (int cm = 0; cm < camNum; cm++)
@@ -180,7 +190,7 @@ int VisionProcess::matchPoint(void)
                 camResult[cm].vPoint[map.row(index)(cm)]->x,
                 camResult[cm].vPoint[map.row(index)(cm)]->y,
                 pm));
-            
+
             std::cout << "\r\n\t" << camResult[cm].vPoint[map.row(index)(cm)]->x << "\t" << camResult[cm].vPoint[map.row(index)(cm)]->y << "\r\n";
         }
     }
@@ -594,9 +604,9 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
                     std::vector<cv::Point3f> srcPoints;
                     std::vector<cv::Point3f> dstPoints;
 
-                    srcPoints.push_back(cv::Point3f(60, 0, 0));
+                    srcPoints.push_back(cv::Point3f(80, 0, 0));
                     srcPoints.push_back(cv::Point3f(0, 0, 0));
-                    srcPoints.push_back(cv::Point3f(0, -40, 0));
+                    srcPoints.push_back(cv::Point3f(0, -60, 0));
 
                     for (int cm = 0; cm < pointNum; cm++)
                     {
@@ -631,6 +641,14 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
 
                     emit onXYZSignals(Xr, &eulerAnglesDrone, vision_param.ptNum);
                 }
+                else
+                {
+                    onMatching();
+                }
+            }
+            else
+            {
+                onMatching();
             }
         }
     }
@@ -670,4 +688,78 @@ Vector3d *VisionProcess::triangulation(void)
     }
 
     return multipleViewTriangulation.triangulation();
+}
+
+int VisionProcess::onMatching(void)
+{
+    static QElapsedTimer mstimer;
+    static CameraPointMap cpMap;
+
+    pointNum = checkVPointSize();
+
+    if (pointNum < 1)
+    {
+        //DBG("Error Return, pointNum < 1");
+        return -1;
+    }
+
+    MatrixXi map = cpMap.getPointMap(camNum, pointNum);
+    int indexResult[pointNum];
+
+    MatrixXd xy[map.rows()];
+    double rerr[map.rows()];
+    Vector3d Xr[map.rows()];
+    vector<double> rerrSort;
+
+    for (int i = 0; i < map.rows(); i++)
+    {
+        for (int cm = 0; cm < camNum; cm++)
+        {
+
+            xy[i].resize(2, camNum);
+            xy[i].col(cm)(0) = camResult[cm].vPoint[map.row(i)(cm)]->x;
+            xy[i].col(cm)(1) = camResult[cm].vPoint[map.row(i)(cm)]->y;
+        }
+    }
+
+    mstimer.start();
+
+    multipleViewTriangulation.getRMS(vision_param.P,
+                                     camNum,
+                                     xy,
+                                     Xr,
+                                     map.rows(),
+                                     rerr);
+
+    mlog->show("get rms take time " + QString::number((double)mstimer.nsecsElapsed() / (double)1000) + "us");
+
+    //std::cout << "===>>>result rms :\r\n";
+    for (int i = 0; i < map.rows(); i++)
+    {
+        //std::cout << i << " : " << map.row(i) << " " << rerr[i] << endl;
+        rerrSort.push_back(rerr[i]);
+    }
+
+    if (rerrSort.size() < pointNum)
+    {
+        DBG("rerrSort size Error, Return");
+        return -1;
+    }
+
+    sort(rerrSort.begin(), rerrSort.end());
+
+    //for debug
+    // for (int pm; pm < rerrSort.size(); pm++)
+    // {
+    //     DBG("sort index pm : %d \t%f", getIndex(rerr, map.rows(), rerrSort[pm]),rerrSort[pm]);
+    // }
+
+    for (int pm; pm < pointNum; pm++)
+    {
+        indexResult[pm] = getIndex(rerr, map.rows(), rerrSort[pm]);
+        DBG("index pm : %d", indexResult[pm]);
+    }
+
+
+    return 0;
 }

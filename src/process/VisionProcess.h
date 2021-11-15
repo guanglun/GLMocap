@@ -65,6 +65,7 @@ private:
     int checkVPointSize(void);
     int calibrateGND(vector<GLPoint *> *vPoint);
     int findDroneModule(vector<GLPoint *> *vPoint);
+    int onMatching(void);
     void forloop(int pm,int cm);
 public:
 

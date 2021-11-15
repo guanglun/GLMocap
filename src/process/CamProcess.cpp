@@ -19,7 +19,9 @@ double distance(Point2f p1, Point2f p2)
 
 void CamProcess::match(vector<Point2f> centers)
 {
-    if (vio->visionProcess->matchState == MATCH_START)
+    if (vio->visionProcess->matchState == MATCH_START)  
+    // if (vio->visionProcess->matchState == MATCH_START ||
+    //     vio->visionProcess->matchState == MATCH_IDLE)
     {
         vPoint.clear();
         for (int i = 0; i < centers.size(); i++)
