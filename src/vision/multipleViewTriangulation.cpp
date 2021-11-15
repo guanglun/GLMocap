@@ -221,15 +221,22 @@ void MultipleViewTriangulation::getRMS(
 
     double sum = 0;
     Vector4d xytmp;
+
     for(int i=0;i<ptNum;i++)
     {
         sum = 0;
+        std::cout << "point" << i << "\r\n";
         for(int cnum = 0;cnum<CamNumAll;cnum++)
         {
             xytmp << Xr[i](0,0),Xr[i](1,0),Xr[i](2,0),1;
+
+            
+
             pxy = Prj[cnum] * xytmp;
             pxy = pxy/pxy(2,0);
-            sum = sum + pow(pxy(0,0)-xy[i](cnum,0),2)+pow(pxy(1,0)-xy[i](cnum,1),2);
+
+            std::cout << xy[i](cnum,0) << " " << xy[i](cnum,1) << " " << pxy(0,0) << " " << pxy(1,0) << "\r\n";
+            sum = sum + pow(pxy(0,0)-xy[i](0,cnum),2)+pow(pxy(1,0)-xy[i](1,cnum),2);
         }
         rms[i] = sqrt(sum/4);
     }
@@ -260,12 +267,13 @@ Vector3d *MultipleViewTriangulation::triangulation(void)
             //idx.row(cm)(i) = 1;
         }
     }    
-    optimal_correction_all(vision_param.P,
-                            vision_param.CamNum,
-                            xy,
-                            xy,
-                            idx,
-                            rerr,vision_param.ptNum);
+    
+    // optimal_correction_all(vision_param.P,
+    //                         vision_param.CamNum,
+    //                         xy,
+    //                         xy,
+    //                         idx,
+    //                         rerr,vision_param.ptNum);
 
 
     triangulation_all(vision_param.P,vision_param.CamNum,xy,Xr,vision_param.ptNum,idx);

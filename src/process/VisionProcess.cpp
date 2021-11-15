@@ -110,34 +110,34 @@ int VisionProcess::matchPoint(void)
         }
     }
 
-    double rms[map.rows()];
     multipleViewTriangulation.getRMS(vision_param.P,
                                      camNum,
                                      xy,
                                      map.rows(),
-                                     rms);
+                                     rerr);
     std::cout << "===>>>result rms :\r\n";
     for (int i = 0; i < map.rows(); i++)
     {
-        std::cout << i << " : " << map.row(i) << " " << rms[i] << endl;
+        std::cout << i << " : " << map.row(i) << " " << rerr[i] << endl;
+        rerrSort.push_back(rerr[i]);      
     }
 
-    multipleViewTriangulation.optimal_correction_all(vision_param.P,
-                                                     camNum,
-                                                     xy,
-                                                     xyc,
-                                                     idx,
-                                                     rerr, map.rows());
-    std::cout << "===>>>result1:\r\n";
-    for (int i = 0; i < map.rows(); i++)
-    {
-        std::cout << i << " : " << map.row(i) << " ";
-        mlog->show(QString::number(rerr[i]));
-        if (rerr[i] != -1)
-        {
-            rerrSort.push_back(rerr[i]);
-        }
-    }
+    // multipleViewTriangulation.optimal_correction_all(vision_param.P,
+    //                                                  camNum,
+    //                                                  xy,
+    //                                                  xyc,
+    //                                                  idx,
+    //                                                  rerr, map.rows());
+    // std::cout << "===>>>result1:\r\n";
+    // for (int i = 0; i < map.rows(); i++)
+    // {
+    //     std::cout << i << " : " << map.row(i) << " ";
+    //     mlog->show(QString::number(rerr[i]));
+    //     if (rerr[i] != -1)
+    //     {
+    //         rerrSort.push_back(rerr[i]);
+    //     }
+    // }
     if (rerrSort.size() < pointNum)
     {
         DBG("rerrSort size Error, Return");
@@ -145,6 +145,13 @@ int VisionProcess::matchPoint(void)
     }
 
     sort(rerrSort.begin(), rerrSort.end());
+
+    //for debug
+    for (int pm; pm < rerrSort.size(); pm++)
+    {
+        DBG("sort index pm : %d \t%f", getIndex(rerr, map.rows(), rerrSort[pm]),rerrSort[pm]);
+    }
+
     for (int pm; pm < pointNum; pm++)
     {
         indexResult[pm] = getIndex(rerr, map.rows(), rerrSort[pm]);
