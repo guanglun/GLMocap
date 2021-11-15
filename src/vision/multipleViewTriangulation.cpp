@@ -200,6 +200,41 @@ double MultipleViewTriangulation::distance3d(cv::Point3d p1,cv::Point3d p2)
     return sqrt(pow(p1.x-p2.x,2)+pow(p1.y-p2.y,2)+pow(p1.z-p2.z,2));
 }
 
+void MultipleViewTriangulation::getRMS(    
+    const Matrix34d Prj[],
+    int CamNumAll,
+    MatrixXd xy[],
+    int ptNum,
+    double rms[])
+{
+    Vector3d pxy;
+    Vector3d Xr[ptNum];
+    MatrixXi idx(ptNum, CamNumAll);
+    for (int i = 0; i < ptNum; i++)
+    {
+        for (int cm = 0; cm < CamNumAll; cm++)
+        {
+            idx.row(i)(cm) = 1;
+        }
+    }
+    triangulation_all(Prj,CamNumAll,xy,Xr,ptNum,idx);
+
+    double sum = 0;
+    Vector4d xytmp;
+    for(int i=0;i<ptNum;i++)
+    {
+        sum = 0;
+        for(int cnum = 0;cnum<CamNumAll;cnum++)
+        {
+            xytmp << Xr[i](0,0),Xr[i](1,0),Xr[i](2,0),1;
+            pxy = Prj[cnum] * xytmp;
+            pxy = pxy/pxy(2,0);
+            sum = sum + pow(pxy(0,0)-xy[i](cnum,0),2)+pow(pxy(1,0)-xy[i](cnum,1),2);
+        }
+        rms[i] = sqrt(sum/4);
+    }
+}
+
 Vector3d *MultipleViewTriangulation::triangulation(void)
 {
     double rerr[vision_param.ptNum];

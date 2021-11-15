@@ -17,6 +17,7 @@ typedef Matrix<double, 4, 4> Matrix44d;
 typedef Matrix<double, 3, 9> Matrix39d;
 typedef Matrix<double, 6, 1> Vector6d;
 typedef Matrix<double, 3, 1> Vector3d;
+typedef Matrix<double, 4, 1> Vector4d;
 typedef Matrix<double, 6, 3> Matrix63d;
 typedef Matrix<double, 6, 6> Matrix6d;
 typedef Matrix<double, 9, 1> Vector9d;
@@ -95,6 +96,13 @@ public:
                            int PtNum,
                            MatrixXi& idx,
                            double f0 = Default_f0);
+
+    void getRMS(    
+        const Matrix34d Prj[],
+        int CamNumAll,
+        MatrixXd xy[],
+        int ptNum,
+        double rms[]);
 
     bool optimal_correction_all(
         Matrix34d Proj[],

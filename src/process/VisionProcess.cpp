@@ -110,6 +110,18 @@ int VisionProcess::matchPoint(void)
         }
     }
 
+    double rms[map.rows()];
+    multipleViewTriangulation.getRMS(vision_param.P,
+                                     camNum,
+                                     xy,
+                                     map.rows(),
+                                     rms);
+    std::cout << "===>>>result rms :\r\n";
+    for (int i = 0; i < map.rows(); i++)
+    {
+        std::cout << i << " : " << map.row(i) << " " << rms[i] << endl;
+    }
+
     multipleViewTriangulation.optimal_correction_all(vision_param.P,
                                                      camNum,
                                                      xy,
