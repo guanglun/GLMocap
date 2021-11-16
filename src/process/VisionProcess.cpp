@@ -6,6 +6,7 @@
 VisionProcess::VisionProcess(PX4Thread *px4, QObject *parent)
 {
     this->px4 = px4;
+    mm = new MarksManagement();
 }
 
 void VisionProcess::init(int camNum)
@@ -508,6 +509,13 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
 
     if (check == true)
     {
+        mm->catchDone(camNum);
+    }
+
+    return;
+
+    if (check == true)
+    {
         //mlog->show("===>>>" + QString::number(camResult[0].time) + " " + QString::number(camResult[0].time - lastAllTime));
         lastAllTime = camResult[0].time;
 
@@ -706,7 +714,7 @@ int VisionProcess::onMatching(void)
     }
 
     MatrixXi map = cpMap.getPointMap(camNum, pointNum);
-    int indexResult[pointNum];
+    int index[pointNum];
 
     MatrixXd xy[map.rows()];
     double rerr[map.rows()];
@@ -738,7 +746,7 @@ int VisionProcess::onMatching(void)
     std::cout << "===>>>result rms :\r\n";
     for (int i = 0; i < map.rows(); i++)
     {
-        std::cout << i << " : " << map.row(i) << " " << rerr[i] << endl;
+        //std::cout << i << " : " << map.row(i) << " " << rerr[i] << endl;
         rerrSort.push_back(rerr[i]);
     }
 
@@ -751,17 +759,41 @@ int VisionProcess::onMatching(void)
     sort(rerrSort.begin(), rerrSort.end());
 
     //for debug
-    for (int pm; pm < rerrSort.size(); pm++)
+    for (int pm; pm < pointNum*2; pm++)
     {
         DBG("sort index pm : %d \t%f", getIndex(rerr, map.rows(), rerrSort[pm]),rerrSort[pm]);
     }
 
     for (int pm; pm < pointNum; pm++)
     {
-        indexResult[pm] = getIndex(rerr, map.rows(), rerrSort[pm]);
-        DBG("index pm : %d", indexResult[pm]);
+        index[pm] = getIndex(rerr, map.rows(), rerrSort[pm]);
+        DBG("index pm : %d", index[pm]);
     }
 
+    
+    double d1 = multipleViewTriangulation.distance3d(
+            cv::Point3d(Xr[index[0]](0, 0), Xr[index[0]](1, 0), Xr[index[0]](2, 0)),
+            cv::Point3d(Xr[index[1]](0, 0), Xr[index[1]](1, 0), Xr[index[1]](2, 0)));
+    double d2 = multipleViewTriangulation.distance3d(
+            cv::Point3d(Xr[index[0]](0, 0), Xr[index[0]](1, 0), Xr[index[0]](2, 0)),
+            cv::Point3d(Xr[index[2]](0, 0), Xr[index[2]](1, 0), Xr[index[2]](2, 0)));
+    double d3 = multipleViewTriangulation.distance3d(
+            cv::Point3d(Xr[index[2]](0, 0), Xr[index[2]](1, 0), Xr[index[2]](2, 0)),
+            cv::Point3d(Xr[index[1]](0, 0), Xr[index[1]](1, 0), Xr[index[1]](2, 0)));
+
+    DBG("%f\t%f\t%f\r\n",d1,d2,d3);
+
+    d1 = multipleViewTriangulation.distance3d(
+            cv::Point3d(Xr[index[3]](0, 0), Xr[index[3]](1, 0), Xr[index[3]](2, 0)),
+            cv::Point3d(Xr[index[4]](0, 0), Xr[index[4]](1, 0), Xr[index[4]](2, 0)));
+    d2 = multipleViewTriangulation.distance3d(
+            cv::Point3d(Xr[index[3]](0, 0), Xr[index[3]](1, 0), Xr[index[3]](2, 0)),
+            cv::Point3d(Xr[index[5]](0, 0), Xr[index[5]](1, 0), Xr[index[5]](2, 0)));
+    d3 = multipleViewTriangulation.distance3d(
+            cv::Point3d(Xr[index[4]](0, 0), Xr[index[4]](1, 0), Xr[index[4]](2, 0)),
+            cv::Point3d(Xr[index[5]](0, 0), Xr[index[5]](1, 0), Xr[index[5]](2, 0)));
+
+    DBG("%f\t%f\t%f\r\n",d1,d2,d3);
 
     return 0;
 }

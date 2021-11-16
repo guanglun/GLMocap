@@ -15,6 +15,7 @@
 #include "GLPoint.h"
 #include "MultipleViewTriangulation.h"
 
+#include "MarksManagement.h"
 #include "PX4Thread.h"
 
 using namespace std;
@@ -58,7 +59,8 @@ private:
     
     int camNum = 0;
     int pointNum = 0;
-    PX4Thread *px4;
+    PX4Thread *px4; 
+    
     Vector3d eulerAnglesDrone;
 
     int matchPoint(void);
@@ -68,7 +70,7 @@ private:
     int onMatching(void);
     void forloop(int pm,int cm);
 public:
-
+    MarksManagement *mm;
     MATCH_STATE matchState = MATCH_IDLE;
     CAL_STATE calGNDstate = CAL_IDLE;
     FIND_MODULE_STATE findDroneState = FIND_MODULE_IDLE;

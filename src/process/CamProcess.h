@@ -13,7 +13,7 @@
 
 #include "GLPoint.h"
 
-//class VisionProcess;
+class VisionProcess;
 #include "VisionProcess.h"
 
 class OPENVIO;

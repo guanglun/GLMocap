@@ -65,6 +65,8 @@ add_executable(GLMocap
     src/PathPlan/MuItemPoint.cpp
     src/formAbout/formabout.cpp
     src/vision/GLPoint.cpp
+    src/MarksManagement/MarksManagement.cpp
+    src/MarksManagement/MarkPoint.cpp
 
     src/main.cpp
     src/openvio/openvio.cpp
@@ -123,6 +125,7 @@ include_directories(
                     src/formLogWindow
                     src/formCvWindow
                     src/firmwareUpgrade
+                    src/MarksManagement
                     src/gl_protocol
                     src/process
                     src/MuItemCtrl
