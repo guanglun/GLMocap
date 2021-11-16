@@ -99,7 +99,7 @@ public:
     
     //int row;
 
-    OPENVIO(libusb_device *dev);
+    OPENVIO(libusb_device *dev,enum OPENVIO_TYPE type = TYPE_NULL);
     ~OPENVIO();
 
     int open(void);
@@ -107,7 +107,7 @@ public:
     
     void removeReady(void);
     int getRow(void);
-    void setItem(QStandardItemModel *pModelOpenvio);
+    void setItem(QStandardItemModel *pModelOpenvio,int cameraNumber = -1);
     void setStatus(QString status);
     void setSpeed(QString speed);
     void setNumber(int number);

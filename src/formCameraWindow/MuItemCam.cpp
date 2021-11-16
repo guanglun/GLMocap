@@ -54,7 +54,7 @@ void MuItemCam::paint(QPainter *painter, const QStyleOptionViewItem &option, con
 
         QRectF statusRect = QRect(nameRect.left(), nameRect.bottom(), rect.width()-10-iconRect.width(), 20);
 
-        if(itemData.type == TYPE_OPENVIO)
+        if(itemData.type == TYPE_OPENVIO || itemData.type == TYPE_VIRTUAL)
         {
             painter->drawImage(iconRect, QImage(QString(":/image/camera.png")));
         }else if(itemData.type == TYPE_BOOTLOADER)

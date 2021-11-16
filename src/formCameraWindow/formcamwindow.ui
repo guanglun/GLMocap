@@ -125,9 +125,17 @@
     </property>
     <addaction name="actionabout"/>
    </widget>
+   <widget class="QMenu" name="menuvirtual">
+    <property name="title">
+     <string>virtual</string>
+    </property>
+    <addaction name="actioninit_virtual_cameras"/>
+    <addaction name="actionload_images"/>
+   </widget>
    <addaction name="menu"/>
    <addaction name="menuWindow"/>
    <addaction name="menuOperations"/>
+   <addaction name="menuvirtual"/>
    <addaction name="menuabout"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -227,6 +235,16 @@
   <action name="actionopen_all_view">
    <property name="text">
     <string>open all view</string>
+   </property>
+  </action>
+  <action name="actioninit_virtual_cameras">
+   <property name="text">
+    <string>init virtual cameras</string>
+   </property>
+  </action>
+  <action name="actionload_images">
+   <property name="text">
+    <string>load images</string>
    </property>
   </action>
  </widget>

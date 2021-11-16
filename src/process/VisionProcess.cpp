@@ -481,15 +481,17 @@ int VisionProcess::calibrateGND(vector<GLPoint *> *vPoint)
 
 void VisionProcess::positionSlot(CAMERA_RESULT result)
 {
+    bool isFirst = true;
     bool check = true;
     int foundNum = 0;
 
     camResult[result.camIndex] = result;
 
-    // mlog->show("index: " + QString::number(result.camIndex) +
-    //            " ptnum: " + QString::number(result.pointNum) +
-    //            " time: " + QString::number(result.time) +
-    //            " diff: " + QString::number(result.time - lastTime[result.camIndex]));
+    mlog->show("index: " + QString::number(result.camIndex) +
+               " ptnum: " + QString::number(result.pointNum) +
+               " time: " + QString::number(result.time) +
+               " diff: " + QString::number(result.time - lastTime[result.camIndex]));
+
     lastTime[result.camIndex] = result.time;
 
     if (camNum < 2)
@@ -733,10 +735,10 @@ int VisionProcess::onMatching(void)
 
     mlog->show("get rms take time " + QString::number((double)mstimer.nsecsElapsed() / (double)1000) + "us");
 
-    //std::cout << "===>>>result rms :\r\n";
+    std::cout << "===>>>result rms :\r\n";
     for (int i = 0; i < map.rows(); i++)
     {
-        //std::cout << i << " : " << map.row(i) << " " << rerr[i] << endl;
+        std::cout << i << " : " << map.row(i) << " " << rerr[i] << endl;
         rerrSort.push_back(rerr[i]);
     }
 
@@ -749,10 +751,10 @@ int VisionProcess::onMatching(void)
     sort(rerrSort.begin(), rerrSort.end());
 
     //for debug
-    // for (int pm; pm < rerrSort.size(); pm++)
-    // {
-    //     DBG("sort index pm : %d \t%f", getIndex(rerr, map.rows(), rerrSort[pm]),rerrSort[pm]);
-    // }
+    for (int pm; pm < rerrSort.size(); pm++)
+    {
+        DBG("sort index pm : %d \t%f", getIndex(rerr, map.rows(), rerrSort[pm]),rerrSort[pm]);
+    }
 
     for (int pm; pm < pointNum; pm++)
     {

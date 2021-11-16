@@ -72,8 +72,6 @@ FormCamWindow::FormCamWindow(QWidget *parent) : QMainWindow(parent),
     formCamConfig = new FormCamConfig(ctrlProcess);
 
     fPx4Window.setPX4Thread(&qwinusb->px4Thread);
-
-
 }
 
 void FormCamWindow::ProvideContextMenu(const QPoint &pos)
@@ -215,7 +213,7 @@ void FormCamWindow::closeEvent(QCloseEvent *event)
     if (fCalibrWindow.isEnabled())
         fCalibrWindow.close();
     if (fAbout.isEnabled())
-        fAbout.close();        
+        fAbout.close();
     qwinusb->closeDevice();
 }
 
@@ -314,7 +312,6 @@ void FormCamWindow::on_pb_capture_clicked()
     }
 }
 
-
 void FormCamWindow::on_pb_quick_start_clicked()
 {
     on_actionopen_all_view_triggered();
@@ -330,7 +327,7 @@ void FormCamWindow::on_pb_init_module_clicked()
 void FormCamWindow::on_actioninit_gnd_triggered()
 {
     qwinusb->visionProcess->matchState = MATCH_START;
-    qwinusb->visionProcess->calGNDstate = CAL_START;    
+    qwinusb->visionProcess->calGNDstate = CAL_START;
 }
 
 // void FormCamWindow::on_pb_find_drone_clicked()
@@ -388,7 +385,7 @@ void FormCamWindow::on_actionopen_all_view_triggered()
         OPENVIO *vio = it.value();
         if (vio != nullptr)
         {
-            if (vio->type == TYPE_OPENVIO)
+            if (vio->type == TYPE_OPENVIO || vio->type == TYPE_VIRTUAL)
             {
                 if (vio->formVioWindow == nullptr)
                 {
@@ -566,3 +563,43 @@ void FormCamWindow::on_actionsave_vision_param_triggered()
     }
 }
 
+void FormCamWindow::on_actioninit_virtual_cameras_triggered()
+{
+
+    QMap<uint8_t, OPENVIO *>::Iterator it = qwinusb->vioMap.begin();
+    while (it != qwinusb->vioMap.end())
+    {
+        if (it.value() != nullptr)
+        {
+            it.value()->removeReady();
+            it = qwinusb->vioMap.erase(it);
+        }
+    }
+
+    for (int i = 0; i < 4; i++)
+    {
+        OPENVIO *vio = new OPENVIO(nullptr, TYPE_VIRTUAL);
+        vio->devAddr = i;
+        qwinusb->vioMap.insert(vio->devAddr, vio);
+        vio->setItem(qwinusb->pModelOpenvio, i);
+        vio->visionProcess = qwinusb->visionProcess;
+        qwinusb->visionProcess->init(qwinusb->vioMap.size());
+        connect(vio->camProcess, SIGNAL(positionSignals(CAMERA_RESULT)), vio->visionProcess, SLOT(positionSlot(CAMERA_RESULT)));
+    }
+}
+
+void FormCamWindow::on_actionload_images_triggered()
+{
+    QString sPath = "C:\\Users\\27207\\Desktop\\temp\\0.image\\2021-11-15-23-25-52-684\\camera";
+
+    QDateTime time = QDateTime::currentDateTime();
+
+    for (QMap<uint8_t, OPENVIO *>::Iterator it = qwinusb->vioMap.begin();
+         it != qwinusb->vioMap.end(); it++)
+    {
+        OPENVIO *vio = it.value();
+        QImage image(sPath+QString::number(vio->number)+"\\1636989967978.png");
+        if(!image.isNull())
+            vio->camProcess->emitImage(image,time);
+    }
+}

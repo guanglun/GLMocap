@@ -45,10 +45,12 @@ public:
     void setShowFlag(Qt::CheckState flag);
     void searchMarks(Mat image, vector<Point2f> &points);
     void searchMarks2(Mat image, vector<Point2f> &points);
+    void emitImage(QImage image,QDateTime time);
 public slots:
     void camSlot(int index);
-
+    void imageSlot(QImage image,QDateTime time);
 signals:
+    void imageSignal(QImage image,QDateTime time);
     void visionImageSignals(QPixmap qImage);  
     void positionSignals(CAMERA_RESULT result);  
 };

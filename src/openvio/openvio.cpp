@@ -1,15 +1,20 @@
 #include "openvio.h"
 
-OPENVIO::OPENVIO(libusb_device *dev)
+OPENVIO::OPENVIO(libusb_device *dev, enum OPENVIO_TYPE type)
 {
     this->dev = dev;
+    this->type = type;
+
     pItem = new QStandardItem();
 
-    camThread = new USBThread();
-    imuThread = new USBThread();
+    if (type != TYPE_VIRTUAL)
+    {
+        camThread = new USBThread();
+        imuThread = new USBThread();
 
-    camThread->init(this, "cam");
-    imuThread->init(this, "imu");
+        camThread->init(this, "cam");
+        imuThread->init(this, "imu");
+    }
 
     camStatus = SENSOR_STATUS_STOP;
     imuStatus = SENSOR_STATUS_STOP;
@@ -33,6 +38,9 @@ OPENVIO::~OPENVIO()
 int OPENVIO::open(void)
 {
     int ret = 0;
+
+    if (type == TYPE_VIRTUAL)
+        return false;
 
     if (dev_handle != nullptr)
     {
@@ -76,6 +84,9 @@ init_fail:
 
 int OPENVIO::close(void)
 {
+    if (type == TYPE_VIRTUAL)
+        return false;
+
     if (dev_handle != nullptr)
     {
         libusb_release_interface(dev_handle, 0);
@@ -88,7 +99,7 @@ int OPENVIO::close(void)
 
 void OPENVIO::removeReady(void)
 {
-    if(formVioWindow != nullptr && formVioWindow->isEnabled())
+    if (formVioWindow != nullptr && formVioWindow->isEnabled())
     {
         formVioWindow->close();
     }
@@ -98,6 +109,9 @@ void OPENVIO::removeReady(void)
 
 void OPENVIO::CamRecv(void)
 {
+    if (type == TYPE_VIRTUAL)
+        return;
+
     DBG("cam recv start");
     int ret = 0;
     int img_index = 0;
@@ -188,6 +202,9 @@ void OPENVIO::CamRecv(void)
 
 void OPENVIO::IMURecv(void)
 {
+    if (type == TYPE_VIRTUAL)
+        return;
+
     DBG("imu recv start");
     int ret = 0;
     FindStr findStr;
@@ -235,6 +252,9 @@ bool OPENVIO::sendBulk(unsigned char *buffer, int len)
     int recvLen = 0;
     int ret = 0;
 
+    if (type == TYPE_VIRTUAL)
+        return false;
+
     ret = libusb_bulk_transfer(dev_handle, CTRL_EPADDR, buffer, len, &recvLen, 0);
 
     if (ret < 0)
@@ -254,6 +274,9 @@ int OPENVIO::recvBulk(unsigned char *buffer, int len)
     int recvLen = 0;
     int ret = 0;
 
+    if (type == TYPE_VIRTUAL)
+        return false;
+
     ret = libusb_bulk_transfer(dev_handle, CAM_EPADDR, buffer, len, &recvLen, 0);
 
     if (ret < 0 && ret != -7)
@@ -269,10 +292,21 @@ int OPENVIO::recvBulk(unsigned char *buffer, int len)
     }
 }
 
-void OPENVIO::setItem(QStandardItemModel *pModelOpenvio)
+void OPENVIO::setItem(QStandardItemModel *pModelOpenvio,int cameraNumber)
 {
     this->pModelOpenvio = pModelOpenvio;
-    number = setting->getNumberById(idStr);
+    if(type == TYPE_VIRTUAL)
+    {
+        number = cameraNumber;
+        memset(idStr, '\0', sizeof(idStr));
+        strcpy(&idStr[16],"VIRTUAL");
+        version[0] = 0;
+        version[1] = 0;
+        version[2] = 0;
+    }else{
+        number = setting->getNumberById(idStr);
+    }
+    
     if (number > -1)
     {
         name = "camera" + QString::number(number);
@@ -364,6 +398,9 @@ void OPENVIO::closeSlot(void)
 int OPENVIO::sendCtrl(char request, uint8_t type, unsigned char *buffer, uint16_t len)
 {
     int ret = 0;
+    if (type == TYPE_VIRTUAL)
+        return false;
+
     if (dev_handle == nullptr)
     {
         open();
@@ -377,12 +414,12 @@ int OPENVIO::sendCtrl(char request, uint8_t type, unsigned char *buffer, uint16_
 
         if (ret < 0)
         {
-            DBG("sendCtrl %02X fail ret:%d", (uint8_t)request , ret);
+            DBG("sendCtrl %02X fail ret:%d", (uint8_t)request, ret);
             return -1;
         }
         else
         {
-            DBG("sendCtrl %02X success. ret:%d", (uint8_t)request , ret);
+            DBG("sendCtrl %02X success. ret:%d", (uint8_t)request, ret);
             return ret;
         }
     }
@@ -392,6 +429,9 @@ int OPENVIO::sendCtrl(char request, uint8_t type, unsigned char *buffer, uint16_
 
 int OPENVIO::camRecvStart()
 {
+    if (type == TYPE_VIRTUAL)
+        return false;
+
     isCamRecv = true;
     camThread->start();
     return true;
@@ -399,6 +439,9 @@ int OPENVIO::camRecvStart()
 
 int OPENVIO::camRecvStop()
 {
+    if (type == TYPE_VIRTUAL)
+        return false;
+
     isCamRecv = false;
     //camThread->quit();
     camThread->wait();
@@ -410,6 +453,9 @@ int OPENVIO::camRecvStop()
 
 int OPENVIO::camStart()
 {
+    if (type == TYPE_VIRTUAL)
+        return false;
+
     DBG("cam start");
     isCamRecv = true;
     camThread->start();
@@ -420,6 +466,9 @@ int OPENVIO::camStart()
 int OPENVIO::camStop()
 {
     int close_try_cnt = 0;
+
+    if (type == TYPE_VIRTUAL)
+        return false;
 
     while (ctrlCamStatus(0) != 0 && close_try_cnt < 4)
     {
@@ -435,6 +484,9 @@ int OPENVIO::camStop()
 int OPENVIO::ctrlCamStatus(uint8_t state)
 {
     uint8_t ret = 0;
+
+    if (type == TYPE_VIRTUAL)
+        return false;
 
     ctrl_buffer[0] = state;
     ret = sendCtrl(REQUEST_SET_CAMERA_STATUS, LIBUSB_ENDPOINT_OUT, ctrl_buffer, 1);
@@ -461,6 +513,9 @@ int OPENVIO::ctrlReboot(uint8_t boot)
 {
     uint8_t ret = 0;
 
+    if (type == TYPE_VIRTUAL)
+        return false;
+
     ctrl_buffer[0] = boot;
     ret = sendCtrl(REQUEST_SET_REBOOT, LIBUSB_ENDPOINT_OUT, ctrl_buffer, 1);
     if (ret < 0)
@@ -473,6 +528,9 @@ int OPENVIO::ctrlReboot(uint8_t boot)
 int OPENVIO::getVersion()
 {
     uint8_t ret = 0;
+
+    if (type == TYPE_VIRTUAL)
+        return false;
 
     ret = sendCtrl(REQUEST_GET_VERSION, LIBUSB_ENDPOINT_IN, ctrl_buffer, 128);
     if (ret < 0)
@@ -496,6 +554,9 @@ int OPENVIO::getVersion()
 
 int OPENVIO::IMUStart()
 {
+    if (type == TYPE_VIRTUAL)
+        return false;
+
     //DBG("imu start");
     isIMURecv = true;
     imuThread->start();
@@ -506,6 +567,9 @@ int OPENVIO::IMUStart()
 int OPENVIO::IMUStop()
 {
     int close_try_cnt = 0;
+
+    if (type == TYPE_VIRTUAL)
+        return false;
 
     while (ctrlIMUStop() != 0 && close_try_cnt < 4)
     {
@@ -551,6 +615,9 @@ int OPENVIO::ctrlCamSyncStatus(uint8_t state)
 {
     uint8_t ret = 0;
 
+    if (type == TYPE_VIRTUAL)
+        return false;
+
     ctrl_buffer[0] = state;
     ret = sendCtrl(REQUEST_CAMERA_SET_SYNC_STATUS, LIBUSB_ENDPOINT_OUT, ctrl_buffer, 1);
     if (ret < 0)
@@ -573,6 +640,9 @@ int OPENVIO::ctrlCamSyncStatus(uint8_t state)
 int OPENVIO::ctrlCamSyncMode(uint8_t mode)
 {
     uint8_t ret = 0;
+
+    if (type == TYPE_VIRTUAL)
+        return false;
 
     ctrl_buffer[0] = mode;
 
@@ -598,6 +668,9 @@ int OPENVIO::ctrlCamFps(uint8_t fps)
 {
     uint8_t ret = 0;
 
+    if (type == TYPE_VIRTUAL)
+        return false;
+
     ctrl_buffer[0] = fps;
 
     ret = sendCtrl(REQUEST_CAMERA_SET_FPS, LIBUSB_ENDPOINT_OUT, ctrl_buffer, 1);
@@ -622,6 +695,9 @@ int OPENVIO::ctrlCamFps(uint8_t fps)
 int OPENVIO::ctrlInfraredPwm(uint8_t pwm)
 {
     uint8_t ret = 0;
+
+    if (type == TYPE_VIRTUAL)
+        return false;
 
     ctrl_buffer[0] = pwm;
 
@@ -667,6 +743,10 @@ int OPENVIO::ctrlCamSetFrameSizeNum(uint16_t num)
 int OPENVIO::getCameraStatus()
 {
     int ret = 0;
+
+    if (type == TYPE_VIRTUAL)
+        return false;
+
     ret = sendCtrl(REQUEST_GET_CAMERA_STATUS, LIBUSB_ENDPOINT_IN, ctrl_buffer, CAMERA_STATE_SIZE);
     if (ret != CAMERA_STATE_SIZE)
     {
@@ -699,6 +779,9 @@ int OPENVIO::getCameraStatus()
 int OPENVIO::ctrlCamSetExposure(int value)
 {
     uint8_t ret = 0;
+
+    if (type == TYPE_VIRTUAL)
+        return false;
 
     ctrl_buffer[0] = (uint8_t)(value >> 24);
     ctrl_buffer[1] = (uint8_t)(value >> 16);

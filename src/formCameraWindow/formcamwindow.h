@@ -94,6 +94,8 @@ private slots:
     void on_actionstop_triggered();
     void on_actionopen_all_view_triggered();
     void on_actionabout_triggered();
+    void on_actioninit_virtual_cameras_triggered();
+    void on_actionload_images_triggered();
 private:
     Ui::FormCamWindow *ui;
     

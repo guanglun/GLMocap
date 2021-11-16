@@ -5,6 +5,8 @@ CamProcess::CamProcess(OPENVIO *vio, QObject *parent)
 {
     this->vio = vio;
     this->hPoint = new QHash<POINT_STATE, GLPoint *>();
+
+    connect(this, SIGNAL(imageSignal(QImage,QDateTime)), this, SLOT(imageSlot(QImage,QDateTime)));
 }
 
 void CamProcess::setShowFlag(Qt::CheckState flag)
@@ -19,9 +21,9 @@ double distance(Point2f p1, Point2f p2)
 
 void CamProcess::match(vector<Point2f> centers)
 {
-    if (vio->visionProcess->matchState == MATCH_START)  
-    // if (vio->visionProcess->matchState == MATCH_START ||
-    //     vio->visionProcess->matchState == MATCH_IDLE)
+    //if (vio->visionProcess->matchState == MATCH_START)
+    if (vio->visionProcess->matchState == MATCH_START ||
+        vio->visionProcess->matchState == MATCH_IDLE)
     {
         vPoint.clear();
         for (int i = 0; i < centers.size(); i++)
@@ -60,6 +62,21 @@ void CamProcess::match(vector<Point2f> centers)
         result.vPoint = vPoint;
         emit positionSignals(result);
     }
+}
+
+void CamProcess::emitImage(QImage image,QDateTime time)
+{
+    emit imageSignal(image,time);
+}
+
+void CamProcess::imageSlot(QImage image,QDateTime time)
+{
+    if (showFlag == Qt::CheckState::Unchecked)
+    {
+        emit visionImageSignals(QPixmap::fromImage(image));
+    }
+
+    cvProcess(image, time);
 }
 
 void CamProcess::camSlot(int index)
@@ -146,7 +163,7 @@ void CamProcess::searchMarks(Mat image, vector<Point2f> &points)
     vector<float> radius(contours.size());    //半径
 
     int size = contours.size();
-    if(size > PT_NUM_MAX)
+    if (size > PT_NUM_MAX)
         size = PT_NUM_MAX;
 
     for (int i = 0; i < size; i++)
@@ -172,20 +189,20 @@ void CamProcess::searchMarks(Mat image, vector<Point2f> &points)
 void CamProcess::searchMarks2(Mat image, vector<Point2f> &points)
 {
     Point2f pt;
-    Mat src, src_color,g_src, labels, stats, centroids;
+    Mat src, src_color, g_src, labels, stats, centroids;
     int size = connectedComponentsWithStats(image, labels, stats, centroids) - 1;
 
     // if(vio->number == 0)
     //     cout << "centroids: " << centroids << endl;
 
-    if(size > PT_NUM_MAX)
+    if (size > PT_NUM_MAX)
         size = PT_NUM_MAX;
 
     for (int i = 0; i < size; i++)
     {
 
-        pt.x = centroids.at<double>(i+1, 0);
-        pt.y = centroids.at<double>(i+1, 1);
+        pt.x = centroids.at<double>(i + 1, 0);
+        pt.y = centroids.at<double>(i + 1, 1);
 
         points.push_back(pt);
     }
@@ -204,7 +221,7 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
 
     vector<Point2f> points;
 
-    searchMarks2(image,points);
+    searchMarks2(image, points);
 
     result.camIndex = vio->number;
     result.pointNum = (int)0;
@@ -237,8 +254,8 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
         cv::cvtColor(sourceImg, sourceImg, cv::COLOR_BGR2RGB);
         QImage qSourceImg = QImage((const unsigned char *)(sourceImg.data), sourceImg.cols, sourceImg.rows, sourceImg.step, QImage::Format_RGB888);
         emit visionImageSignals(QPixmap::fromImage(qSourceImg));
-
-    }else if (showFlag == Qt::CheckState::Checked)
+    }
+    else if (showFlag == Qt::CheckState::Checked)
     {
         for (int i = 0; i < vPoint.size(); i++)
         {
@@ -254,7 +271,6 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
         QImage qImage = QImage((const unsigned char *)(image.data), image.cols, image.rows, image.step, QImage::Format_RGB888);
         emit visionImageSignals(QPixmap::fromImage(qImage));
     }
-        
 
     // t2 = QDateTime::currentDateTime().toMSecsSinceEpoch();
     // mlog->show(QString::number(vio->number) + " diff " + QString::number(t2-time.toMSecsSinceEpoch()));
