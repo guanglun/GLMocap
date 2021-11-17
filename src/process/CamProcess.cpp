@@ -216,7 +216,7 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
     Mat image;
 
     Mat sourceImg = cv::Mat(qImage.height(), qImage.width(), CV_8UC1, qImage.bits());
-
+    
     threshold(sourceImg, image, setting->threshold, 255.0, THRESH_BINARY);
 
     vector<Point2f> points;
@@ -227,7 +227,7 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
     result.pointNum = (int)0;
     result.time = time.toMSecsSinceEpoch();
     result.path = vio->saveImagePath;
-    result.image = image;
+    result.image = sourceImg.clone();
     result.hPoint = hPoint;
     result.pointNum = points.size();
 
@@ -243,15 +243,15 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
 
     if (showFlag == Qt::CheckState::PartiallyChecked)
     {
-        for (int i = 0; i < vPoint.size(); i++)
-        {
-            if (vio->visionProcess->matchState == MATCH_OK)
-            {
-                putText(sourceImg, std::to_string(vPoint[i]->id), Point(vPoint[i]->x, vPoint[i]->y - 15), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255, 0, 0), 2);
-            }
+        // for (int i = 0; i < vPoint.size(); i++)
+        // {
+        //     if (vio->visionProcess->matchState == MATCH_OK)
+        //     {
+        //         putText(sourceImg, std::to_string(vPoint[i]->id), Point(vPoint[i]->x, vPoint[i]->y - 15), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255, 0, 0), 2);
+        //     }
 
-            drawMarker(sourceImg, Point2f(vPoint[i]->x, vPoint[i]->y), Scalar(255, 0, 0), MarkerTypes::MARKER_CROSS, 20, 1, 8);
-        }
+        //     drawMarker(sourceImg, Point2f(vPoint[i]->x, vPoint[i]->y), Scalar(255, 0, 0), MarkerTypes::MARKER_CROSS, 20, 1, 8);
+        // }
 
         cv::cvtColor(sourceImg, sourceImg, cv::COLOR_BGR2RGB);
         QImage qSourceImg = QImage((const unsigned char *)(sourceImg.data), sourceImg.cols, sourceImg.rows, sourceImg.step, QImage::Format_RGB888);

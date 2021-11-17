@@ -488,10 +488,10 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
 
     camResult[result.camIndex] = result;
 
-    mlog->show("index: " + QString::number(result.camIndex) +
-               " ptnum: " + QString::number(result.pointNum) +
-               " time: " + QString::number(result.time) +
-               " diff: " + QString::number(result.time - lastTime[result.camIndex]));
+    // mlog->show("index: " + QString::number(result.camIndex) +
+    //            " ptnum: " + QString::number(result.pointNum) +
+    //            " time: " + QString::number(result.time) +
+    //            " diff: " + QString::number(result.time - lastTime[result.camIndex]));
 
     lastTime[result.camIndex] = result.time;
 
@@ -761,10 +761,10 @@ int VisionProcess::onMatching(void)
     sort(rerrSort.begin(), rerrSort.end());
 
     //for debug
-    for (int pm; pm < pointNum+4; pm++)
-    {
-        DBG("sort index pm : %d \t%f", getIndex(rerr, map.rows(), rerrSort[pm]),rerrSort[pm]);
-    }
+    // for (int pm; pm < pointNum+4; pm++)
+    // {
+    //     DBG("sort index pm : %d \t%f", getIndex(rerr, map.rows(), rerrSort[pm]),rerrSort[pm]);
+    // }
 
     for (int pm; pm < pointNum; pm++)
     {
@@ -800,29 +800,29 @@ int VisionProcess::onMatching(void)
         cv::imshow("camera"+std::to_string(cm), sourceImg);
     }
 
-    double d1 = multipleViewTriangulation.distance3d(
-            cv::Point3d(Xr[index[0]](0, 0), Xr[index[0]](1, 0), Xr[index[0]](2, 0)),
-            cv::Point3d(Xr[index[1]](0, 0), Xr[index[1]](1, 0), Xr[index[1]](2, 0)));
-    double d2 = multipleViewTriangulation.distance3d(
-            cv::Point3d(Xr[index[0]](0, 0), Xr[index[0]](1, 0), Xr[index[0]](2, 0)),
-            cv::Point3d(Xr[index[2]](0, 0), Xr[index[2]](1, 0), Xr[index[2]](2, 0)));
-    double d3 = multipleViewTriangulation.distance3d(
-            cv::Point3d(Xr[index[2]](0, 0), Xr[index[2]](1, 0), Xr[index[2]](2, 0)),
-            cv::Point3d(Xr[index[1]](0, 0), Xr[index[1]](1, 0), Xr[index[1]](2, 0)));
+    // double d1 = multipleViewTriangulation.distance3d(
+    //         cv::Point3d(Xr[index[0]](0, 0), Xr[index[0]](1, 0), Xr[index[0]](2, 0)),
+    //         cv::Point3d(Xr[index[1]](0, 0), Xr[index[1]](1, 0), Xr[index[1]](2, 0)));
+    // double d2 = multipleViewTriangulation.distance3d(
+    //         cv::Point3d(Xr[index[0]](0, 0), Xr[index[0]](1, 0), Xr[index[0]](2, 0)),
+    //         cv::Point3d(Xr[index[2]](0, 0), Xr[index[2]](1, 0), Xr[index[2]](2, 0)));
+    // double d3 = multipleViewTriangulation.distance3d(
+    //         cv::Point3d(Xr[index[2]](0, 0), Xr[index[2]](1, 0), Xr[index[2]](2, 0)),
+    //         cv::Point3d(Xr[index[1]](0, 0), Xr[index[1]](1, 0), Xr[index[1]](2, 0)));
 
-    DBG("%f\t%f\t%f",d1,d2,d3);
+    // DBG("%f\t%f\t%f",d1,d2,d3);
 
-    d1 = multipleViewTriangulation.distance3d(
-            cv::Point3d(Xr[index[3]](0, 0), Xr[index[3]](1, 0), Xr[index[3]](2, 0)),
-            cv::Point3d(Xr[index[4]](0, 0), Xr[index[4]](1, 0), Xr[index[4]](2, 0)));
-    d2 = multipleViewTriangulation.distance3d(
-            cv::Point3d(Xr[index[3]](0, 0), Xr[index[3]](1, 0), Xr[index[3]](2, 0)),
-            cv::Point3d(Xr[index[5]](0, 0), Xr[index[5]](1, 0), Xr[index[5]](2, 0)));
-    d3 = multipleViewTriangulation.distance3d(
-            cv::Point3d(Xr[index[4]](0, 0), Xr[index[4]](1, 0), Xr[index[4]](2, 0)),
-            cv::Point3d(Xr[index[5]](0, 0), Xr[index[5]](1, 0), Xr[index[5]](2, 0)));
+    // d1 = multipleViewTriangulation.distance3d(
+    //         cv::Point3d(Xr[index[3]](0, 0), Xr[index[3]](1, 0), Xr[index[3]](2, 0)),
+    //         cv::Point3d(Xr[index[4]](0, 0), Xr[index[4]](1, 0), Xr[index[4]](2, 0)));
+    // d2 = multipleViewTriangulation.distance3d(
+    //         cv::Point3d(Xr[index[3]](0, 0), Xr[index[3]](1, 0), Xr[index[3]](2, 0)),
+    //         cv::Point3d(Xr[index[5]](0, 0), Xr[index[5]](1, 0), Xr[index[5]](2, 0)));
+    // d3 = multipleViewTriangulation.distance3d(
+    //         cv::Point3d(Xr[index[4]](0, 0), Xr[index[4]](1, 0), Xr[index[4]](2, 0)),
+    //         cv::Point3d(Xr[index[5]](0, 0), Xr[index[5]](1, 0), Xr[index[5]](2, 0)));
 
-    DBG("%f\t%f\t%f",d1,d2,d3);
+    // DBG("%f\t%f\t%f",d1,d2,d3);
 
 
 
