@@ -527,7 +527,8 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
                 {
                     QString filePath = camResult[i].path + "/" + QString::number(camResult[0].time) + ".png";
 
-                    camResult[i].image.save(filePath);
+                    //camResult[i].image.save(filePath);
+                    cv::imwrite(filePath.toStdString(),camResult[i].image);
                     mlog->show("save " + filePath);
                 }
                 saveLastTime = camResult[0].time;
@@ -774,22 +775,28 @@ int VisionProcess::onMatching(void)
     
     for(int cm=0;cm<camNum;cm++)
     {
-        cv::Mat sourceImg = cv::Mat(camResult[cm].image.height(), camResult[cm].image.width(), CV_8UC1, camResult[cm].image.bits());
+        cv::Mat sourceImg = camResult[cm].image;
+        cv::cvtColor(sourceImg,sourceImg, cv::COLOR_GRAY2RGB);
+
         for (int i = 0; i < pointNum; i++)
         {
             double xx = camResult[cm].vPoint[map.row(getIndex(rerr, map.rows(), rerrSort[i]))(cm)]->x;
             double yy = camResult[cm].vPoint[map.row(getIndex(rerr, map.rows(), rerrSort[i]))(cm)]->y;
 
-            putText(sourceImg, std::to_string(i), cv::Point(xx, yy - 15), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 0, 0), 1);
+            putText(sourceImg, std::to_string(i), cv::Point(xx, yy - 15), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 255), 1);
 
             putText(sourceImg, std::to_string(i) + " : " +std::to_string(rerrSort[i]), cv::Point(10, 20*(i+1)), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 0, 0), 1);
             
             drawMarker(sourceImg, cv::Point2f(xx, yy), cv::Scalar(255, 0, 0), cv::MarkerTypes::MARKER_CROSS, 20, 1, 8);
         }
 
-        cv::cvtColor(sourceImg, sourceImg, cv::COLOR_BGR2RGB);
+        for (int i = pointNum; i < pointNum + 4; i++)
+        {
+            putText(sourceImg, std::to_string(i) + " : " +std::to_string(rerrSort[i]), cv::Point(10, 20*(i+1)), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 0), 1);
+        }
+        //cv::cvtColor(sourceImg, sourceImg, cv::COLOR_BGR2RGB);
 
-        //cv::namedWindow("camera"+std::to_string(cm),cv::WINDOW_NORMAL);
+        cv::namedWindow("camera"+std::to_string(cm),cv::WINDOW_NORMAL);
         cv::imshow("camera"+std::to_string(cm), sourceImg);
     }
 

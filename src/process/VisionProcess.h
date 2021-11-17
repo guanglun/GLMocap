@@ -45,7 +45,7 @@ typedef struct CAMERA_RESULT{
     int pointNum;
     qint64 time;
     QString path;
-    QImage image;
+    cv::Mat image;
     double x[PT_NUM_MAX];
     double y[PT_NUM_MAX];
     QHash<POINT_STATE, GLPoint *> *hPoint; 

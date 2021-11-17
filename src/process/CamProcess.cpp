@@ -221,13 +221,13 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
 
     vector<Point2f> points;
 
-    searchMarks2(image, points);
+    searchMarks(image, points);
 
     result.camIndex = vio->number;
     result.pointNum = (int)0;
     result.time = time.toMSecsSinceEpoch();
     result.path = vio->saveImagePath;
-    result.image = qImage;
+    result.image = image;
     result.hPoint = hPoint;
     result.pointNum = points.size();
 
