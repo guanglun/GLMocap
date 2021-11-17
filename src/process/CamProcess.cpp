@@ -237,9 +237,9 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
         result.y[i] = points[i].y;
     }
     
-    vio->visionProcess->mm->inputPoint(vio->number,points);
-    emit positionSignals(result);
-    //match(points);
+    //vio->visionProcess->mm->inputPoint(vio->number,points);
+    //emit positionSignals(result);
+    match(points);
 
     if (showFlag == Qt::CheckState::PartiallyChecked)
     {

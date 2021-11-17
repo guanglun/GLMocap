@@ -38,7 +38,8 @@ private:
 public:
     int threshold = 200;
     int camNumber = 4;
-    QString imagePath,calibrPath,loadVisionParamPath;
+    int indexVirtualNumber = 0;
+    QString imagePath,virtualImagePath,calibrPath,loadVisionParamPath;
     Setting();
     void getIMUOffset(T_int16_xyz *acc,T_int16_xyz *gyro);
     void setAccOffset(T_int16_xyz *acc);
@@ -46,6 +47,11 @@ public:
 
     void setNumberById(QString id,int number);
     int getNumberById(QString id);
+
+    int getVirtualIndex();
+    void setVirtualIndex(int num);
+    void setVirtualImagePath(QString path);
+    QString getVirtualImagePath();
 
     void setImagePath(QString path);
     QString getImagePath();

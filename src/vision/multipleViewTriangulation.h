@@ -98,7 +98,23 @@ public:
                            double f0 = Default_f0);
 
     void getRMS(    
-        const Matrix34d Prj[],
+        Matrix34d Prj[],
+        int CamNumAll,
+        MatrixXd xy[],
+        Vector3d Xr[],        
+        int ptNum,
+        double rms[]);
+
+    void getRMS2(    
+        Matrix34d Prj[],
+        int CamNumAll,
+        MatrixXd xy[],
+        Vector3d Xr[],        
+        int ptNum,
+        double rms[]);
+
+    void getRMS3(    
+        Matrix34d Prj[],
         int CamNumAll,
         MatrixXd xy[],
         Vector3d Xr[],        

@@ -25,6 +25,8 @@ Setting::Setting()
     getCamNumber();
     getThreshold();
     getImagePath();
+    getVirtualImagePath();
+    getVirtualIndex();
     getCalibrPath();
 }
 
@@ -142,6 +144,38 @@ QString Setting::getImagePath()
     imagePath = set->value("IMAGE_PATH").toString();
     set->endGroup();
     return imagePath;
+}
+
+void Setting::setVirtualImagePath(QString path)
+{
+    set->beginGroup("openvio");
+    virtualImagePath = path;
+    set->setValue("IMAGE_VIRTUAL_PATH", path);
+    set->endGroup();
+}
+
+QString Setting::getVirtualImagePath()
+{
+    set->beginGroup("openvio");
+    virtualImagePath = set->value("IMAGE_VIRTUAL_PATH").toString();
+    set->endGroup();
+    return virtualImagePath;
+}
+
+int Setting::getVirtualIndex()
+{
+    set->beginGroup("openvio");
+    indexVirtualNumber = set->value("NUMBER_VIRTUAL_INDEX").toInt();
+    set->endGroup();
+    return indexVirtualNumber;
+}
+
+void Setting::setVirtualIndex(int num)
+{
+    set->beginGroup("openvio");
+    indexVirtualNumber = num;
+    set->setValue("NUMBER_VIRTUAL_INDEX", num);
+    set->endGroup();
 }
 
 void Setting::setCalibrPath(QString path)

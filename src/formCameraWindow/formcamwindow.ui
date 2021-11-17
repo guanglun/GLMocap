@@ -106,6 +106,7 @@
     <addaction name="action3d_view"/>
     <addaction name="actionLog_view"/>
     <addaction name="actionPx4_view"/>
+    <addaction name="actionvirtual_view"/>
    </widget>
    <widget class="QMenu" name="menuOperations">
     <property name="title">
@@ -125,17 +126,9 @@
     </property>
     <addaction name="actionabout"/>
    </widget>
-   <widget class="QMenu" name="menuvirtual">
-    <property name="title">
-     <string>virtual</string>
-    </property>
-    <addaction name="actioninit_virtual_cameras"/>
-    <addaction name="actionload_images"/>
-   </widget>
    <addaction name="menu"/>
    <addaction name="menuWindow"/>
    <addaction name="menuOperations"/>
-   <addaction name="menuvirtual"/>
    <addaction name="menuabout"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -245,6 +238,11 @@
   <action name="actionload_images">
    <property name="text">
     <string>load images</string>
+   </property>
+  </action>
+  <action name="actionvirtual_view">
+   <property name="text">
+    <string>virtual view</string>
    </property>
   </action>
  </widget>

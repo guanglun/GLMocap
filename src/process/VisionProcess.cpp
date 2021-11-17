@@ -507,12 +507,12 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
         }
     }
 
-    if (check == true)
-    {
-        mm->catchDone(camNum);
-    }
+    // if (check == true)
+    // {
+    //     mm->catchDone(camNum);
+    // }
 
-    return;
+    // return;
 
     if (check == true)
     {
@@ -721,6 +721,8 @@ int VisionProcess::onMatching(void)
     Vector3d Xr[map.rows()];
     vector<double> rerrSort;
 
+    
+
     for (int i = 0; i < map.rows(); i++)
     {
         for (int cm = 0; cm < camNum; cm++)
@@ -733,7 +735,6 @@ int VisionProcess::onMatching(void)
     }
 
     mstimer.start();
-
     multipleViewTriangulation.getRMS(vision_param.P,
                                      camNum,
                                      xy,
@@ -743,7 +744,7 @@ int VisionProcess::onMatching(void)
 
     mlog->show("get rms take time " + QString::number((double)mstimer.nsecsElapsed() / (double)1000) + "us");
 
-    std::cout << "===>>>result rms :\r\n";
+    //std::cout << "===>>>result rms :\r\n";
     for (int i = 0; i < map.rows(); i++)
     {
         //std::cout << i << " : " << map.row(i) << " " << rerr[i] << endl;
@@ -759,7 +760,7 @@ int VisionProcess::onMatching(void)
     sort(rerrSort.begin(), rerrSort.end());
 
     //for debug
-    for (int pm; pm < pointNum*2; pm++)
+    for (int pm; pm < pointNum+4; pm++)
     {
         DBG("sort index pm : %d \t%f", getIndex(rerr, map.rows(), rerrSort[pm]),rerrSort[pm]);
     }
@@ -767,10 +768,31 @@ int VisionProcess::onMatching(void)
     for (int pm; pm < pointNum; pm++)
     {
         index[pm] = getIndex(rerr, map.rows(), rerrSort[pm]);
-        DBG("index pm : %d", index[pm]);
+        //DBG("index pm : %d", index[pm]);
     }
 
     
+    for(int cm=0;cm<camNum;cm++)
+    {
+        cv::Mat sourceImg = cv::Mat(camResult[cm].image.height(), camResult[cm].image.width(), CV_8UC1, camResult[cm].image.bits());
+        for (int i = 0; i < pointNum; i++)
+        {
+            double xx = camResult[cm].vPoint[map.row(getIndex(rerr, map.rows(), rerrSort[i]))(cm)]->x;
+            double yy = camResult[cm].vPoint[map.row(getIndex(rerr, map.rows(), rerrSort[i]))(cm)]->y;
+
+            putText(sourceImg, std::to_string(i), cv::Point(xx, yy - 15), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 0, 0), 1);
+
+            putText(sourceImg, std::to_string(i) + " : " +std::to_string(rerrSort[i]), cv::Point(10, 20*(i+1)), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 0, 0), 1);
+            
+            drawMarker(sourceImg, cv::Point2f(xx, yy), cv::Scalar(255, 0, 0), cv::MarkerTypes::MARKER_CROSS, 20, 1, 8);
+        }
+
+        cv::cvtColor(sourceImg, sourceImg, cv::COLOR_BGR2RGB);
+
+        //cv::namedWindow("camera"+std::to_string(cm),cv::WINDOW_NORMAL);
+        cv::imshow("camera"+std::to_string(cm), sourceImg);
+    }
+
     double d1 = multipleViewTriangulation.distance3d(
             cv::Point3d(Xr[index[0]](0, 0), Xr[index[0]](1, 0), Xr[index[0]](2, 0)),
             cv::Point3d(Xr[index[1]](0, 0), Xr[index[1]](1, 0), Xr[index[1]](2, 0)));
@@ -781,7 +803,7 @@ int VisionProcess::onMatching(void)
             cv::Point3d(Xr[index[2]](0, 0), Xr[index[2]](1, 0), Xr[index[2]](2, 0)),
             cv::Point3d(Xr[index[1]](0, 0), Xr[index[1]](1, 0), Xr[index[1]](2, 0)));
 
-    DBG("%f\t%f\t%f\r\n",d1,d2,d3);
+    DBG("%f\t%f\t%f",d1,d2,d3);
 
     d1 = multipleViewTriangulation.distance3d(
             cv::Point3d(Xr[index[3]](0, 0), Xr[index[3]](1, 0), Xr[index[3]](2, 0)),
@@ -793,7 +815,11 @@ int VisionProcess::onMatching(void)
             cv::Point3d(Xr[index[4]](0, 0), Xr[index[4]](1, 0), Xr[index[4]](2, 0)),
             cv::Point3d(Xr[index[5]](0, 0), Xr[index[5]](1, 0), Xr[index[5]](2, 0)));
 
-    DBG("%f\t%f\t%f\r\n",d1,d2,d3);
+    DBG("%f\t%f\t%f",d1,d2,d3);
+
+
+
+
 
     return 0;
 }
