@@ -6,7 +6,7 @@ CamProcess::CamProcess(OPENVIO *vio, QObject *parent)
     this->vio = vio;
     this->hPoint = new QHash<POINT_STATE, GLPoint *>();
 
-    connect(this, SIGNAL(imageSignal(QImage,QDateTime)), this, SLOT(imageSlot(QImage,QDateTime)));
+    connect(this, SIGNAL(imageSignal(QImage, QDateTime)), this, SLOT(imageSlot(QImage, QDateTime)));
 }
 
 void CamProcess::setShowFlag(Qt::CheckState flag)
@@ -64,12 +64,12 @@ void CamProcess::match(vector<Point2f> centers)
     }
 }
 
-void CamProcess::emitImage(QImage image,QDateTime time)
+void CamProcess::emitImage(QImage image, QDateTime time)
 {
-    emit imageSignal(image,time);
+    emit imageSignal(image, time);
 }
 
-void CamProcess::imageSlot(QImage image,QDateTime time)
+void CamProcess::imageSlot(QImage image, QDateTime time)
 {
     if (showFlag == Qt::CheckState::Unchecked)
     {
@@ -213,11 +213,26 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
     // qint64 t1,t2;
     // t1 = QDateTime::currentDateTime().toMSecsSinceEpoch();
 
-    Mat image;
+    Mat image, sourceImg, undistortImg;
 
-    Mat sourceImg = cv::Mat(qImage.height(), qImage.width(), CV_8UC1, qImage.bits());
-    
-    threshold(sourceImg, image, setting->threshold, 255.0, THRESH_BINARY);
+    undistortImg = cv::Mat(qImage.height(), qImage.width(), CV_8UC1, qImage.bits());
+    // sourceImg = cv::Mat(qImage.height(), qImage.width(), CV_8UC1, qImage.bits());
+    // undistort(sourceImg,                              //输入原图
+    //           undistortImg,                           //输出矫正后的图像
+    //           vision_param.cameraMatrix[vio->number], //内参矩阵
+    //           vision_param.distCoeffs[vio->number],    //畸变系数
+    //           vision_param.cameraMatrix[vio->number]
+    // );
+
+    // if(vio->number == 0)
+    // {
+    //     cv::namedWindow("source"+std::to_string(vio->number),cv::WINDOW_NORMAL);
+    //     cv::imshow("source"+std::to_string(vio->number), sourceImg);
+    //     cv::namedWindow("undistort"+std::to_string(vio->number),cv::WINDOW_NORMAL);
+    //     cv::imshow("undistort"+std::to_string(vio->number), undistortImg);
+    // }
+
+    threshold(undistortImg, image, setting->threshold, 255.0, THRESH_BINARY);
 
     vector<Point2f> points;
 
@@ -227,7 +242,7 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
     result.pointNum = (int)0;
     result.time = time.toMSecsSinceEpoch();
     result.path = vio->saveImagePath;
-    result.image = sourceImg.clone();
+    result.image = undistortImg.clone();
     result.hPoint = hPoint;
     result.pointNum = points.size();
 
@@ -236,7 +251,7 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
         result.x[i] = points[i].x;
         result.y[i] = points[i].y;
     }
-    
+
     //vio->visionProcess->mm->inputPoint(vio->number,points);
     //emit positionSignals(result);
     match(points);

@@ -283,26 +283,27 @@ bool Setting::saveVisionParam(QString path)
         save_vision = new QSettings(path, QSettings::IniFormat);
     }
 
+    vision_param.CamNum = getCamNumber();
     save_vision->setValue("CamNum", vision_param.CamNum);
     for (int i = 0; i < vision_param.CamNum; i++)
     {
-        // save_vision->setValue(QString("I" + QString::number(i)),
-        //                     QString::number(vision_param.intrinsics[i].row(0)(0), 'f', 15) + "," +
-        //                     QString::number(vision_param.intrinsics[i].row(0)(1), 'f', 15) + "," +
-        //                     QString::number(vision_param.intrinsics[i].row(0)(2), 'f', 15) + ";" +
-        //                     QString::number(vision_param.intrinsics[i].row(1)(0), 'f', 15) + "," +
-        //                     QString::number(vision_param.intrinsics[i].row(1)(1), 'f', 15) + "," +
-        //                     QString::number(vision_param.intrinsics[i].row(1)(2), 'f', 15) + ";" +
-        //                     QString::number(vision_param.intrinsics[i].row(2)(0), 'f', 15) + "," +
-        //                     QString::number(vision_param.intrinsics[i].row(2)(1), 'f', 15) + "," +
-        //                     QString::number(vision_param.intrinsics[i].row(2)(2), 'f', 15));
+        save_vision->setValue(QString("I" + QString::number(i)),
+                            QString::number(vision_param.I[i].row(0)(0), 'f', 15) + "," +
+                            QString::number(vision_param.I[i].row(0)(1), 'f', 15) + "," +
+                            QString::number(vision_param.I[i].row(0)(2), 'f', 15) + ";" +
+                            QString::number(vision_param.I[i].row(1)(0), 'f', 15) + "," +
+                            QString::number(vision_param.I[i].row(1)(1), 'f', 15) + "," +
+                            QString::number(vision_param.I[i].row(1)(2), 'f', 15) + ";" +
+                            QString::number(vision_param.I[i].row(2)(0), 'f', 15) + "," +
+                            QString::number(vision_param.I[i].row(2)(1), 'f', 15) + "," +
+                            QString::number(vision_param.I[i].row(2)(2), 'f', 15));
 
-        // save_vision->setValue(QString("K" + QString::number(i)),
-        //                         QString::number(vision_param.distortion_coeffs[i].row(0)(0), 'f', 15) + "," +
-        //                         QString::number(vision_param.distortion_coeffs[i].row(0)(1), 'f', 15) + "," +
-        //                         QString::number(vision_param.distortion_coeffs[i].row(0)(2), 'f', 15) + "," +
-        //                         QString::number(vision_param.distortion_coeffs[i].row(0)(3), 'f', 15) + "," +
-        //                         QString::number(vision_param.distortion_coeffs[i].row(0)(4), 'f', 15));
+        save_vision->setValue(QString("K" + QString::number(i)),
+                                QString::number(vision_param.K[i].row(0)(0), 'f', 15) + "," +
+                                QString::number(vision_param.K[i].row(0)(1), 'f', 15) + "," +
+                                QString::number(vision_param.K[i].row(0)(2), 'f', 15) + "," +
+                                QString::number(vision_param.K[i].row(0)(3), 'f', 15) + "," +
+                                QString::number(vision_param.K[i].row(0)(4), 'f', 15));
 
         save_vision->setValue(QString("P" + QString::number(i)),
                               QString::number(vision_param.P[i].row(0)(0), 'f', 15) + "," +
@@ -333,12 +334,25 @@ bool Setting::saveVisionParam(QString path)
                               QString::number(vision_param.T[i].row(0)(0), 'f', 15) + ";" +
                                   QString::number(vision_param.T[i].row(1)(0), 'f', 15) + ";" +
                                   QString::number(vision_param.T[i].row(2)(0), 'f', 15));
+
+        save_vision->setValue(QString("ERR" + QString::number(i)),
+                              QString::number(vision_param.ERR[i], 'f', 15));
+
+        vision_param.cameraMatrix[i] = cv::Mat::zeros(3, 3, CV_64F);
+        vision_param.distCoeffs[i] = cv::Mat::zeros(3, 3, CV_64F);
+        cv::eigen2cv(vision_param.I[i], vision_param.cameraMatrix[i]);
+        cv::eigen2cv(vision_param.K[i], vision_param.distCoeffs[i]);
+        
         // sprintf(buffer, "%lf,%lf,%lf,%lf;%lf,%lf,%lf,%lf;%lf,%lf,%lf,%lf",
         //          &p11, &p12, &p13, &p14,
         //          &p21, &p22, &p23, &p24,
         //          &p31, &p32, &p33, &p34);
     }
-
+    for (int i = 0; i < vision_param.CamNum-1; i++)
+    {
+        save_vision->setValue(QString("RMS" + QString::number(i) + "TO" + QString::number(i+1)),
+                              QString::number(vision_param.RMS[i], 'f', 15));
+    }
     saveGNDVisionParam(save_vision);
 }
 
@@ -354,32 +368,32 @@ bool Setting::loadVisionParam(QString path)
 
     for (int i = 0; i < vision_param.CamNum; i++)
     {
-        // QString I = set_vision->value(QString("I" + QString::number(i))).toString();
-        // sscanf_s(I.toStdString().data(), "%lf,%lf,%lf;%lf,%lf,%lf;%lf,%lf,%lf",
-        //          &p11, &p12, &p13,
-        //          &p21, &p22, &p23,
-        //          &p31, &p32, &p33);
-        // vision_param.intrinsics[i] << p11, p12, p13, p21, p22, p23, p31, p32, p33;
-        // std::cout << "I" << i << ":\n"
-        //           << vision_param.intrinsics[i] << std::endl;
+        QString I = set_vision->value(QString("I" + QString::number(i))).toString();
+        sscanf_s(I.toStdString().data(), "%lf,%lf,%lf;%lf,%lf,%lf;%lf,%lf,%lf",
+                 &p11, &p12, &p13,
+                 &p21, &p22, &p23,
+                 &p31, &p32, &p33);
+        vision_param.I[i] << p11, p12, p13, p21, p22, p23, p31, p32, p33;
+        std::cout << "I" << i << ":\n"
+                  << vision_param.I[i] << std::endl;
 
-        // QString K = set_vision->value(QString("K" + QString::number(i))).toString();
-        // sscanf_s(K.toStdString().data(), "%lf,%lf,%lf,%lf,%lf",
-        //          &p11, &p12, &p13, &p14, &p15);
-        // vision_param.distortion_coeffs[i] << p11, p12, p13, p14, p15;
-        // std::cout << "K" << i << ":\n"
-        //           << vision_param.distortion_coeffs[i] << std::endl;
+        QString K = set_vision->value(QString("K" + QString::number(i))).toString();
+        sscanf_s(K.toStdString().data(), "%lf,%lf,%lf,%lf,%lf",
+                 &p11, &p12, &p13, &p14, &p15);
+        vision_param.K[i] << p11, p12, p13, p14, p15;
+        std::cout << "K" << i << ":\n"
+                  << vision_param.K[i] << std::endl;
 
-        cv::Mat cameraMatrix = cv::Mat::zeros(3, 3, CV_64F);
-        cv::Mat distCoeffs = cv::Mat::zeros(1, 5, CV_64F);
-        cv::eigen2cv(vision_param.intrinsics[i], cameraMatrix);
-        cv::eigen2cv(vision_param.distortion_coeffs[i], distCoeffs);
+        vision_param.cameraMatrix[i] = cv::Mat::zeros(3, 3, CV_64F);
+        vision_param.distCoeffs[i] = cv::Mat::zeros(3, 3, CV_64F);
+        cv::eigen2cv(vision_param.I[i], vision_param.cameraMatrix[i]);
+        cv::eigen2cv(vision_param.K[i], vision_param.distCoeffs[i]);
 
         std::cout << "I" << i << ":\n"
-                  << cameraMatrix << std::endl;
+                  << vision_param.cameraMatrix[i] << std::endl;
 
         std::cout << "K" << i << ":\n"
-                  << distCoeffs << std::endl;
+                  << vision_param.distCoeffs[i] << std::endl;
 
         vision_param.P[i] << p11, p12, p13, p14, p21, p22, p23, p24, p31, p32, p33, p34;
 
@@ -392,8 +406,8 @@ bool Setting::loadVisionParam(QString path)
                  &p31, &p32, &p33, &p34);
 
         vision_param.P[i] << p11, p12, p13, p14, p21, p22, p23, p24, p31, p32, p33, p34;
-        std::cout << "P" << i << ":\n"
-                  << vision_param.P[i] << std::endl;
+        // std::cout << "P" << i << ":\n"
+        //           << vision_param.P[i] << std::endl;
 
         QString R = set_vision->value(QString("R" + QString::number(i))).toString();
         //mlog->show(R);
@@ -404,8 +418,8 @@ bool Setting::loadVisionParam(QString path)
         Matrix33d R_;
         R_ << p11, p12, p13, p21, p22, p23, p31, p32, p33;
         vision_param.R[i] = R_;
-        std::cout << "R" << i << ":\n"
-                  << vision_param.R[i] << std::endl;
+        // std::cout << "R" << i << ":\n"
+        //           << vision_param.R[i] << std::endl;
 
         QString T = set_vision->value(QString("T" + QString::number(i))).toString();
         //mlog->show(T);
@@ -414,8 +428,8 @@ bool Setting::loadVisionParam(QString path)
         RowVector3d T_;
         T_ << p11, p12, p13;
         vision_param.T[i] = T_;
-        std::cout << "T" << i << ":\n"
-                  << vision_param.T[i] << std::endl;
+        // std::cout << "T" << i << ":\n"
+        //           << vision_param.T[i] << std::endl;
     }
 
     QString RGND = set_vision->value("RGND").toString();

@@ -134,6 +134,7 @@ void Calibration::calibrStart(QString path)
     Mat img;
     Matrix43d PSTMP;
     Matrix43d RTS43d;
+    double calibrateCameraError[setting->camNumber];
 
     vector<QMap<uint8_t, vector<Point2f>>> camcorners;
 
@@ -225,14 +226,16 @@ void Calibration::calibrStart(QString path)
         Matrix33d cami;
         Matrix<double, 1, 5> camk;
 
-        double err = calibrateCamera(objRealPoint, corners, imageSize, intrinsic, distortion_coeff, rvecs, tvecs);
+        msg("calibrate camera" + QString::number(i) + " start..");
+
+        calibrateCameraError[i] = calibrateCamera(objRealPoint, corners, imageSize, intrinsic, distortion_coeff, rvecs, tvecs);
 
         cv2eigen(intrinsic, cami);
         cv2eigen(distortion_coeff, camk);
         //msg("corners size" + QString::number(i) + ": \r\n" + QString::number(corners.size()));
         msg("intrinsic" + QString::number(i) + ": \r\n" + EasyTool::MatToString(cami));
         msg("distortion_coeff" + QString::number(i) + ": \r\n" + EasyTool::MatToString(camk));
-        msg("cailbr : camera" + QString::number(i) + " error : " + QString::number(err));
+        msg("cailbr : camera" + QString::number(i) + " error : " + QString::number(calibrateCameraError[i]));
 
         intrinsics.push_back(intrinsic);
         distortion_coeffs.push_back(distortion_coeff);
@@ -252,7 +255,7 @@ void Calibration::calibrStart(QString path)
             }
         }
 
-        msg("cailbr : camera" + QString::number(0) + " to camera" + QString::number(i + 1) + " start");
+        msg("cailbr : camera" + QString::number(0) + " to camera" + QString::number(i + 1) + " start..");
         goodFrameCount = cornersL.size();
 
         /*计算实际的校正点的三维坐标*/
@@ -326,7 +329,12 @@ void Calibration::calibrStart(QString path)
             vision_param.R[i] << RS[i];
             vision_param.T[i] << TS[i];
             vision_param.P[i] << PS[i];
-
+            vision_param.ERR[i] = calibrateCameraError[i];
+            cv2eigen(intrinsics.at(i), vision_param.I[i]);
+            cv2eigen(distortion_coeffs.at(i), vision_param.K[i]);
+            
+            msg("I" + QString::number(i) + ": \r\n" + EasyTool::MatToString(vision_param.I[i]));
+            msg("K" + QString::number(i) + ": \r\n" + EasyTool::MatToString(vision_param.K[i]));
             msg("P" + QString::number(i) + ": \r\n" + EasyTool::MatToString(vision_param.P[i]));
             msg("R" + QString::number(i) + ": \r\n" + EasyTool::MatToString(vision_param.R[i]));
             msg("T" + QString::number(i) + ": \r\n" + EasyTool::MatToString(vision_param.T[i]));
@@ -339,7 +347,12 @@ void Calibration::calibrStart(QString path)
         vision_param.R[i + 1] << RS[i + 1];
         vision_param.T[i + 1] << TS[i + 1];
         vision_param.P[i + 1] << PS[i + 1];
+        vision_param.ERR[i + 1] = calibrateCameraError[i + 1];
+        cv2eigen(intrinsics.at(i + 1), vision_param.I[i + 1]);
+        cv2eigen(distortion_coeffs.at(i + 1), vision_param.K[i + 1]);
 
+        msg("I" + QString::number(i + 1) + ": \r\n" + EasyTool::MatToString(vision_param.I[i + 1]));
+        msg("K" + QString::number(i + 1) + ": \r\n" + EasyTool::MatToString(vision_param.K[i + 1]));
         msg("P" + QString::number(i + 1) + ": \r\n" + EasyTool::MatToString(vision_param.P[i + 1]));
         msg("R" + QString::number(i + 1) + ": \r\n" + EasyTool::MatToString(vision_param.R[i + 1]));
         msg("T" + QString::number(i + 1) + ": \r\n" + EasyTool::MatToString(vision_param.T[i + 1]));
@@ -347,6 +360,8 @@ void Calibration::calibrStart(QString path)
         // cout << std::setprecision(16) << "P" << i + 1 << ": " << vision_param.P[i + 1] << endl;
         // cout << std::setprecision(16) << "R" << i + 1 << ": " << vision_param.R[i + 1] << endl;
         // cout << std::setprecision(16) << "T" << i + 1 << ": " << vision_param.T[i + 1] << endl;
+
+        vision_param.RMS[i] = vrms.at(i);
 
         msg("take time " + QString::number(time.elapsed() / 1000.0) + "s");
         msg("Stereo Calibration done with RMS error = " + QString::number(rms, 'f', 6));

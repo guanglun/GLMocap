@@ -722,8 +722,6 @@ int VisionProcess::onMatching(void)
     Vector3d Xr[map.rows()];
     vector<double> rerrSort;
 
-    
-
     for (int i = 0; i < map.rows(); i++)
     {
         for (int cm = 0; cm < camNum; cm++)
@@ -761,10 +759,14 @@ int VisionProcess::onMatching(void)
     sort(rerrSort.begin(), rerrSort.end());
 
     //for debug
-    // for (int pm; pm < pointNum+4; pm++)
-    // {
-    //     DBG("sort index pm : %d \t%f", getIndex(rerr, map.rows(), rerrSort[pm]),rerrSort[pm]);
-    // }
+    for (int pm; pm < pointNum; pm++)
+    {
+        DBG("sort index pm : %d \t%f", getIndex(rerr, map.rows(), rerrSort[pm]),rerrSort[pm]);
+    }
+    for (int pm = pointNum; pm < pointNum + 4; pm++)
+    {
+        DBG("sort error index pm : %d \t%f", getIndex(rerr, map.rows(), rerrSort[pm]),rerrSort[pm]);
+    }
 
     for (int pm; pm < pointNum; pm++)
     {
@@ -794,10 +796,8 @@ int VisionProcess::onMatching(void)
         {
             putText(sourceImg, std::to_string(i) + " : " +std::to_string(rerrSort[i]), cv::Point(10, 20*(i+1)), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 0), 1);
         }
-        //cv::cvtColor(sourceImg, sourceImg, cv::COLOR_BGR2RGB);
-
-        cv::namedWindow("camera"+std::to_string(cm),cv::WINDOW_NORMAL);
-        cv::imshow("camera"+std::to_string(cm), sourceImg);
+        // cv::namedWindow("camera"+std::to_string(cm),cv::WINDOW_NORMAL);
+        // cv::imshow("camera"+std::to_string(cm), sourceImg);
     }
 
     // double d1 = multipleViewTriangulation.distance3d(

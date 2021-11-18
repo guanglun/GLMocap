@@ -43,13 +43,19 @@ struct VISION_PARAM
 {
     int CamNum;
     int ptNum;
+
+    double RMS[CAM_NUM_MAX];
+    double ERR[CAM_NUM_MAX];
     Matrix34d P[CAM_NUM_MAX];
     Matrix33d R[CAM_NUM_MAX];
     Vector3d T[CAM_NUM_MAX];
+    Matrix33d I[CAM_NUM_MAX];
+    Matrix<double, 1, 5>K[CAM_NUM_MAX];
+
+    cv::Mat cameraMatrix[CAM_NUM_MAX];
+    cv::Mat distCoeffs[CAM_NUM_MAX];
+
     MatrixXd xy[PT_NUM_MAX];
-    Matrix33d intrinsics[PT_NUM_MAX];
-    Matrix<double, 1, 5>distortion_coeffs[PT_NUM_MAX];
-    
 
     Matrix44d RTGNDINV;
     Matrix44d RTGND;
@@ -57,9 +63,7 @@ struct VISION_PARAM
     Vector3d  TGND;
 
     Vector3d eulerAngles;
-    // Matrix<double, PT_NUM_MAX, CAM_NUM_MAX> idx;
     MatrixXi idx;
-    // Vector3d    Xr[PT_NUM_MAX];
 };
 
 extern struct VISION_PARAM vision_param;
