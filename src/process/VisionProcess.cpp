@@ -654,12 +654,12 @@ void VisionProcess::positionSlot(CAMERA_RESULT result)
                 }
                 else
                 {
-                    onMatching();
+                    //onMatching();
                 }
             }
             else
             {
-                onMatching();
+                //onMatching();
             }
         }
     }

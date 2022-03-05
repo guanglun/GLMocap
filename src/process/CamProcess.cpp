@@ -21,9 +21,9 @@ double distance(Point2f p1, Point2f p2)
 
 void CamProcess::match(vector<Point2f> centers)
 {
-    //if (vio->visionProcess->matchState == MATCH_START)
-    if (vio->visionProcess->matchState == MATCH_START ||
-        vio->visionProcess->matchState == MATCH_IDLE)
+    if (vio->visionProcess->matchState == MATCH_START)
+    // if (vio->visionProcess->matchState == MATCH_START ||
+    //     vio->visionProcess->matchState == MATCH_IDLE)
     {
         vPoint.clear();
         for (int i = 0; i < centers.size(); i++)
@@ -215,7 +215,7 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
 
     Mat image, sourceImg, undistortImg;
 
-    undistortImg = cv::Mat(qImage.height(), qImage.width(), CV_8UC1, qImage.bits());
+    sourceImg = cv::Mat(qImage.height(), qImage.width(), CV_8UC1, qImage.bits());
     // sourceImg = cv::Mat(qImage.height(), qImage.width(), CV_8UC1, qImage.bits());
     // undistort(sourceImg,                              //输入原图
     //           undistortImg,                           //输出矫正后的图像
@@ -232,17 +232,17 @@ void CamProcess::cvProcess(QImage qImage, QDateTime time)
     //     cv::imshow("undistort"+std::to_string(vio->number), undistortImg);
     // }
 
-    threshold(undistortImg, image, setting->threshold, 255.0, THRESH_BINARY);
+    threshold(sourceImg, image, setting->threshold, 255.0, THRESH_BINARY);
 
     vector<Point2f> points;
 
-    searchMarks(image, points);
+    searchMarks2(image, points);
 
     result.camIndex = vio->number;
     result.pointNum = (int)0;
     result.time = time.toMSecsSinceEpoch();
     result.path = vio->saveImagePath;
-    result.image = undistortImg.clone();
+    result.image = sourceImg.clone();
     result.hPoint = hPoint;
     result.pointNum = points.size();
 
