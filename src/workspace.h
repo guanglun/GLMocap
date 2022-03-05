@@ -7,6 +7,12 @@
 #include "log.h"
 #include "EasyTool.h"
 
+
+
+//#define __ENABLE_3D__
+
+
+
 #ifdef MSVC
     #define QLOG(fmt,...) do{\
         char temp[4096];\

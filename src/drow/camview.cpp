@@ -13,7 +13,9 @@
 using namespace Eigen;
 
 CamView::CamView(QWidget *parent) : QOpenGLWidget(parent),
+#ifdef __ENABLE_3D__
                                     m_model(0),
+#endif                                    
                                     m_camera(20.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
                                     m_program(0)
 {
@@ -22,8 +24,9 @@ CamView::CamView(QWidget *parent) : QOpenGLWidget(parent),
 CamView::~CamView()
 {
     makeCurrent();
-
+#ifdef __ENABLE_3D__
     delete m_model;
+#endif    
     delete m_program;
 
     doneCurrent();
@@ -53,6 +56,7 @@ void CamView::initializeGL()
 
 void CamView::loadModel(QString filename)
 {
+#ifdef __ENABLE_3D__    
     makeCurrent();
     if (m_model != 0)
     {
@@ -60,6 +64,7 @@ void CamView::loadModel(QString filename)
     }
     m_model = new Model(filename, this);
     doneCurrent();
+#endif    
 }
 
 void CamView::updateGL()
@@ -99,11 +104,12 @@ void CamView::paintGL()
         m_program->setUniformValue("view", view);
         m_program->setUniformValue("model", m_modelMat);
         m_program->setUniformValue("projection", m_projectionMat);
-
+#ifdef __ENABLE_3D__
         if (m_model != 0)
         {
             m_model->draw(this);
         }
+#endif        
         m_program->release();
         glPopMatrix();
     }

@@ -9,7 +9,10 @@
 #include <QWheelEvent>
 #include <QMouseEvent>
 
+#ifdef __ENABLE_3D__
 #include "model.h"
+#endif
+
 #include "camera.h"
 
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions {
@@ -34,7 +37,9 @@ protected:
     void mouseReleaseEvent(QMouseEvent* event);
 
 private:
+#ifdef __ENABLE_3D__
     Model* m_model;
+#endif    
     QMatrix4x4 m_modelMat;
     QMatrix4x4 m_projectionMat;
 

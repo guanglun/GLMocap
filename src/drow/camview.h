@@ -16,7 +16,10 @@
 #include "MultipleViewTriangulation.h"
 #include "PlanPoint.h"
 
+#ifdef __ENABLE_3D__
 #include "model.h"
+#endif
+
 #include "camera.h"
 
 class CamView : public QOpenGLWidget ,
@@ -25,8 +28,9 @@ class CamView : public QOpenGLWidget ,
     Q_OBJECT
 
 public:
-
+#ifdef __ENABLE_3D__
     Model* m_model;
+#endif    
     QMatrix4x4 m_modelMat;
     QMatrix4x4 m_projectionMat;
     Camera m_camera;

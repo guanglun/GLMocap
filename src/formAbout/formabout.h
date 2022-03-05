@@ -21,6 +21,8 @@ public:
     explicit FormAbout(QWidget *parent = 0);
     ~FormAbout();
 
+private slots:
+    void on_pb_openlink_clicked();
 
 };
 

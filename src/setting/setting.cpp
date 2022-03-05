@@ -9,18 +9,69 @@ Setting::Setting()
     QApplication::setOrganizationDomain("openvio.com");
     QApplication::setApplicationName("openvio");
 
-    QString setFile = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/.settings.ini";
+    QString setFile = QCoreApplication::applicationDirPath() + "/settings.ini";
     qDebug() << "configure file path:" << setFile;
     set = new QSettings(setFile, QSettings::IniFormat);
 
     set->beginGroup("openvio");
-    QString thr = set->value(VISION_THRESHOLD.SET_NAME).toString();
-    if (thr.isEmpty())
+    QString var = set->value(VISION_THRESHOLD.SET_NAME).toString();
+    if (var.isEmpty())
     {
         set->setValue(VISION_THRESHOLD.SET_NAME, VISION_THRESHOLD.DEFAULT_VALUE);
         threshold = VISION_THRESHOLD.DEFAULT_VALUE.toInt();
     }
+    var = set->value("VISION_PARAM_PATH").toString();
+    if (var.isEmpty())
+    {
+        set->setValue("VISION_PARAM_PATH", 
+        QCoreApplication::applicationDirPath() + "/vision.ini");
+    }
+
+    var = set->value("VISION_SAVE_PARAM_PATH").toString();
+    if (var.isEmpty())
+    {
+        set->setValue("VISION_SAVE_PARAM_PATH", 
+        QCoreApplication::applicationDirPath() + "/vision.ini");
+    }
+
+    var = set->value("FIRMWARE_PATH").toString();
+    if (var.isEmpty())
+    {
+        set->setValue("FIRMWARE_PATH", 
+        QCoreApplication::applicationDirPath() + "/vision.ini");
+    }
+
+    var = set->value("FIRMWARE_PATH").toString();
+    if (var.isEmpty())
+    {
+        set->setValue("FIRMWARE_PATH", 
+        QCoreApplication::applicationDirPath() + "/vision.ini");
+    }
+
+    var = set->value("NUMBER_CAMS").toString();
+    if (var.isEmpty())
+    {
+        set->setValue("NUMBER_CAMS","4");
+    }   
+
+    var = set->value("IMAGE_PATH").toString();
+    if (var.isEmpty())
+    {
+        set->setValue("IMAGE_PATH", 
+        QCoreApplication::applicationDirPath());
+    }
+
+    var = set->value("CALIBR_PATH").toString();
+    if (var.isEmpty())
+    {
+        set->setValue("CALIBR_PATH", 
+        QCoreApplication::applicationDirPath());
+    }    
     set->endGroup();
+
+
+
+
 
     getCamNumber();
     getThreshold();

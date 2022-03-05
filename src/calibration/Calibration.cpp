@@ -148,7 +148,7 @@ void Calibration::calibrStart(QString path)
     QStringList files = checkFile(path);
     if (files.size() == 0)
     {
-        return;
+        goto exit;
     }
 
     for (int i = 0; i < setting->camNumber; i++)
@@ -372,6 +372,7 @@ void Calibration::calibrStart(QString path)
         msg(QString::number(0) + " to " + QString::number(i + 1) + " rms error = " + QString::number(vrms.at(i), 'f', 6));
     }
 
+exit:
     msg("Calibration Exit");
 }
 

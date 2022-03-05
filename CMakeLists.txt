@@ -2,6 +2,15 @@ cmake_minimum_required(VERSION 3.5)
 
 project(GLMocap LANGUAGES C CXX)
 
+#set version
+add_definitions(-DVERSION="0.2.0")
+
+set(__ENABLE_3D__ OFF)
+#enable 3d module
+if(__ENABLE_3D__)
+add_definitions(-D__ENABLE_3D__)
+endif()
+
 find_package(Qt5 COMPONENTS Core Widgets Gui OpenGL Network REQUIRED)
 find_package(OpenCV 4.5.3 REQUIRED)
 find_package(OpenGL REQUIRED)
@@ -37,9 +46,16 @@ QT5_WRAP_UI( UI_HEADERS
 
 set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/resource/image/logo.rc")
 
+if(__ENABLE_3D__)
+set(srcs
+    src/drow/model.cpp
+    src/drow/mesh.cpp
+)
+endif()
 add_executable(GLMocap 
     # WIN32
     ${UI_HEADERS}
+    ${srcs}
     src/resource.qrc
     
     src/formCameraConfig/formcamconfig.cpp
@@ -95,8 +111,7 @@ add_executable(GLMocap
 
     src/px4/PX4Thread/PX4Thread.cpp
 
-    src/drow/model.cpp
-    src/drow/mesh.cpp
+
     src/drow/glwidget.cpp
     src/drow/camera.cpp
     src/process/CalibrProcess.cpp
@@ -105,10 +120,18 @@ add_executable(GLMocap
     src/formVirtual/formvirtual.cpp
     src/formCalibrWindow/formcalibrwindow.cpp
 
+    
     ${APP_ICON_RESOURCE_WINDOWS}
 )
 
+if(__ENABLE_3D__)
+set(incs
+    lib/assimp/include
+)
+endif()
+   
 include_directories(
+                    ${incs}
                     src
                     src/winusb
                     src/imu
@@ -144,9 +167,10 @@ include_directories(
                     src/formCalibrWindow
                     lib/eigen-3.2.10
                     lib/libusb/include/libusb-1.0
-                    lib/assimp/include
-                    ${OpenCV_INCLUDE_DIRS}
+                    ${OpenCV_INCLUDE_DIRS}              
 )
+
+
 
 link_directories(
                     lib/eigen-3.2.10
@@ -156,7 +180,15 @@ if (MSVC)
     set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO /NODEFAULTLIB:${CMAKE_SOURCE_DIR}/lib/usb/libusb-1.0.lib")
 endif()           
 
+if(__ENABLE_3D__)
+set(libs
+    ${CMAKE_SOURCE_DIR}/lib/assimp/lib/libIrrXML.a
+    ${CMAKE_SOURCE_DIR}/lib/assimp/lib/libassimp.dll.a
+)
+endif()
+
 target_link_libraries(GLMocap 
+                        ${libs}
                         Qt5::Widgets
                         Qt5::Core
                         Qt5::Gui
@@ -164,9 +196,9 @@ target_link_libraries(GLMocap
                         Qt5::OpenGL
                         ${OPENGL_LIBRARIES}
                         ${CMAKE_SOURCE_DIR}/lib/libusb/MinGW64/dll/libusb-1.0.dll.a
-                        ${CMAKE_SOURCE_DIR}/lib/assimp/lib/libIrrXML.a
-                        ${CMAKE_SOURCE_DIR}/lib/assimp/lib/libassimp.dll.a
                         ${OpenCV_LIBS}
 )
+
+
 
 
