@@ -57,15 +57,22 @@ void FormVirtual::on_pb_load_image_path_clicked()
 void FormVirtual::init(QString srcDirPath)
 {
     imageDirPath = srcDirPath;
+    // mlog->show("virtual image path: " + imageDirPath);
     files = checkFile(imageDirPath,&camVirtualNumber);
-    initVirtualCamera();
-    index = setting->getVirtualIndex();
-    if(index >= files.size())
-        index = 0;
+    if(!files.isEmpty())
+    {
+        initVirtualCamera();
+        index = setting->getVirtualIndex();
+        if(index >= files.size())
+            index = 0;
 
-    ui->lb_now->setText(files.at(index));
-    ui->lb_index->setText(QString::number(index + 1)+"/"+QString::number(files.size()));
-    ui->lb_cam_number->setText(QString::number(camVirtualNumber));
+        ui->lb_now->setText(files.at(index));
+        ui->lb_index->setText(QString::number(index + 1)+"/"+QString::number(files.size()));
+        ui->lb_cam_number->setText(QString::number(camVirtualNumber));            
+    }
+
+
+
 }
 
 void FormVirtual::initVirtualCamera()
@@ -152,6 +159,7 @@ QStringList FormVirtual::checkFile(QString path,int *num)
     if (camFiles.size() < 1)
     {
         mlog->show("virtual check camera number error,files.size < 1,exit");
+        return files;
     }
     else
     {
